@@ -21,10 +21,7 @@ export default async function handler(req, res) {
 
     if (settingKey) {
       const sb = getSupabase();
-      // ใช้ SQL ตรงๆ แบบเดียวกับที่ทดสอบแล้วได้ผล
-      await sb.rpc('exec_sql', {
-        sql: `UPDATE settings SET value = value || '{"${settingKey}":"${url}"}'::jsonb WHERE key = 'site'`
-      });
+      await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
     }
 
     res.json({ ok: true, url });
