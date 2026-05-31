@@ -1,4 +1,4 @@
-import { getSupabase, cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
+import { cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
 import { uploadToCloudinary, uploadAudioToCloudinary } from '../../lib/cloudinary.js';
 
 export default async function handler(req, res) {
@@ -19,21 +19,14 @@ export default async function handler(req, res) {
       url = await uploadToCloudinary(data, publicId);
     }
 
+    // บันทึก URL ผ่าน admin/settings โดยตรง
     if (settingKey) {
-      const sb = getSupabase();
-      const { data: existing } = await sb
-        .from('settings')
-        .select('value')
-        .eq('key', 'site')
-        .single();
-
-      const current = existing?.value || {};
-      const updated = { ...current, [settingKey]: url };
-
-      await sb
-        .from('settings')
-        .update({ value: updated })
-        .eq('key', 'site');
+      const origin = `https://${req.headers.host}`;
+      await fetch(`${origin}/api/admin/settings`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password, [settingKey]: url })
+      });
     }
 
     res.json({ ok: true, url });
