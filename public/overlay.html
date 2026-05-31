@@ -13,9 +13,6 @@
     overflow:hidden;position:relative;
   }
 
-  /* ══════════════════════════════════════════════════
-     ALERT CARD
-  ══════════════════════════════════════════════════ */
   .alert{
     position:absolute;
     min-width:360px;max-width:500px;
@@ -32,15 +29,13 @@
     transition:opacity 0.4s ease;
   }
 
-  /* Positions */
   .alert.pos-bottom-left   { bottom:48px;left:48px; }
   .alert.pos-bottom-right  { bottom:48px;right:48px; }
   .alert.pos-top-left      { top:48px;left:48px; }
   .alert.pos-top-right     { top:48px;right:48px; }
-  .alert.pos-center        { bottom:48px;left:50%;transform:translateX(-50%); }
-  .alert.pos-center.show   { transform:translateX(-50%) !important; }
+  .alert.pos-center        { top:50%;left:50%;transform:translate(-50%,-50%) scale(0.92);min-width:600px;max-width:800px; }
+  .alert.pos-center.show   { transform:translate(-50%,-50%) scale(1) !important; }
 
-  /* Entrance animations by position */
   .alert.pos-bottom-left,
   .alert.pos-bottom-right  { transform:translateY(80px) scale(0.92); }
   .alert.pos-top-left,
@@ -48,9 +43,10 @@
   .alert:not(.pos-center)  { transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1),opacity 0.4s ease; }
 
   .alert.show { opacity:1; transform:translateY(0) scale(1) !important; }
-  .alert.hide { opacity:0 !important; transform:translateY(40px) scale(0.96) !important; transition:transform 0.4s ease,opacity 0.35s ease !important; }
+  .alert.pos-center.show { opacity:1; transform:translate(-50%,-50%) scale(1) !important; }
+  .alert.pos-center.hide { opacity:0 !important; transform:translate(-50%,-50%) scale(0.96) !important; transition:transform 0.4s ease,opacity 0.35s ease !important; }
+  .alert:not(.pos-center).hide { opacity:0 !important; transform:translateY(40px) scale(0.96) !important; transition:transform 0.4s ease,opacity 0.35s ease !important; }
 
-  /* Top gradient bar */
   .bar{
     height:3px;
     background:linear-gradient(90deg,var(--accent),var(--accent2),#a0e8c0,var(--accent));
@@ -61,7 +57,6 @@
 
   .alert-inner{padding:18px 22px 20px;display:flex;gap:14px;align-items:flex-start}
 
-  /* Optional image/gif */
   .alert-img{
     width:56px;height:56px;border-radius:12px;
     object-fit:cover;flex-shrink:0;
@@ -105,7 +100,6 @@
     display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
   }
 
-  /* Glow ring when high amount */
   .alert.glow-effect{
     box-shadow:
       0 32px 80px rgba(0,0,0,0.7),
@@ -119,7 +113,6 @@
     50%{box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 2px rgba(232,164,200,0.8),0 0 60px rgba(232,164,200,0.4),0 0 120px rgba(232,164,200,0.2)}
   }
 
-  /* Name glow for big donations */
   .donor-name.name-glow{
     color:var(--accent);
     text-shadow:0 0 20px color-mix(in srgb,var(--accent) 80%,transparent),
@@ -131,7 +124,6 @@
     to{text-shadow:0 0 25px color-mix(in srgb,var(--accent) 90%,transparent),0 0 55px color-mix(in srgb,var(--accent) 50%,transparent),0 0 80px color-mix(in srgb,var(--accent) 20%,transparent)}
   }
 
-  /* Shimmer overlay on card */
   .shimmer{
     position:absolute;inset:0;pointer-events:none;border-radius:22px;overflow:hidden;
   }
@@ -143,7 +135,6 @@
   }
   @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
 
-  /* Queue indicator */
   .queue-badge{
     position:absolute;top:14px;right:14px;
     font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;
@@ -155,9 +146,6 @@
   }
   .queue-badge.show{display:block}
 
-  /* ══════════════════════════════════════════════════
-     FALLING ROSES / PETALS
-  ══════════════════════════════════════════════════ */
   #particles{
     position:fixed;inset:0;
     pointer-events:none;overflow:hidden;
@@ -176,9 +164,6 @@
     100%{opacity:0;transform:translateY(1200px) rotate(720deg) scale(1.1)}
   }
 
-  /* ══════════════════════════════════════════════════
-     TEST BUTTON (hidden in OBS)
-  ══════════════════════════════════════════════════ */
   #testBtn{
     position:fixed;bottom:12px;right:12px;
     padding:6px 14px;border:1px solid rgba(232,164,200,0.3);
@@ -216,12 +201,9 @@
 <audio id="sfxMin" preload="auto"></audio>
 
 <script>
-// ══════════════════════════════════════════════════
-//  CONFIG & STATE
-// ══════════════════════════════════════════════════
 const SUPABASE_URL = document.currentScript?.dataset?.supabaseUrl
   || window.__SUPABASE_URL__
-  || '%%SUPABASE_URL%%';  // will be replaced by env or set manually
+  || '%%SUPABASE_URL%%';
 
 const SUPABASE_ANON = document.currentScript?.dataset?.supabaseAnon
   || window.__SUPABASE_ANON__
@@ -247,9 +229,6 @@ let queue = [];
 let showing = false;
 let supabaseChannel = null;
 
-// ══════════════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════════════
 async function init() {
   await loadSettings();
   connectRealtime();
@@ -270,12 +249,10 @@ function applySettings(s) {
   document.documentElement.style.setProperty('--accent', accent);
   document.documentElement.style.setProperty('--accent2', accent + 'cc');
 
-  // Update position class
   const alert = document.getElementById('alert');
   alert.className = alert.className.replace(/pos-\S+/g, '').trim();
   alert.classList.add('pos-' + (settings.overlayPosition || 'bottom-left'));
 
-  // Sound sources
   if (settings.overlayAlertSoundUrl) {
     document.getElementById('sfxAlert').src = settings.overlayAlertSoundUrl;
   }
@@ -283,7 +260,6 @@ function applySettings(s) {
     document.getElementById('sfxMin').src = settings.overlayMinSoundUrl;
   }
 
-  // Alert image
   const img = document.getElementById('alertImg');
   if (settings.overlayImageUrl) {
     img.src = settings.overlayImageUrl;
@@ -293,16 +269,12 @@ function applySettings(s) {
   }
 }
 
-// ══════════════════════════════════════════════════
-//  REALTIME (Supabase Broadcast Channel)
-// ══════════════════════════════════════════════════
 function connectRealtime() {
   if (!SUPABASE_URL || SUPABASE_URL.includes('%%')) {
     console.warn('[overlay] Supabase URL not set — realtime disabled');
     return;
   }
 
-  // Dynamic import Supabase JS from CDN
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
   script.onload = () => {
@@ -325,9 +297,6 @@ function connectRealtime() {
   document.head.appendChild(script);
 }
 
-// ══════════════════════════════════════════════════
-//  QUEUE
-// ══════════════════════════════════════════════════
 function processQueue() {
   if (queue.length === 0) { showing = false; updateQueueBadge(); return; }
   showing = true;
@@ -345,47 +314,34 @@ function updateQueueBadge() {
   }
 }
 
-// ══════════════════════════════════════════════════
-//  SHOW DONATION
-// ══════════════════════════════════════════════════
 function showDonation({ name, message, amount }) {
   const alert = document.getElementById('alert');
   const isMin = Number(amount) >= Number(settings.overlayMinAmount);
 
-  // Update text
   document.getElementById('donorName').textContent = name;
   document.getElementById('donorAmount').textContent = '฿' + Number(amount).toLocaleString();
   document.getElementById('donorMsg').textContent = message || settings.thankyou || '';
+  document.getElementById('alertBadge').textContent = isMin ? '✦ DONATE' : 'DONATE';
 
-  // Badge label
-  document.getElementById('alertBadge').textContent =
-    isMin ? '✦ DONATE' : 'DONATE';
-
-  // Glow + name glow effects
   const nameEl = document.getElementById('donorName');
   const shouldGlow = isMin && (settings.overlayEffect === 'glow' || settings.overlayEffect === 'both');
   alert.classList.toggle('glow-effect', shouldGlow);
   nameEl.classList.toggle('name-glow', shouldGlow);
 
-  // Show card
   alert.classList.remove('hide');
   void alert.offsetWidth;
   alert.classList.add('show');
 
-  // Sound
   playSound(isMin);
 
-  // TTS (only if >= minAmount)
   if (isMin && settings.ttsEnabled) {
     setTimeout(() => speakTTS(name, message, amount), 800);
   }
 
-  // Particles
   if (isMin && (settings.overlayEffect === 'roses' || settings.overlayEffect === 'both')) {
     launchPetals(60);
   }
 
-  // Duration
   const dur = (Number(settings.overlayDuration) || 8) * 1000;
   setTimeout(() => {
     alert.classList.remove('show');
@@ -394,9 +350,6 @@ function showDonation({ name, message, amount }) {
   }, dur);
 }
 
-// ══════════════════════════════════════════════════
-//  SOUND
-// ══════════════════════════════════════════════════
 function playSound(isMin) {
   try {
     if (isMin && settings.overlayMinSoundUrl) {
@@ -411,9 +364,6 @@ function playSound(isMin) {
   } catch(e) {}
 }
 
-// ══════════════════════════════════════════════════
-//  TTS (Web Speech API)
-// ══════════════════════════════════════════════════
 function speakTTS(name, message, amount) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
@@ -427,7 +377,6 @@ function speakTTS(name, message, amount) {
   utt.rate  = Number(settings.ttsRate)  || 1;
   utt.pitch = Number(settings.ttsPitch) || 1;
 
-  // Try to use configured voice
   const voices = window.speechSynthesis.getVoices();
   const targetVoice = voices.find(v =>
     v.name === settings.ttsVoice || v.lang === 'th-TH'
@@ -437,9 +386,6 @@ function speakTTS(name, message, amount) {
   window.speechSynthesis.speak(utt);
 }
 
-// ══════════════════════════════════════════════════
-//  FALLING PETALS 🌹
-// ══════════════════════════════════════════════════
 const PETALS = ['🌸','🌹','🌺','✿','❀','🌷','💮','🏵️'];
 
 function launchPetals(count) {
@@ -460,9 +406,6 @@ function launchPetals(count) {
   }
 }
 
-// ══════════════════════════════════════════════════
-//  TEST BUTTON
-// ══════════════════════════════════════════════════
 function testDonation() {
   const testData = [
     { name: 'TestUser', message: 'ทดสอบระบบ overlay นะคะ', amount: settings.overlayMinAmount || 20 },
@@ -474,7 +417,6 @@ function testDonation() {
   if (!showing) processQueue();
 }
 
-// Preload voices
 window.speechSynthesis?.getVoices();
 window.speechSynthesis?.addEventListener?.('voiceschanged', () => window.speechSynthesis.getVoices());
 
