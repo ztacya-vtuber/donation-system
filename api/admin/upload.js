@@ -17,10 +17,10 @@ export default async function handler(req, res) {
     } else {
       url = await uploadToCloudinary(data, publicId);
     }
-   if (settingKey) {
-  console.log('[upload] calling rpc with:', settingKey, url);
+ if (settingKey) {
   const sb = getSupabase();
-  await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
+  const { error } = await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
+  console.log('[upload] rpc error:', JSON.stringify(error));
 }
     }
     res.json({ ok: true, url });
