@@ -17,15 +17,15 @@ export default async function handler(req, res) {
     } else {
       url = await uploadToCloudinary(data, publicId);
     }
-   if (settingKey) {
-  const sb = getSupabase();
-  const { data: existing } = await sb.from('settings').select('value').eq('key','site').single();
-  const current = existing?.value && Object.keys(existing.value).length > 0 
-    ? existing.value 
-    : { ...DEFAULT_SETTINGS };
-  const merged = { ...current, [settingKey]: url };
-  await sb.from('settings').update({ value: merged, updated_at: new Date().toISOString() }).eq('key', 'site');
-}
+    if (settingKey) {
+      const sb = getSupabase();
+      const { data: existing } = await sb.from('settings').select('value').eq('key','site').single();
+      const current = existing?.value && Object.keys(existing.value).length > 0
+        ? existing.value
+        : { ...DEFAULT_SETTINGS };
+      const merged = { ...current, [settingKey]: url };
+      await sb.from('settings').update({ value: merged, updated_at: new Date().toISOString() }).eq('key', 'site');
+    }
     res.json({ ok: true, url });
   } catch (e) {
     console.error('[upload]', e.message);
