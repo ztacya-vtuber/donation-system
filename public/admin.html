@@ -671,7 +671,7 @@ async function uploadImg(inputId,filename,settingKey){
   const reader=new FileReader();
   reader.onload=async(e)=>{
     try{
-      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type:'image'})});
+      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type:'image',settingKey})});
       const j=await res.json();
       if(j.ok){
         await saveSettings({[settingKey]:j.url+'?t='+Date.now()});
@@ -696,7 +696,7 @@ async function uploadAudio(inputId,filename,settingKey){
   const reader=new FileReader();
   reader.onload=async(e)=>{
     try{
-      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type:'audio'})});
+      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type:'audio',settingKey})});
       const j=await res.json();
       if(j.ok){
         await saveSettings({[settingKey]:j.url});
