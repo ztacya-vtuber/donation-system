@@ -1,4 +1,4 @@
-import { cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
+import { getSupabase, cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
 import { uploadToCloudinary, uploadAudioToCloudinary } from '../../lib/cloudinary.js';
 
 export default async function handler(req, res) {
@@ -19,13 +19,11 @@ export default async function handler(req, res) {
       url = await uploadToCloudinary(data, publicId);
     }
 
-    // บันทึก URL ผ่าน admin/settings โดยตรง
     if (settingKey) {
-      const origin = `https://${req.headers.host}`;
-      await fetch(`${origin}/api/admin/settings`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password, [settingKey]: url })
+      const sb = getSupabase();
+      // ใช้ SQL ตรงๆ แบบเดียวกับที่ทดสอบแล้วได้ผล
+      await sb.rpc('exec_sql', {
+        sql: `UPDATE settings SET value = value || '{"${settingKey}":"${url}"}'::jsonb WHERE key = 'site'`
       });
     }
 
