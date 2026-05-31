@@ -21,20 +21,17 @@ export default async function handler(req, res) {
 
     if (settingKey) {
       const sb = getSupabase();
-
       const { data: existing } = await sb
         .from('settings')
         .select('value')
         .eq('key', 'site')
         .single();
-
       const current = existing?.value || {};
       const updated = { ...current, [settingKey]: url };
-
       const { error } = await sb
         .from('settings')
-        .upsert({ key: 'site', value: updated });
-
+        .update({ value: updated })
+        .eq('key', 'site');
       if (error) console.error('[upload] supabase error:', error.message);
     }
 
