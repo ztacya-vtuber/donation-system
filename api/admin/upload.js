@@ -1,5 +1,5 @@
 // api/admin/upload.js
-import { getSupabase, cors, ADMIN_PASSWORD, DEFAULT_SETTINGS } from '../../lib/supabase.js';
+import { getSupabase, cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
 import { uploadToCloudinary, uploadAudioToCloudinary } from '../../lib/cloudinary.js';
 
 export default async function handler(req, res) {
@@ -19,12 +19,7 @@ export default async function handler(req, res) {
     }
     if (settingKey) {
       const sb = getSupabase();
-      const { data: existing } = await sb.from('settings').select('value').eq('key','site').single();
-      const current = existing?.value && Object.keys(existing.value).length > 0
-        ? existing.value
-        : { ...DEFAULT_SETTINGS };
-      const merged = { ...current, [settingKey]: url };
-      await sb.from('settings').update({ value: merged, updated_at: new Date().toISOString() }).eq('key', 'site');
+      await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
     }
     res.json({ ok: true, url });
   } catch (e) {
