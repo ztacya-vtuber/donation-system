@@ -21,11 +21,24 @@ export default async function handler(req, res) {
 
     if (settingKey) {
       const sb = getSupabase();
-      const { error } = await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
-      console.log('[upload] rpc error:', JSON.stringify(error));
+
+      const { data: existing } = await sb
+        .from('settings')
+        .select('value')
+        .eq('key', 'site')
+        .single();
+
+      const current = existing?.value || {};
+      const updated = { ...current, [settingKey]: url };
+
+      const { error } = await sb
+        .from('settings')
+        .upsert({ key: 'site', value: updated });
+
+      if (error) console.error('[upload] supabase error:', error.message);
     }
 
-    res.json({ ok: true, url }); // ✅ อยู่ใน try
+    res.json({ ok: true, url });
   } catch (e) {
     console.error('[upload]', e.message);
     res.status(500).json({ error: e.message });
