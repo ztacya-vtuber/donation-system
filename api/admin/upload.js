@@ -21,7 +21,11 @@ export default async function handler(req, res) {
 
     if (settingKey) {
       const sb = getSupabase();
-      await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
+      const { error } = await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
+      if (error) {
+        console.error('[upload] rpc error:', error);
+        return res.status(500).json({ error: error.message });
+      }
     }
 
     res.json({ ok: true, url });
