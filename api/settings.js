@@ -24,7 +24,6 @@ import { getSupabase, cors, DEFAULT_SETTINGS } from '../lib/supabase.js';
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
-
   try {
     const sb = getSupabase();
     const { data } = await sb
@@ -32,8 +31,8 @@ export default async function handler(req, res) {
       .select('value')
       .eq('key', 'site')
       .single();
-
     const merged = { ...DEFAULT_SETTINGS, ...(data?.value || {}) };
+    res.setHeader('Cache-Control', 'no-store');
     res.json(merged);
   } catch (e) {
     res.json(DEFAULT_SETTINGS);
