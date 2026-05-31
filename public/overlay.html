@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Overlay</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+Thai:wght@300;400&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+Thai:wght@300;400;700&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
   :root{--accent:#e8a4c8;--accent2:#c87eb0}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -13,139 +13,86 @@
     overflow:hidden;position:relative;
   }
 
+  /* ══ FULL ALERT (รูปใหญ่ + ข้อความใหญ่) ══ */
   .alert{
     position:absolute;
-    min-width:360px;max-width:500px;
-    background:linear-gradient(135deg,rgba(8,2,6,0.95),rgba(16,5,12,0.97));
-    border:1px solid rgba(232,164,200,0.2);
-    border-radius:22px;
-    overflow:hidden;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%) scale(0.9);
+    width:700px;
     opacity:0;
-    backdrop-filter:blur(16px);
-    box-shadow:
-      0 32px 80px rgba(0,0,0,0.7),
-      0 0 0 1px rgba(232,164,200,0.06),
-      inset 0 1px 0 rgba(255,255,255,0.04);
-    transition:opacity 0.4s ease;
+    transition:opacity 0.4s ease, transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
+    text-align:center;
+  }
+  .alert.show{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+  }
+  .alert.hide{
+    opacity:0 !important;
+    transform:translate(-50%,-50%) scale(0.95) !important;
+    transition:transform 0.4s ease,opacity 0.35s ease !important;
   }
 
-  .alert.pos-bottom-left   { bottom:48px;left:48px; }
-  .alert.pos-bottom-right  { bottom:48px;right:48px; }
-  .alert.pos-top-left      { top:48px;left:48px; }
-  .alert.pos-top-right     { top:48px;right:48px; }
-  .alert.pos-center        { top:50%;left:50%;transform:translate(-50%,-50%) scale(0.92);min-width:600px;max-width:800px; }
-  .alert.pos-center.show   { transform:translate(-50%,-50%) scale(1) !important; }
-
-  .alert.pos-bottom-left,
-  .alert.pos-bottom-right  { transform:translateY(80px) scale(0.92); }
-  .alert.pos-top-left,
-  .alert.pos-top-right     { transform:translateY(-80px) scale(0.92); }
-  .alert:not(.pos-center)  { transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1),opacity 0.4s ease; }
-
-  .alert.show { opacity:1; transform:translateY(0) scale(1) !important; }
-  .alert.pos-center.show { opacity:1; transform:translate(-50%,-50%) scale(1) !important; }
-  .alert.pos-center.hide { opacity:0 !important; transform:translate(-50%,-50%) scale(0.96) !important; transition:transform 0.4s ease,opacity 0.35s ease !important; }
-  .alert:not(.pos-center).hide { opacity:0 !important; transform:translateY(40px) scale(0.96) !important; transition:transform 0.4s ease,opacity 0.35s ease !important; }
-
-  .bar{
-    height:3px;
-    background:linear-gradient(90deg,var(--accent),var(--accent2),#a0e8c0,var(--accent));
-    background-size:300% 100%;
-    animation:barFlow 4s linear infinite;
-  }
-  @keyframes barFlow{0%{background-position:0%}100%{background-position:300%}}
-
-  .alert-inner{padding:18px 22px 20px;display:flex;gap:14px;align-items:flex-start}
-
-  .alert-img{
-    width:56px;height:56px;border-radius:12px;
-    object-fit:cover;flex-shrink:0;
-    border:1px solid rgba(232,164,200,0.2);
+  /* รูปใหญ่ด้านบน */
+  .alert-image-wrap{
+    width:320px;height:320px;
+    margin:0 auto 24px;
+    border-radius:24px;
+    overflow:hidden;
+    border:3px solid rgba(232,164,200,0.4);
+    box-shadow:0 0 60px rgba(232,164,200,0.3), 0 20px 60px rgba(0,0,0,0.8);
     display:none;
   }
-  .alert-img.show{display:block}
+  .alert-image-wrap.show{display:block}
+  .alert-image-wrap img{width:100%;height:100%;object-fit:cover}
 
-  .alert-body{flex:1;min-width:0}
-
-  .alert-meta{
-    display:flex;align-items:center;gap:8px;
+  /* ชื่อใหญ่ */
+  .alert-name{
+    font-family:'Cormorant Garamond',serif;
+    font-size:80px;font-weight:600;
+    color:#fff;
+    letter-spacing:0.02em;
+    line-height:1;
+    text-shadow:0 4px 30px rgba(0,0,0,0.8), 0 0 60px rgba(232,164,200,0.4);
     margin-bottom:8px;
   }
-  .badge{
-    font-family:'DM Mono',monospace;
-    font-size:8px;letter-spacing:2px;
-    color:#0a0208;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    padding:3px 10px;border-radius:20px;
-    flex-shrink:0;font-weight:600;
-  }
-  .donor-name{
-    font-family:'Cormorant Garamond',serif;
-    font-size:20px;font-weight:600;
-    color:#f0e8ec;letter-spacing:0.02em;
-    flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
-  .amount{
-    font-family:'DM Mono',monospace;
-    font-size:22px;color:var(--accent);
-    flex-shrink:0;
-    filter:drop-shadow(0 0 12px color-mix(in srgb,var(--accent) 60%,transparent));
-  }
-
-  .msg{
-    font-family:'Noto Sans Thai',sans-serif;
-    font-size:13px;font-weight:300;
-    color:rgba(240,232,236,0.6);
-    line-height:1.6;
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  }
-
-  .alert.glow-effect{
-    box-shadow:
-      0 32px 80px rgba(0,0,0,0.7),
-      0 0 0 2px rgba(232,164,200,0.5),
-      0 0 40px rgba(232,164,200,0.25),
-      0 0 80px rgba(232,164,200,0.1) !important;
-    animation:glowPulse 2s ease-in-out infinite;
-  }
-  @keyframes glowPulse{
-    0%,100%{box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 2px rgba(232,164,200,0.5),0 0 40px rgba(232,164,200,0.25),0 0 80px rgba(232,164,200,0.1)}
-    50%{box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 2px rgba(232,164,200,0.8),0 0 60px rgba(232,164,200,0.4),0 0 120px rgba(232,164,200,0.2)}
-  }
-
-  .donor-name.name-glow{
+  .alert-name.name-glow{
     color:var(--accent);
-    text-shadow:0 0 20px color-mix(in srgb,var(--accent) 80%,transparent),
-                0 0 40px color-mix(in srgb,var(--accent) 40%,transparent);
-    animation:nameGlow 1.5s ease-in-out infinite alternate;
-  }
-  @keyframes nameGlow{
-    from{text-shadow:0 0 10px color-mix(in srgb,var(--accent) 60%,transparent),0 0 30px color-mix(in srgb,var(--accent) 30%,transparent)}
-    to{text-shadow:0 0 25px color-mix(in srgb,var(--accent) 90%,transparent),0 0 55px color-mix(in srgb,var(--accent) 50%,transparent),0 0 80px color-mix(in srgb,var(--accent) 20%,transparent)}
+    text-shadow:0 0 30px color-mix(in srgb,var(--accent) 80%,transparent),
+                0 0 60px color-mix(in srgb,var(--accent) 40%,transparent),
+                0 4px 30px rgba(0,0,0,0.8);
   }
 
-  .shimmer{
-    position:absolute;inset:0;pointer-events:none;border-radius:22px;overflow:hidden;
+  /* ข้อความกลาง */
+  .alert-verb{
+    font-family:'Noto Sans Thai',sans-serif;
+    font-size:32px;font-weight:300;
+    color:rgba(255,255,255,0.7);
+    margin-bottom:8px;
+    text-shadow:0 2px 20px rgba(0,0,0,0.8);
   }
-  .shimmer::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.03) 50%,transparent 100%);
-    background-size:400px 100%;
-    animation:shimmer 3s linear infinite;
-  }
-  @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
 
-  .queue-badge{
-    position:absolute;top:14px;right:14px;
-    font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;
-    color:rgba(232,164,200,0.5);
-    background:rgba(10,2,8,0.8);
-    padding:2px 8px;border-radius:20px;
-    border:1px solid rgba(232,164,200,0.15);
-    display:none;
+  /* ยอดเงินใหญ่ */
+  .alert-amount{
+    font-family:'DM Mono',monospace;
+    font-size:100px;font-weight:400;
+    color:var(--accent);
+    line-height:1;
+    filter:drop-shadow(0 0 30px color-mix(in srgb,var(--accent) 70%,transparent));
+    text-shadow:0 4px 30px rgba(0,0,0,0.8);
+    margin-bottom:16px;
   }
-  .queue-badge.show{display:block}
 
+  /* ข้อความโดเนท */
+  .alert-msg{
+    font-family:'Noto Sans Thai',sans-serif;
+    font-size:28px;font-weight:300;
+    color:rgba(255,255,255,0.6);
+    text-shadow:0 2px 20px rgba(0,0,0,0.8);
+    line-height:1.5;
+  }
+
+  /* Particles */
   #particles{
     position:fixed;inset:0;
     pointer-events:none;overflow:hidden;
@@ -164,6 +111,7 @@
     100%{opacity:0;transform:translateY(1200px) rotate(720deg) scale(1.1)}
   }
 
+  /* Test button */
   #testBtn{
     position:fixed;bottom:12px;right:12px;
     padding:6px 14px;border:1px solid rgba(232,164,200,0.3);
@@ -178,21 +126,15 @@
 <body>
 
 <div id="particles"></div>
-<div class="alert pos-bottom-left" id="alert">
-  <div class="shimmer"></div>
-  <div class="bar"></div>
-  <div class="alert-inner">
-    <img class="alert-img" id="alertImg" alt="">
-    <div class="alert-body">
-      <div class="alert-meta">
-        <div class="badge" id="alertBadge">DONATE</div>
-        <div class="donor-name" id="donorName">-</div>
-        <div class="amount" id="donorAmount">฿0</div>
-      </div>
-      <div class="msg" id="donorMsg"></div>
-    </div>
+
+<div class="alert" id="alert">
+  <div class="alert-image-wrap" id="alertImgWrap">
+    <img id="alertImg" alt="">
   </div>
-  <div class="queue-badge" id="queueBadge"></div>
+  <div class="alert-name" id="donorName">-</div>
+  <div class="alert-verb">โดเนท</div>
+  <div class="alert-amount" id="donorAmount">฿0</div>
+  <div class="alert-msg" id="donorMsg"></div>
 </div>
 
 <button id="testBtn" onclick="testDonation()">⟳ Test</button>
@@ -201,13 +143,8 @@
 <audio id="sfxMin" preload="auto"></audio>
 
 <script>
-const SUPABASE_URL = document.currentScript?.dataset?.supabaseUrl
-  || window.__SUPABASE_URL__
-  || '%%SUPABASE_URL%%';
-
-const SUPABASE_ANON = document.currentScript?.dataset?.supabaseAnon
-  || window.__SUPABASE_ANON__
-  || '%%SUPABASE_ANON%%';
+const SUPABASE_URL = window.__SUPABASE_URL__ || '%%SUPABASE_URL%%';
+const SUPABASE_ANON = window.__SUPABASE_ANON__ || '%%SUPABASE_ANON%%';
 
 let settings = {
   accentColor: '#e8a4c8',
@@ -217,17 +154,14 @@ let settings = {
   overlayMinSoundUrl: '',
   overlayImageUrl: '',
   ttsEnabled: true,
-  ttsVoice: 'th-TH-PremwadeeNeural',
   ttsRate: 1,
   ttsPitch: 1,
   overlayDuration: 8,
-  overlayPosition: 'bottom-left',
   overlayEffect: 'roses',
 };
 
 let queue = [];
 let showing = false;
-let supabaseChannel = null;
 
 async function init() {
   await loadSettings();
@@ -239,7 +173,7 @@ async function loadSettings() {
     const s = await fetch('/api/settings').then(r => r.json());
     applySettings(s);
   } catch(e) {
-    console.warn('[overlay] Settings load failed, using defaults');
+    console.warn('[overlay] Settings load failed');
   }
 }
 
@@ -249,69 +183,44 @@ function applySettings(s) {
   document.documentElement.style.setProperty('--accent', accent);
   document.documentElement.style.setProperty('--accent2', accent + 'cc');
 
-  const alert = document.getElementById('alert');
-  alert.className = alert.className.replace(/pos-\S+/g, '').trim();
-  alert.classList.add('pos-' + (settings.overlayPosition || 'bottom-left'));
-
-  if (settings.overlayAlertSoundUrl) {
+  if (settings.overlayAlertSoundUrl)
     document.getElementById('sfxAlert').src = settings.overlayAlertSoundUrl;
-  }
-  if (settings.overlayMinSoundUrl) {
+  if (settings.overlayMinSoundUrl)
     document.getElementById('sfxMin').src = settings.overlayMinSoundUrl;
-  }
 
+  const wrap = document.getElementById('alertImgWrap');
   const img = document.getElementById('alertImg');
   if (settings.overlayImageUrl) {
     img.src = settings.overlayImageUrl;
-    img.classList.add('show');
+    wrap.classList.add('show');
   } else {
-    img.classList.remove('show');
+    wrap.classList.remove('show');
   }
 }
 
 function connectRealtime() {
-  if (!SUPABASE_URL || SUPABASE_URL.includes('%%')) {
-    console.warn('[overlay] Supabase URL not set — realtime disabled');
-    return;
-  }
-
+  if (!SUPABASE_URL || SUPABASE_URL.includes('%%')) return;
   const script = document.createElement('script');
   script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
   script.onload = () => {
-    const { createClient } = window.supabase;
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
-
-    supabaseChannel = sb.channel('donations')
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+    sb.channel('donations')
       .on('broadcast', { event: 'new_donation' }, ({ payload }) => {
         queue.push(payload);
-        updateQueueBadge();
         if (!showing) processQueue();
       })
       .on('broadcast', { event: 'settings_update' }, ({ payload }) => {
         applySettings(payload);
       })
-      .subscribe(status => {
-        console.log('[overlay] Realtime:', status);
-      });
+      .subscribe();
   };
   document.head.appendChild(script);
 }
 
 function processQueue() {
-  if (queue.length === 0) { showing = false; updateQueueBadge(); return; }
+  if (!queue.length) { showing = false; return; }
   showing = true;
   showDonation(queue.shift());
-  updateQueueBadge();
-}
-
-function updateQueueBadge() {
-  const badge = document.getElementById('queueBadge');
-  if (queue.length > 0) {
-    badge.textContent = '+' + queue.length + ' รายการ';
-    badge.classList.add('show');
-  } else {
-    badge.classList.remove('show');
-  }
 }
 
 function showDonation({ name, message, amount }) {
@@ -321,11 +230,9 @@ function showDonation({ name, message, amount }) {
   document.getElementById('donorName').textContent = name;
   document.getElementById('donorAmount').textContent = '฿' + Number(amount).toLocaleString();
   document.getElementById('donorMsg').textContent = message || settings.thankyou || '';
-  document.getElementById('alertBadge').textContent = isMin ? '✦ DONATE' : 'DONATE';
 
   const nameEl = document.getElementById('donorName');
   const shouldGlow = isMin && (settings.overlayEffect === 'glow' || settings.overlayEffect === 'both');
-  alert.classList.toggle('glow-effect', shouldGlow);
   nameEl.classList.toggle('name-glow', shouldGlow);
 
   alert.classList.remove('hide');
@@ -334,13 +241,11 @@ function showDonation({ name, message, amount }) {
 
   playSound(isMin);
 
-  if (isMin && settings.ttsEnabled) {
+  if (isMin && settings.ttsEnabled)
     setTimeout(() => speakTTS(name, message, amount), 800);
-  }
 
-  if (isMin && (settings.overlayEffect === 'roses' || settings.overlayEffect === 'both')) {
+  if (isMin && (settings.overlayEffect === 'roses' || settings.overlayEffect === 'both'))
     launchPetals(60);
-  }
 
   const dur = (Number(settings.overlayDuration) || 8) * 1000;
   setTimeout(() => {
@@ -354,12 +259,10 @@ function playSound(isMin) {
   try {
     if (isMin && settings.overlayMinSoundUrl) {
       const sfx = document.getElementById('sfxMin');
-      sfx.currentTime = 0;
-      sfx.play().catch(() => {});
+      sfx.currentTime = 0; sfx.play().catch(()=>{});
     } else if (settings.overlayAlertSoundUrl) {
       const sfx = document.getElementById('sfxAlert');
-      sfx.currentTime = 0;
-      sfx.play().catch(() => {});
+      sfx.currentTime = 0; sfx.play().catch(()=>{});
     }
   } catch(e) {}
 }
@@ -367,27 +270,20 @@ function playSound(isMin) {
 function speakTTS(name, message, amount) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
-
   const text = message
     ? `${name} โดเนท ${Number(amount).toLocaleString()} บาท พูดว่า ${message}`
     : `${name} โดเนท ${Number(amount).toLocaleString()} บาท ขอบคุณมากนะคะ`;
-
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang = 'th-TH';
-  utt.rate  = Number(settings.ttsRate)  || 1;
+  utt.rate = Number(settings.ttsRate) || 1;
   utt.pitch = Number(settings.ttsPitch) || 1;
-
   const voices = window.speechSynthesis.getVoices();
-  const targetVoice = voices.find(v =>
-    v.name === settings.ttsVoice || v.lang === 'th-TH'
-  );
-  if (targetVoice) utt.voice = targetVoice;
-
+  const v = voices.find(v => v.lang === 'th-TH');
+  if (v) utt.voice = v;
   window.speechSynthesis.speak(utt);
 }
 
 const PETALS = ['🌸','🌹','🌺','✿','❀','🌷','💮','🏵️'];
-
 function launchPetals(count) {
   const container = document.getElementById('particles');
   for (let i = 0; i < count; i++) {
@@ -399,7 +295,6 @@ function launchPetals(count) {
       p.style.fontSize = (14 + Math.random() * 18) + 'px';
       const dur = 4 + Math.random() * 5;
       p.style.animationDuration = dur + 's';
-      p.style.animationDelay = '0s';
       container.appendChild(p);
       setTimeout(() => p.remove(), dur * 1000 + 200);
     }, Math.random() * 2000);
@@ -413,7 +308,6 @@ function testDonation() {
   ];
   const pick = testData[Math.floor(Math.random() * testData.length)];
   queue.push(pick);
-  updateQueueBadge();
   if (!showing) processQueue();
 }
 
