@@ -21,26 +21,19 @@ export default async function handler(req, res) {
 
     if (settingKey) {
       const sb = getSupabase();
-      const { data: existing, error: fetchErr } = await sb
+      const { data: existing } = await sb
         .from('settings')
         .select('value')
         .eq('key', 'site')
         .single();
 
-      console.log('[upload] fetch existing:', JSON.stringify(existing), 'err:', fetchErr?.message);
-
       const current = existing?.value || {};
       const updated = { ...current, [settingKey]: url };
 
-      console.log('[upload] updating settingKey:', settingKey, 'url:', url);
-
-      const { data: updateData, error } = await sb
+      await sb
         .from('settings')
         .update({ value: updated })
-        .eq('key', 'site')
-        .select();
-
-      console.log('[upload] update result:', JSON.stringify(updateData), 'error:', error?.message);
+        .eq('key', 'site');
     }
 
     res.json({ ok: true, url });
