@@ -663,51 +663,99 @@ function previewAudio(input,previewId){
   audio.style.display='block';
 }
 
-async function uploadImg(inputId,filename,settingKey){
-  const input=document.getElementById(inputId);
-  if(!input.files[0]){toast('กรุณาเลือกรูปก่อน','error');return}
-  const btn=input.closest('.img-upload-card').querySelector('button');
-  btn.disabled=true;btn.textContent='กำลังอัปโหลด...';
-  const reader=new FileReader();
-  reader.onload=async(e)=>{
-    try{
-      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type:'image',settingKey})});
-      const j=await res.json();
+async function uploadImg(fileInputId, filename, settingKey){
+  const input = document.getElementById(fileInputId);
+  if(!input.files || input.files.length === 0){
+    showToast('กรุณาเลือกไฟล์รูปภาพก่อนอัปโหลด', 'error');
+    return;
+  }
+  const file = input.files[0];
+  const btn = input.closest('.img-upload-card').querySelector('.btn');
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'กำลังอัปโหลด...';
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: pwd,
+          filename: filename,
+          data: e.target.result,
+          type: 'image',
+          settingKey: settingKey
+        })
+      });
+      const j = await res.json();
       if(j.ok){
-        await saveSettings({[settingKey]:j.url+'?t='+Date.now()});
-        // Update URL fields if applicable
-        if(settingKey==='overlayAlertSoundUrl') document.getElementById('cfgAlertSoundUrl').value=j.url;
-        if(settingKey==='overlayMinSoundUrl') document.getElementById('cfgMinSoundUrl').value=j.url;
-        if(settingKey==='overlayImageUrl') document.getElementById('cfgAlertImgUrl').value=j.url;
-        toast('อัปโหลดสำเร็จ ✓','success');
-      } else toast('อัปโหลดล้มเหลว: '+j.error,'error');
-    }catch(err){toast('เกิดข้อผิดพลาด','error')}
-    btn.disabled=false;btn.textContent='อัปโหลด';
+        showToast('อัปโหลดและบันทึกรูปภาพสำเร็จแล้ว! 🎉', 'success');
+        if(settingKey === 'overlayImageUrl' && document.getElementById('cfgAlertImgUrl')){
+          document.getElementById('cfgAlertImgUrl').value = j.url;
+        }
+      } else {
+        showToast(j.error || 'อัปโหลดล้มเหลว', 'error');
+      }
+    } catch(err) {
+      showToast('ระบบเครือข่ายมีปัญหา', 'error');
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }
   };
-  reader.readAsDataURL(input.files[0]);
+  reader.readAsDataURL(file);
 }
 
-async function uploadAudio(inputId,filename,settingKey){
-  const input=document.getElementById(inputId);
-  if(!input.files[0]){toast('กรุณาเลือกไฟล์เสียงก่อน','error');return}
-  const card=input.closest('.img-upload-card');
-  const btn=card.querySelector('button[class*="btn-primary"]');
-  btn.disabled=true;btn.textContent='กำลังอัปโหลด...';
-  const reader=new FileReader();
-  reader.onload=async(e)=>{
-    try{
-      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type:'audio',settingKey})});
-      const j=await res.json();
+async function uploadAudio(fileInputId, filename, settingKey){
+  const input = document.getElementById(fileInputId);
+  if(!input.files || input.files.length === 0){
+    showToast('กรุณาเลือกไฟล์เสียงก่อนอัปโหลด', 'error');
+    return;
+  }
+  const file = input.files[0];
+  const btn = input.closest('.img-upload-card').querySelector('.btn');
+  const oldText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'กำลังอัปโหลด...';
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    try {
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          password: pwd,
+          filename: filename,
+          data: e.target.result,
+          type: 'audio',
+          settingKey: settingKey
+        })
+      });
+      const j = await res.json();
       if(j.ok){
-        await saveSettings({[settingKey]:j.url});
-        if(settingKey==='overlayAlertSoundUrl') document.getElementById('cfgAlertSoundUrl').value=j.url;
-        if(settingKey==='overlayMinSoundUrl') document.getElementById('cfgMinSoundUrl').value=j.url;
-        toast('อัปโหลดเสียงสำเร็จ ✓','success');
-      } else toast('อัปโหลดล้มเหลว: '+j.error,'error');
-    }catch(err){toast('เกิดข้อผิดพลาด','error')}
-    btn.disabled=false;btn.textContent='อัปโหลด';
+        showToast('อัปโหลดและบันทึกเสียงสำเร็จแล้ว! 🎉', 'success');
+        if(settingKey === 'overlayAlertSoundUrl' && document.getElementById('cfgAlertSoundUrl')){
+          document.getElementById('cfgAlertSoundUrl').value = j.url;
+        }
+        if(settingKey === 'overlayMinSoundUrl' && document.getElementById('cfgMinSoundUrl')){
+          document.getElementById('cfgMinSoundUrl').value = j.url;
+        }
+      } else {
+        showToast(j.error || 'อัปโหลดล้มเหลว', 'error');
+      }
+    } catch(err) {
+      showToast('ระบบเครือข่ายมีปัญหา', 'error');
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldText;
+    }
   };
-  reader.readAsDataURL(input.files[0]);
+  reader.readAsDataURL(file);
 }
 
 // ── Donations Manager ─────────────────────────────────────
