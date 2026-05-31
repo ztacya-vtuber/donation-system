@@ -875,6 +875,14 @@ function toast(msg,type='success'){
   _toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
 }
 
+// พี่เพิ่มฟังก์ชันนี้ต่อท้ายให้เรียบร้อยแล้วครับ ดึงไปใช้งานได้เลย!
+function showToast(msg, type) { 
+  toast(msg, type); 
+}
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;')}
+</script>
+
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;')}
 </script>
 </body>
