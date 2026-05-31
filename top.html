@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Top Donors</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Noto+Sans+Thai:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#0a0208;--accent:#e8a4c8;--accent2:#c87eb0;--card:#12070f;--border:#2a1520;--text:#f0e8ec;--muted:#7a6070}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{min-height:100vh;background:var(--bg);font-family:'Noto Sans Thai',sans-serif;font-weight:300;color:var(--text);position:relative;overflow-x:hidden}
+  .bg-layer{position:fixed;inset:0;background-image:var(--bg-image,none);background-size:cover;background-position:center;filter:brightness(0.15) saturate(0.5);z-index:0}
+  .content{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:40px 16px 80px}
+  .back-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:32px;transition:color 0.2s}
+  .back-link:hover{color:var(--accent)}
+  .page-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;letter-spacing:0.04em}
+  .page-sub{font-size:13px;color:var(--muted);margin-top:4px;font-style:italic;font-family:'Cormorant Garamond',serif;margin-bottom:32px}
+  .podium{display:flex;align-items:flex-end;gap:8px;margin-bottom:32px;padding:0 8px}
+  .podium-item{flex:1;text-align:center}
+  .podium-item.first{order:-1}
+  .podium-bar{border-radius:12px 12px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 8px 12px;position:relative;overflow:hidden}
+  .podium-bar::before{content:'';position:absolute;inset:0;opacity:0.08;background:white}
+  .p1 .podium-bar{height:140px;background:linear-gradient(180deg,#d4af37,#8a6d10);border:1px solid #d4af3760}
+  .p2 .podium-bar{height:100px;background:linear-gradient(180deg,#b0b8c0,#606870);border:1px solid #b0b8c060}
+  .p3 .podium-bar{height:80px;background:linear-gradient(180deg,#cd7f32,#7a4a10);border:1px solid #cd7f3260}
+  .podium-rank{font-family:'DM Mono',monospace;font-size:10px;opacity:0.7;margin-bottom:4px}
+  .podium-name{font-size:12px;color:var(--text);font-weight:500;word-break:break-all;line-height:1.3}
+  .podium-amount{font-family:'DM Mono',monospace;font-size:12px;margin-top:5px}
+  .p1 .podium-amount{color:#d4af37}
+  .p2 .podium-amount{color:#b0b8c0}
+  .p3 .podium-amount{color:#cd7f32}
+  .podium-floor{height:12px;background:var(--border);border-radius:0 0 6px 6px}
+  .list-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+  .list-header{padding:14px 20px;border-bottom:1px solid var(--border);font-size:11px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase}
+  .donor-row{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid #1a0c12;transition:background 0.15s}
+  .donor-row:last-child{border-bottom:none}
+  .donor-row:hover{background:#1a0c12}
+  .rank-num{font-family:'DM Mono',monospace;font-size:12px;color:var(--muted);width:24px;text-align:right;flex-shrink:0}
+  .donor-info{flex:1;min-width:0}
+  .donor-name{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .donor-total{font-family:'DM Mono',monospace;font-size:14px;color:var(--accent);flex-shrink:0}
+  .empty-state{text-align:center;padding:48px 20px;color:var(--muted);font-family:'Cormorant Garamond',serif;font-size:18px;font-style:italic}
+  .nav-links{display:flex;justify-content:center;gap:20px;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
+  .nav-links a{font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s}
+  .nav-links a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+<div class="bg-layer" id="bgLayer"></div>
+<div class="content">
+  <a href="/" class="back-link">← กลับ</a>
+  <div class="page-title">🏆 Top Donors</div>
+  <div class="page-sub" id="pageSub">ขอบคุณทุกคนที่สนับสนุน</div>
+  <div class="podium" id="podium" style="display:none">
+    <div class="podium-item p2" id="pod2"><div class="podium-bar"><div class="podium-rank">#2</div><div class="podium-name" id="p2name">-</div><div class="podium-amount" id="p2amt"></div></div><div class="podium-floor"></div></div>
+    <div class="podium-item p1 first" id="pod1"><div class="podium-bar"><div class="podium-rank">#1</div><div class="podium-name" id="p1name">-</div><div class="podium-amount" id="p1amt"></div></div><div class="podium-floor"></div></div>
+    <div class="podium-item p3" id="pod3"><div class="podium-bar"><div class="podium-rank">#3</div><div class="podium-name" id="p3name">-</div><div class="podium-amount" id="p3amt"></div></div><div class="podium-floor"></div></div>
+  </div>
+  <div class="list-card">
+    <div class="list-header">✦ อันดับทั้งหมด</div>
+    <div id="listBody"><div class="empty-state">กำลังโหลด...</div></div>
+  </div>
+  <div class="nav-links"><a href="/">💝 โดเนท</a></div>
+</div>
+<script>
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+async function load(){
+  try{
+    const [s,top]=await Promise.all([fetch('/api/settings').then(r=>r.json()),fetch('/api/top').then(r=>r.json())]);
+    document.documentElement.style.setProperty('--accent',s.accentColor||'#e8a4c8');
+    if(s.bgUrl) document.getElementById('bgLayer').style.backgroundImage=`url(${s.bgUrl})`;
+    document.getElementById('pageSub').textContent='ขอบคุณทุกคนที่สนับสนุน '+(s.name||'');
+    if(!top.length){document.getElementById('listBody').innerHTML='<div class="empty-state">ยังไม่มีข้อมูล</div>';return}
+    if(top.length>=1){
+      document.getElementById('podium').style.display='flex';
+      const fp=(id,d)=>{document.getElementById(id+'name').textContent=d?d.name:'-';document.getElementById(id+'amt').textContent=d?'฿'+d.total.toLocaleString():''};
+      fp('p1',top[0]);fp('p2',top[1]);fp('p3',top[2]);
+      if(!top[1])document.getElementById('pod2').style.display='none';
+      if(!top[2])document.getElementById('pod3').style.display='none';
+    }
+    const list=top.slice(3);
+    document.getElementById('listBody').innerHTML=list.length?list.map((d,i)=>`<div class="donor-row"><div class="rank-num">${i+4}</div><div class="donor-info"><div class="donor-name">${esc(d.name)}</div></div><div class="donor-total">฿${d.total.toLocaleString()}</div></div>`).join(''):'<div class="empty-state" style="font-size:13px;padding:20px">อันดับ 1–3 แสดงด้านบน</div>';
+  }catch(e){document.getElementById('listBody').innerHTML='<div class="empty-state">เกิดข้อผิดพลาด</div>'}
+}
+load();
+</script>
+</body>
+</html>
