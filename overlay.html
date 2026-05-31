@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Overlay</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+Thai:wght@300;400&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root{--accent:#e8a4c8;--accent2:#c87eb0}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    background:transparent;
+    width:1920px;height:1080px;
+    overflow:hidden;position:relative;
+  }
+
+  /* ══════════════════════════════════════════════════
+     ALERT CARD
+  ══════════════════════════════════════════════════ */
+  .alert{
+    position:absolute;
+    min-width:360px;max-width:500px;
+    background:linear-gradient(135deg,rgba(8,2,6,0.95),rgba(16,5,12,0.97));
+    border:1px solid rgba(232,164,200,0.2);
+    border-radius:22px;
+    overflow:hidden;
+    opacity:0;
+    backdrop-filter:blur(16px);
+    box-shadow:
+      0 32px 80px rgba(0,0,0,0.7),
+      0 0 0 1px rgba(232,164,200,0.06),
+      inset 0 1px 0 rgba(255,255,255,0.04);
+    transition:opacity 0.4s ease;
+  }
+
+  /* Positions */
+  .alert.pos-bottom-left   { bottom:48px;left:48px; }
+  .alert.pos-bottom-right  { bottom:48px;right:48px; }
+  .alert.pos-top-left      { top:48px;left:48px; }
+  .alert.pos-top-right     { top:48px;right:48px; }
+  .alert.pos-center        { bottom:48px;left:50%;transform:translateX(-50%); }
+  .alert.pos-center.show   { transform:translateX(-50%) !important; }
+
+  /* Entrance animations by position */
+  .alert.pos-bottom-left,
+  .alert.pos-bottom-right  { transform:translateY(80px) scale(0.92); }
+  .alert.pos-top-left,
+  .alert.pos-top-right     { transform:translateY(-80px) scale(0.92); }
+  .alert:not(.pos-center)  { transition:transform 0.6s cubic-bezier(0.34,1.56,0.64,1),opacity 0.4s ease; }
+
+  .alert.show { opacity:1; transform:translateY(0) scale(1) !important; }
+  .alert.hide { opacity:0 !important; transform:translateY(40px) scale(0.96) !important; transition:transform 0.4s ease,opacity 0.35s ease !important; }
+
+  /* Top gradient bar */
+  .bar{
+    height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2),#a0e8c0,var(--accent));
+    background-size:300% 100%;
+    animation:barFlow 4s linear infinite;
+  }
+  @keyframes barFlow{0%{background-position:0%}100%{background-position:300%}}
+
+  .alert-inner{padding:18px 22px 20px;display:flex;gap:14px;align-items:flex-start}
+
+  /* Optional image/gif */
+  .alert-img{
+    width:56px;height:56px;border-radius:12px;
+    object-fit:cover;flex-shrink:0;
+    border:1px solid rgba(232,164,200,0.2);
+    display:none;
+  }
+  .alert-img.show{display:block}
+
+  .alert-body{flex:1;min-width:0}
+
+  .alert-meta{
+    display:flex;align-items:center;gap:8px;
+    margin-bottom:8px;
+  }
+  .badge{
+    font-family:'DM Mono',monospace;
+    font-size:8px;letter-spacing:2px;
+    color:#0a0208;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    padding:3px 10px;border-radius:20px;
+    flex-shrink:0;font-weight:600;
+  }
+  .donor-name{
+    font-family:'Cormorant Garamond',serif;
+    font-size:20px;font-weight:600;
+    color:#f0e8ec;letter-spacing:0.02em;
+    flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .amount{
+    font-family:'DM Mono',monospace;
+    font-size:22px;color:var(--accent);
+    flex-shrink:0;
+    filter:drop-shadow(0 0 12px color-mix(in srgb,var(--accent) 60%,transparent));
+  }
+
+  .msg{
+    font-family:'Noto Sans Thai',sans-serif;
+    font-size:13px;font-weight:300;
+    color:rgba(240,232,236,0.6);
+    line-height:1.6;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+
+  /* Glow ring when high amount */
+  .alert.glow-effect{
+    box-shadow:
+      0 32px 80px rgba(0,0,0,0.7),
+      0 0 0 2px rgba(232,164,200,0.5),
+      0 0 40px rgba(232,164,200,0.25),
+      0 0 80px rgba(232,164,200,0.1) !important;
+    animation:glowPulse 2s ease-in-out infinite;
+  }
+  @keyframes glowPulse{
+    0%,100%{box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 2px rgba(232,164,200,0.5),0 0 40px rgba(232,164,200,0.25),0 0 80px rgba(232,164,200,0.1)}
+    50%{box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 2px rgba(232,164,200,0.8),0 0 60px rgba(232,164,200,0.4),0 0 120px rgba(232,164,200,0.2)}
+  }
+
+  /* Name glow for big donations */
+  .donor-name.name-glow{
+    color:var(--accent);
+    text-shadow:0 0 20px color-mix(in srgb,var(--accent) 80%,transparent),
+                0 0 40px color-mix(in srgb,var(--accent) 40%,transparent);
+    animation:nameGlow 1.5s ease-in-out infinite alternate;
+  }
+  @keyframes nameGlow{
+    from{text-shadow:0 0 10px color-mix(in srgb,var(--accent) 60%,transparent),0 0 30px color-mix(in srgb,var(--accent) 30%,transparent)}
+    to{text-shadow:0 0 25px color-mix(in srgb,var(--accent) 90%,transparent),0 0 55px color-mix(in srgb,var(--accent) 50%,transparent),0 0 80px color-mix(in srgb,var(--accent) 20%,transparent)}
+  }
+
+  /* Shimmer overlay on card */
+  .shimmer{
+    position:absolute;inset:0;pointer-events:none;border-radius:22px;overflow:hidden;
+  }
+  .shimmer::after{
+    content:'';position:absolute;inset:0;
+    background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.03) 50%,transparent 100%);
+    background-size:400px 100%;
+    animation:shimmer 3s linear infinite;
+  }
+  @keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+
+  /* Queue indicator */
+  .queue-badge{
+    position:absolute;top:14px;right:14px;
+    font-family:'DM Mono',monospace;font-size:9px;letter-spacing:1px;
+    color:rgba(232,164,200,0.5);
+    background:rgba(10,2,8,0.8);
+    padding:2px 8px;border-radius:20px;
+    border:1px solid rgba(232,164,200,0.15);
+    display:none;
+  }
+  .queue-badge.show{display:block}
+
+  /* ══════════════════════════════════════════════════
+     FALLING ROSES / PETALS
+  ══════════════════════════════════════════════════ */
+  #particles{
+    position:fixed;inset:0;
+    pointer-events:none;overflow:hidden;
+    z-index:10;
+  }
+  .petal{
+    position:absolute;top:-60px;
+    font-size:20px;
+    animation:fallPetal linear forwards;
+    opacity:0;
+  }
+  @keyframes fallPetal{
+    0%  {opacity:0;transform:translateY(0) rotate(0deg) scale(0.8)}
+    8%  {opacity:1}
+    90% {opacity:0.7}
+    100%{opacity:0;transform:translateY(1200px) rotate(720deg) scale(1.1)}
+  }
+
+  /* ══════════════════════════════════════════════════
+     TEST BUTTON (hidden in OBS)
+  ══════════════════════════════════════════════════ */
+  #testBtn{
+    position:fixed;bottom:12px;right:12px;
+    padding:6px 14px;border:1px solid rgba(232,164,200,0.3);
+    border-radius:8px;background:rgba(10,2,8,0.8);
+    color:rgba(232,164,200,0.7);font-size:11px;
+    cursor:pointer;font-family:'DM Mono',monospace;
+    z-index:999;
+  }
+  #testBtn:hover{border-color:var(--accent);color:var(--accent)}
+</style>
+</head>
+<body>
+
+<div id="particles"></div>
+<div class="alert pos-bottom-left" id="alert">
+  <div class="shimmer"></div>
+  <div class="bar"></div>
+  <div class="alert-inner">
+    <img class="alert-img" id="alertImg" alt="">
+    <div class="alert-body">
+      <div class="alert-meta">
+        <div class="badge" id="alertBadge">DONATE</div>
+        <div class="donor-name" id="donorName">-</div>
+        <div class="amount" id="donorAmount">฿0</div>
+      </div>
+      <div class="msg" id="donorMsg"></div>
+    </div>
+  </div>
+  <div class="queue-badge" id="queueBadge"></div>
+</div>
+
+<button id="testBtn" onclick="testDonation()">⟳ Test</button>
+
+<audio id="sfxAlert" preload="auto"></audio>
+<audio id="sfxMin" preload="auto"></audio>
+
+<script>
+// ══════════════════════════════════════════════════
+//  CONFIG & STATE
+// ══════════════════════════════════════════════════
+const SUPABASE_URL = document.currentScript?.dataset?.supabaseUrl
+  || window.__SUPABASE_URL__
+  || '%%SUPABASE_URL%%';  // will be replaced by env or set manually
+
+const SUPABASE_ANON = document.currentScript?.dataset?.supabaseAnon
+  || window.__SUPABASE_ANON__
+  || '%%SUPABASE_ANON%%';
+
+let settings = {
+  accentColor: '#e8a4c8',
+  thankyou: 'ขอบคุณมากนะคะ ♡',
+  overlayMinAmount: 20,
+  overlayAlertSoundUrl: '',
+  overlayMinSoundUrl: '',
+  overlayImageUrl: '',
+  ttsEnabled: true,
+  ttsVoice: 'th-TH-PremwadeeNeural',
+  ttsRate: 1,
+  ttsPitch: 1,
+  overlayDuration: 8,
+  overlayPosition: 'bottom-left',
+  overlayEffect: 'roses',
+};
+
+let queue = [];
+let showing = false;
+let supabaseChannel = null;
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+async function init() {
+  await loadSettings();
+  connectRealtime();
+}
+
+async function loadSettings() {
+  try {
+    const s = await fetch('/api/settings').then(r => r.json());
+    applySettings(s);
+  } catch(e) {
+    console.warn('[overlay] Settings load failed, using defaults');
+  }
+}
+
+function applySettings(s) {
+  settings = { ...settings, ...s };
+  const accent = s.accentColor || '#e8a4c8';
+  document.documentElement.style.setProperty('--accent', accent);
+  document.documentElement.style.setProperty('--accent2', accent + 'cc');
+
+  // Update position class
+  const alert = document.getElementById('alert');
+  alert.className = alert.className.replace(/pos-\S+/g, '').trim();
+  alert.classList.add('pos-' + (settings.overlayPosition || 'bottom-left'));
+
+  // Sound sources
+  if (settings.overlayAlertSoundUrl) {
+    document.getElementById('sfxAlert').src = settings.overlayAlertSoundUrl;
+  }
+  if (settings.overlayMinSoundUrl) {
+    document.getElementById('sfxMin').src = settings.overlayMinSoundUrl;
+  }
+
+  // Alert image
+  const img = document.getElementById('alertImg');
+  if (settings.overlayImageUrl) {
+    img.src = settings.overlayImageUrl;
+    img.classList.add('show');
+  } else {
+    img.classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  REALTIME (Supabase Broadcast Channel)
+// ══════════════════════════════════════════════════
+function connectRealtime() {
+  if (!SUPABASE_URL || SUPABASE_URL.includes('%%')) {
+    console.warn('[overlay] Supabase URL not set — realtime disabled');
+    return;
+  }
+
+  // Dynamic import Supabase JS from CDN
+  const script = document.createElement('script');
+  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  script.onload = () => {
+    const { createClient } = window.supabase;
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON);
+
+    supabaseChannel = sb.channel('donations')
+      .on('broadcast', { event: 'new_donation' }, ({ payload }) => {
+        queue.push(payload);
+        updateQueueBadge();
+        if (!showing) processQueue();
+      })
+      .on('broadcast', { event: 'settings_update' }, ({ payload }) => {
+        applySettings(payload);
+      })
+      .subscribe(status => {
+        console.log('[overlay] Realtime:', status);
+      });
+  };
+  document.head.appendChild(script);
+}
+
+// ══════════════════════════════════════════════════
+//  QUEUE
+// ══════════════════════════════════════════════════
+function processQueue() {
+  if (queue.length === 0) { showing = false; updateQueueBadge(); return; }
+  showing = true;
+  showDonation(queue.shift());
+  updateQueueBadge();
+}
+
+function updateQueueBadge() {
+  const badge = document.getElementById('queueBadge');
+  if (queue.length > 0) {
+    badge.textContent = '+' + queue.length + ' รายการ';
+    badge.classList.add('show');
+  } else {
+    badge.classList.remove('show');
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  SHOW DONATION
+// ══════════════════════════════════════════════════
+function showDonation({ name, message, amount }) {
+  const alert = document.getElementById('alert');
+  const isMin = Number(amount) >= Number(settings.overlayMinAmount);
+
+  // Update text
+  document.getElementById('donorName').textContent = name;
+  document.getElementById('donorAmount').textContent = '฿' + Number(amount).toLocaleString();
+  document.getElementById('donorMsg').textContent = message || settings.thankyou || '';
+
+  // Badge label
+  document.getElementById('alertBadge').textContent =
+    isMin ? '✦ DONATE' : 'DONATE';
+
+  // Glow + name glow effects
+  const nameEl = document.getElementById('donorName');
+  const shouldGlow = isMin && (settings.overlayEffect === 'glow' || settings.overlayEffect === 'both');
+  alert.classList.toggle('glow-effect', shouldGlow);
+  nameEl.classList.toggle('name-glow', shouldGlow);
+
+  // Show card
+  alert.classList.remove('hide');
+  void alert.offsetWidth;
+  alert.classList.add('show');
+
+  // Sound
+  playSound(isMin);
+
+  // TTS (only if >= minAmount)
+  if (isMin && settings.ttsEnabled) {
+    setTimeout(() => speakTTS(name, message, amount), 800);
+  }
+
+  // Particles
+  if (isMin && (settings.overlayEffect === 'roses' || settings.overlayEffect === 'both')) {
+    launchPetals(60);
+  }
+
+  // Duration
+  const dur = (Number(settings.overlayDuration) || 8) * 1000;
+  setTimeout(() => {
+    alert.classList.remove('show');
+    alert.classList.add('hide');
+    setTimeout(processQueue, 500);
+  }, dur);
+}
+
+// ══════════════════════════════════════════════════
+//  SOUND
+// ══════════════════════════════════════════════════
+function playSound(isMin) {
+  try {
+    if (isMin && settings.overlayMinSoundUrl) {
+      const sfx = document.getElementById('sfxMin');
+      sfx.currentTime = 0;
+      sfx.play().catch(() => {});
+    } else if (settings.overlayAlertSoundUrl) {
+      const sfx = document.getElementById('sfxAlert');
+      sfx.currentTime = 0;
+      sfx.play().catch(() => {});
+    }
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════
+//  TTS (Web Speech API)
+// ══════════════════════════════════════════════════
+function speakTTS(name, message, amount) {
+  if (!window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+
+  const text = message
+    ? `${name} โดเนท ${Number(amount).toLocaleString()} บาท พูดว่า ${message}`
+    : `${name} โดเนท ${Number(amount).toLocaleString()} บาท ขอบคุณมากนะคะ`;
+
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'th-TH';
+  utt.rate  = Number(settings.ttsRate)  || 1;
+  utt.pitch = Number(settings.ttsPitch) || 1;
+
+  // Try to use configured voice
+  const voices = window.speechSynthesis.getVoices();
+  const targetVoice = voices.find(v =>
+    v.name === settings.ttsVoice || v.lang === 'th-TH'
+  );
+  if (targetVoice) utt.voice = targetVoice;
+
+  window.speechSynthesis.speak(utt);
+}
+
+// ══════════════════════════════════════════════════
+//  FALLING PETALS 🌹
+// ══════════════════════════════════════════════════
+const PETALS = ['🌸','🌹','🌺','✿','❀','🌷','💮','🏵️'];
+
+function launchPetals(count) {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'petal';
+      p.textContent = PETALS[Math.floor(Math.random() * PETALS.length)];
+      p.style.left = Math.random() * 1920 + 'px';
+      p.style.fontSize = (14 + Math.random() * 18) + 'px';
+      const dur = 4 + Math.random() * 5;
+      p.style.animationDuration = dur + 's';
+      p.style.animationDelay = '0s';
+      container.appendChild(p);
+      setTimeout(() => p.remove(), dur * 1000 + 200);
+    }, Math.random() * 2000);
+  }
+}
+
+// ══════════════════════════════════════════════════
+//  TEST BUTTON
+// ══════════════════════════════════════════════════
+function testDonation() {
+  const testData = [
+    { name: 'TestUser', message: 'ทดสอบระบบ overlay นะคะ', amount: settings.overlayMinAmount || 20 },
+    { name: 'ผู้ใจดี', message: 'สวัสดีค่ะ ♡', amount: 5 },
+  ];
+  const pick = testData[Math.floor(Math.random() * testData.length)];
+  queue.push(pick);
+  updateQueueBadge();
+  if (!showing) processQueue();
+}
+
+// Preload voices
+window.speechSynthesis?.getVoices();
+window.speechSynthesis?.addEventListener?.('voiceschanged', () => window.speechSynthesis.getVoices());
+
+init();
+</script>
+</body>
+</html>
