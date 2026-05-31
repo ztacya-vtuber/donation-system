@@ -11,7 +11,8 @@ export default async function handler(req, res) {
   if (!filename || !data) return res.status(400).json({ error: 'Missing fields' });
 
   try {
-    const publicId = 'donation/' + filename.replace(/\.[^.]+$/, '');
+    const baseName = filename.replace(/\.[^.]+$/, '');
+    const publicId = 'donation/' + baseName + '_' + Date.now();  // ← เพิ่ม timestamp
     let url;
     if (type === 'audio') {
       url = await uploadAudioToCloudinary(data, publicId);
