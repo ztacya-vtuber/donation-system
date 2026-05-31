@@ -1,16 +1,14 @@
 // api/admin/upload.js
-import { cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
+import { getSupabase, cors, ADMIN_PASSWORD, DEFAULT_SETTINGS } from '../../lib/supabase.js';
 import { uploadToCloudinary, uploadAudioToCloudinary } from '../../lib/cloudinary.js';
 
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
-
-  const { password, filename, data, type } = req.body || {};
+  const { password, filename, data, type, settingKey } = req.body || {};
   if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
   if (!filename || !data) return res.status(400).json({ error: 'Missing fields' });
-
   try {
     const publicId = 'donation/' + filename.replace(/\.[^.]+$/, '');
     let url;
@@ -18,6 +16,13 @@ export default async function handler(req, res) {
       url = await uploadAudioToCloudinary(data, publicId);
     } else {
       url = await uploadToCloudinary(data, publicId);
+    }
+    if (settingKey) {
+      const sb = getSupabase();
+      const { data: existing } = await sb.from('settings').select('value').eq('key','site').single();
+      const current = { ...DEFAULT_SETTINGS, ...(existing?.value || {}) };
+      const merged = { ...current, [settingKey]: url + '?t=' + Date.now() };
+      await sb.from('settings').upsert({ key: 'site', value: merged, updated_at: new Date().toISOString() });
     }
     res.json({ ok: true, url });
   } catch (e) {
