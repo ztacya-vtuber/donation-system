@@ -1,0 +1,47 @@
+// api/admin/settings.js
+import { getSupabase, cors, ADMIN_PASSWORD, DEFAULT_SETTINGS } from '../../lib/supabase.js';
+
+const ALLOWED = [
+  'name','greeting','thankyou',
+  'avatarUrl','bannerUrl','bgUrl','bgColor','accentColor','qrUrl',
+  'overlayMinAmount','overlayAlertSoundUrl','overlayMinSoundUrl','overlayImageUrl',
+  'ttsEnabled','ttsVoice','ttsRate','ttsPitch',
+  'overlayDuration','overlayPosition','overlayEffect',
+];
+
+export default async function handler(req, res) {
+  cors(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+  if (req.method !== 'POST') return res.status(405).end();
+
+  const { password, ...newSettings } = req.body || {};
+  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
+
+  try {
+    const sb = getSupabase();
+    // Get current settings
+    const { data: existing } = await sb.from('settings').select('value').eq('key','site').single();
+    const current = { ...DEFAULT_SETTINGS, ...(existing?.value || {}) };
+
+    // Merge only allowed keys
+    const filtered = {};
+    for (const key of ALLOWED) {
+      if (newSettings[key] !== undefined) filtered[key] = newSettings[key];
+    }
+    const merged = { ...current, ...filtered };
+
+    await sb.from('settings').upsert({ key: 'site', value: merged, updated_at: new Date().toISOString() });
+
+    // Broadcast settings update to overlay
+    await sb.channel('donations').send({
+      type: 'broadcast',
+      event: 'settings_update',
+      payload: merged
+    });
+
+    res.json({ ok: true, settings: merged });
+  } catch (e) {
+    console.error('[admin/settings]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+}
