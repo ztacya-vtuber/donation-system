@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/donate", "destination": "/api/donate" },
+    { "source": "/webhook", "destination": "/api/webhook" },
+    { "source": "/api/settings", "destination": "/api/settings" },
+    { "source": "/api/history", "destination": "/api/history" },
+    { "source": "/api/top", "destination": "/api/top" },
+    { "source": "/api/stats", "destination": "/api/stats" },
+    { "source": "/api/admin/login", "destination": "/api/admin/login" },
+    { "source": "/api/admin/settings", "destination": "/api/admin/settings" },
+    { "source": "/api/admin/upload", "destination": "/api/admin/upload" },
+    { "source": "/api/admin/donations", "destination": "/api/admin/donations" },
+    { "source": "/api/admin/donations/:id", "destination": "/api/admin/donations/[id]" },
+    { "source": "/(.*)\\.html", "destination": "/public/$1.html" },
+    { "source": "/", "destination": "/public/index.html" },
+    { "source": "/((?!api/).*)", "destination": "/public/$1" }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+      ]
+    },
+    {
+      "source": "/public/overlay.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-store" }
+      ]
+    }
+  ]
+}
