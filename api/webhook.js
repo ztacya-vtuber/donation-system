@@ -43,14 +43,12 @@ export default async function handler(req, res) {
     const text = event.message.text;
     console.log('[LINE] Received:', text);
 
-    // Match amount: "20 บาท", "฿100", "100THB", etc.
     const m = text.match(/([\d,]+\.?\d*)\s*(บาท|THB|thb|฿)/i);
     if (!m) continue;
 
     const amount = parseFloat(m[1].replace(/,/g, ''));
     if (isNaN(amount) || amount <= 0) continue;
 
-    // Find most recent pending donation (within 10 min)
     const cutoff = new Date(Date.now() - 10 * 60 * 1000).toISOString();
     const { data: pending } = await sb
       .from('pending_donations')
@@ -66,21 +64,20 @@ export default async function handler(req, res) {
       const match = pending[0];
       name = match.name;
       message = match.message;
-      // Remove matched pending
       await sb.from('pending_donations').delete().eq('id', match.id);
     }
 
-    // Save to donations table
-    const { data: donation } = await sb.from('donations').insert({
+    const { data: donation, error: insertError } = await sb.from('donations').insert({
       name,
       message,
-      amount,
-      date: new Date().toISOString()
+      amount
     }).select().single();
 
-    // Broadcast via Supabase Realtime (using postgres notify workaround via channel)
-    // We use a DB insert which triggers realtime subscription on the client side
-    // The overlay polls /api/events which uses Supabase's broadcast channel
+    if (insertError) {
+      console.error('[webhook] Insert error:', insertError);
+      continue;
+    }
+
     await sb.channel('donations').send({
       type: 'broadcast',
       event: 'new_donation',
