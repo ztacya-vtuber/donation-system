@@ -29,7 +29,6 @@
   }
   .content{position:relative;z-index:1;width:100%;max-width:480px;padding:32px 16px 60px}
 
-  /* Banner */
   .banner-wrap{
     width:calc(100% + 32px);margin:0 -16px 0;
     height:180px;overflow:hidden;position:relative;z-index:1;
@@ -41,7 +40,6 @@
   }
   .banner-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#1a0510,#0f021a,#180510)}
 
-  /* Profile */
   .profile-row{
     display:flex;align-items:flex-end;gap:16px;
     margin-top:-48px;margin-bottom:20px;padding:0 4px;
@@ -65,12 +63,10 @@
     font-style:italic;font-family:'Cormorant Garamond',serif;
   }
 
-  /* Card */
   .card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
   .page{display:none}
   .page.active{display:block}
 
-  /* Form */
   .form-inner{padding:24px}
   .form-title{
     font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;
@@ -103,7 +99,6 @@
     border-radius:8px;color:#f07070;font-size:13px;display:none;
   }
 
-  /* QR Page */
   .qr-inner{padding:24px}
   .donor-badge{
     display:flex;align-items:center;gap:12px;
@@ -136,7 +131,17 @@
   }
   .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
 
-  /* Nav — ไม่มี stats bar */
+  .success-wrap{
+    padding:40px 24px;text-align:center;
+  }
+  .success-icon{font-size:48px;margin-bottom:16px}
+  .success-title{
+    font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;
+    margin-bottom:8px;
+  }
+  .success-name{color:var(--accent);font-size:18px;margin-bottom:4px}
+  .success-amount{font-size:14px;color:var(--muted)}
+
   .nav-links{
     display:flex;justify-content:center;gap:20px;margin-top:24px;
     padding-top:20px;border-top:1px solid var(--border);
@@ -166,7 +171,6 @@
       <div class="profile-greeting" id="profileGreeting"></div>
     </div>
   </div>
-  <!-- NO stats bar — private -->
   <div class="card">
     <!-- Page 1 -->
     <div class="page active" id="page1">
@@ -201,12 +205,24 @@
         <button class="btn-ghost" onclick="goBack()">← แก้ไขข้อมูล</button>
       </div>
     </div>
+    <!-- Page 3 Success -->
+    <div class="page" id="page3">
+      <div class="success-wrap">
+        <div class="success-icon">✦</div>
+        <div class="success-title">ขอบคุณมากนะคะ</div>
+        <div class="success-name" id="successName"></div>
+        <div class="success-amount" id="successAmount"></div>
+      </div>
+    </div>
   </div>
   <div class="nav-links">
     <a href="/top.html">🏆 Top Donors</a>
   </div>
 </div>
 <script>
+let pollingTimer = null;
+let currentName = '';
+
 async function loadSettings(){
   try{
     const s = await fetch('/api/settings').then(r=>r.json());
@@ -229,6 +245,7 @@ async function loadSettings(){
     if(s.qrUrl) document.getElementById('qrImg').src=s.qrUrl;
   }catch(e){console.error(e)}
 }
+
 async function goToQR(){
   const name=document.getElementById('name').value.trim();
   const message=document.getElementById('message').value.trim();
@@ -240,18 +257,52 @@ async function goToQR(){
   try{
     const res=await fetch('/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,message})});
     if(res.ok){
+      currentName = name;
       document.getElementById('showName').textContent=name;
       document.getElementById('showMsg').textContent=message||'';
       document.getElementById('page1').classList.remove('active');
       document.getElementById('page2').classList.add('active');
+      startPolling(name);
     }else{err.textContent='เกิดข้อผิดพลาด';err.style.display='block'}
   }catch(e){err.textContent='เกิดข้อผิดพลาด';err.style.display='block'}
   btn.disabled=false;btn.textContent='ถัดไป →';
 }
+
 function goBack(){
+  stopPolling();
   document.getElementById('page1').classList.add('active');
   document.getElementById('page2').classList.remove('active');
 }
+
+function startPolling(name){
+  stopPolling();
+  const startTime = Date.now();
+  pollingTimer = setInterval(async () => {
+    try{
+      const res = await fetch('/api/history?limit=10').then(r=>r.json());
+      const rows = res.data || [];
+      const found = rows.find(d =>
+        d.name === name && new Date(d.created_at).getTime() > startTime - 10000
+      );
+      if(found){
+        stopPolling();
+        showSuccess(found);
+      }
+    }catch(e){}
+  }, 3000);
+}
+
+function stopPolling(){
+  if(pollingTimer){ clearInterval(pollingTimer); pollingTimer = null; }
+}
+
+function showSuccess(donation){
+  document.getElementById('successName').textContent = donation.name;
+  document.getElementById('successAmount').textContent = 'โดเนท ฿' + Number(donation.amount).toLocaleString();
+  document.getElementById('page2').classList.remove('active');
+  document.getElementById('page3').classList.add('active');
+}
+
 document.getElementById('name').addEventListener('keydown',e=>{if(e.key==='Enter')goToQR()});
 loadSettings();
 </script>
