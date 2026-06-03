@@ -390,7 +390,7 @@ const SUPABASE_ANON = window.__SUPABASE_ANON__ || '%%SUPABASE_ANON%%';
 
 let currentName    = '';
 let currentMessage = '';
-let pendingId      = null;   // id ใน pending_donations
+let pendingId      = null;
 let slipFile       = null;
 let realtimeSub    = null;
 
@@ -502,11 +502,10 @@ async function submitSlip(){
     });
 
     const payload = {
+      slipBase64: b64,
       pendingId,
       name:    currentName,
       message: currentMessage,
-      slipData: b64,
-      slipMime: slipFile.type,
     };
 
     const res = await fetch('/api/slip',{
@@ -521,13 +520,16 @@ async function submitSlip(){
       bar.style.width='100%';
       setTimeout(()=>{ prog.style.display='none'; },400);
 
+      // บันทึก pendingId ของสลิปที่ส่งไป
+      const sentPendingId = j.donation?.id || pendingId;
+
       // แสดง thumb ใน page 4
-      const thumbSrc = j.slipUrl || document.getElementById('slipPreviewImg').src;
+      const thumbSrc = document.getElementById('slipPreviewImg').src;
       document.getElementById('waitSlipImg').src  = thumbSrc;
       document.getElementById('waitSlipThumb').style.display = 'block';
 
       showPage(4);
-      listenForApproval(j.pendingId || pendingId);
+      listenForApproval(sentPendingId);
     } else {
       clearInterval(fakeProgress);
       bar.style.width='0%'; prog.style.display='none';
@@ -545,16 +547,57 @@ async function submitSlip(){
 
 // ── Realtime: รอ admin ยืนยัน ──────────────────────────
 function listenForApproval(pid){
-  if(!SUPABASE_URL || SUPABASE_URL.includes('%%')) return;
+  if(!SUPABASE_URL || SUPABASE_URL.includes('%%')) {
+    console.warn('Supabase not configured');
+    return;
+  }
+  
   const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
 
-  // ฟัง broadcast จาก admin เมื่อยืนยันโดเนทที่มี pendingId ตรงกัน
-  realtimeSub = sb.channel('donations')
-    .on('broadcast', { event: 'donation_approved' }, ({ payload }) => {
-      if(payload.pendingId == pid || payload.name === currentName){
-        showSuccess({ name: payload.name, amount: payload.amount });
+  // ฟัง pending_donations table - เมื่อสลิปได้รับการยืนยัน status เปลี่ยน
+  realtimeSub = sb
+    .channel(`pending:${pid}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'pending_donations',
+        filter: `id=eq.${pid}`
+      },
+      (payload) => {
+        console.log('pending_donations changed:', payload);
+        // ถ้า status เปลี่ยนจาก pending_admin ให้ move ไป success
+        if(payload.new.status !== 'pending_admin'){
+          showSuccess({
+            name: currentName,
+            amount: payload.new.amount
+          });
+        }
       }
-    })
+    )
+    .subscribe();
+
+  // Fallback: ฟัง donations table - เมื่อ admin approve บันทึกลงนี่
+  realtimeSub = sb
+    .channel('donations:all')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'donations'
+      },
+      (payload) => {
+        console.log('new donation:', payload);
+        if(payload.new.name === currentName){
+          showSuccess({
+            name: payload.new.name,
+            amount: payload.new.amount
+          });
+        }
+      }
+    )
     .subscribe();
 }
 
