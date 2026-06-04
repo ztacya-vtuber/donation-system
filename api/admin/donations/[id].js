@@ -1,5 +1,30 @@
 import { getSupabase, cors, ADMIN_PASSWORD } from '../../../lib/supabase.js';
 
+// ส่ง broadcast ผ่าน Supabase REST API (ทำงานได้จาก serverless)
+async function broadcastDonation(donation) {
+  const url = `${process.env.SUPABASE_URL}/realtime/v1/api/broadcast`;
+  await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'apikey': process.env.SUPABASE_ANON_KEY,
+      'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+    },
+    body: JSON.stringify({
+      messages: [{
+        topic: 'realtime:donations',
+        event: 'new_donation',
+        payload: {
+          name: donation.name,
+          message: donation.message || '',
+          amount: donation.amount,
+          id: donation.id,
+        },
+      }],
+    }),
+  });
+}
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -24,29 +49,15 @@ export default async function handler(req, res) {
         .eq('id', id)
         .select()
         .single();
-
       if (error) return res.status(500).json({ error: error.message });
 
-      await sb.channel('donations').send({
-        type: 'broadcast',
-        event: 'new_donation',
-        payload: {
-          name: donation.name,
-          message: donation.message || '',
-          amount: donation.amount,
-          id: donation.id,
-        },
-      });
+      try { await broadcastDonation(donation); } catch(e) { console.warn('broadcast failed', e.message); }
 
       return res.json({ ok: true, donation });
     }
 
     if (action === 'reject') {
-      const { error } = await sb
-        .from('donations')
-        .delete()
-        .eq('id', id);
-
+      const { error } = await sb.from('donations').delete().eq('id', id);
       if (error) return res.status(500).json({ error: error.message });
       return res.json({ ok: true });
     }
@@ -57,20 +68,13 @@ export default async function handler(req, res) {
   if (req.method === 'PUT') {
     const { name, amount, message } = body;
     const parsed = parseFloat(amount);
-
     if (!name?.trim() || isNaN(parsed) || parsed <= 0) {
       return res.status(400).json({ error: 'Invalid data' });
     }
-
     const { error } = await sb
       .from('donations')
-      .update({
-        name: name.trim(),
-        amount: parsed,
-        message: (message || '').trim(),
-      })
+      .update({ name: name.trim(), amount: parsed, message: (message || '').trim() })
       .eq('id', id);
-
     if (error) return res.status(500).json({ error: error.message });
     return res.json({ ok: true });
   }
