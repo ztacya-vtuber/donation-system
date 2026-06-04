@@ -28,13 +28,12 @@ export default async function handler(req, res) {
     message: message?.trim() || '',
     amount: parsed,
     ip_address,
-    status: 'pending',
-    date: new Date().toISOString(),
+    shown: false,
   });
 
   if (error) {
     console.error('[donate]', error);
-    return res.status(500).json({ error: 'บันทึกข้อมูลไม่สำเร็จ' });
+    return res.status(500).json({ error: error.message });
   }
 
   return res.status(200).json({ ok: true, status: 'pending' });
