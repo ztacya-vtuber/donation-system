@@ -1,34 +1,36 @@
 import { getSupabase, cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
-
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
-
-  const password = req.method === 'GET' ? req.query?.password : req.body?.password;
+  const password = req.method === 'GET' ? (req.query?.password || req.headers['x-admin-password']) : req.body?.password;
   if (String(password || '') !== String(ADMIN_PASSWORD || '')) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
-
   const sb = getSupabase();
-
   if (req.method === 'GET') {
+    // ?pending=true → ดึงเฉพาะรายการที่ยังไม่อนุมัติ
+    if (req.query.pending === 'true') {
+      const { data, error } = await sb
+        .from('donations')
+        .select('*')
+        .eq('shown', false)
+        .order('created_at', { ascending: true });
+      if (error) return res.status(500).json({ error: error.message });
+      return res.json({ ok: true, data: data || [] });
+    }
     const { data, error } = await sb
       .from('donations')
       .select('*')
       .order('created_at', { ascending: false });
-
     if (error) return res.status(500).json({ error: error.message });
     return res.json({ ok: true, data: data || [] });
   }
-
   if (req.method === 'POST') {
     const { name, amount, message } = req.body || {};
     const parsed = parseFloat(amount);
-
     if (!name?.trim() || isNaN(parsed) || parsed <= 0) {
       return res.status(400).json({ error: 'Invalid data' });
     }
-
     const { data: donation, error } = await sb
       .from('donations')
       .insert({
@@ -39,9 +41,7 @@ export default async function handler(req, res) {
       })
       .select()
       .single();
-
     if (error) return res.status(500).json({ error: error.message });
-
     await sb.channel('donations').send({
       type: 'broadcast',
       event: 'new_donation',
@@ -52,9 +52,7 @@ export default async function handler(req, res) {
         id: donation.id,
       },
     });
-
     return res.json({ ok: true, donation });
   }
-
   return res.status(405).json({ error: 'Method not allowed' });
 }
