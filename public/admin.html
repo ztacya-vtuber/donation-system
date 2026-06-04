@@ -6,12 +6,12 @@
 <title>Admin Panel</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600&family=Noto+Sans+Thai:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-  :root{--bg:#06050a;--accent:#e8a4c8;--card:#0e0b12;--border:#2a2035;--text:#f0e8ec;--muted:#7a6070;--success:#7ec8a0;--danger:#e87070}
+  :root{--bg:#06050a;--accent:#e8a4c8;--card:#0e0b12;--border:#2a2035;--text:#f0e8ec;--ed:#7a6070;--success:#7ec8a0;--danger:#e87070}
   *{box-sizing:border-box;margin:0;padding:0}
   body{min-height:100vh;background:var(--bg);font-family:'Noto Sans Thai',sans-serif;font-weight:300;color:var(--text)}
   .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
   .login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px 32px;width:100%;max-width:340px;text-align:center}
-  .login-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:6px}
+  .login-title{font-familyCormorant Garamond',serif;font-size:26px;font-weight:300;margin-bottom:6px}
   .login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:0.05em}
   .admin-shell{display:none;min-height:100vh;flex-direction:column}
   .admin-shell.show{display:flex}
@@ -19,7 +19,7 @@
   .topbar-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;flex:1}
   .topbar-back{font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:0.06em;transition:color 0.2s}
   .topbar-back:hover{color:var(--accent)}
-  .admin-body{display:flex;flex:1}
+  .admin-bodydisplay:flex;flex:1}
   .sidebar{width:210px;flex-shrink:0;border-right:1px solid var(--border);padding:24px 0;background:var(--card)}
   .sidebar-link{display:block;padding:10px 20px;font-size:13px;color:var(--muted);cursor:pointer;transition:color 0.2s,background 0.2s;text-decoration:none;letter-spacing:0.04em;border-left:2px solid transparent}
   .sidebar-link:hover,.sidebar-link.active{color:var(--accent);background:#0a0510;border-left-color:var(--accent)}
@@ -37,23 +37,23 @@
     width:100%;background:#06050a;border:1px solid var(--border);border-radius:8px;
     padding:10px 14px;color:var(--text);font-family:'Noto Sans Thai',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;
   }
-  input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+  input:focus,textarea:focus,select:focus{border:var(--accent)}
   textarea{resize:vertical;min-height:70px}
   input[type=color]{padding:4px 8px;height:40px;cursor:pointer}
   select{cursor:pointer}
 
   .toggle-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
   .toggle-label{flex:1;font-size:13px}
-  .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+  .toggle{position:relative;width:44px;height:px;flex-shrink:0}
   .toggle input{opacity:0;width:0;height:0}
   .toggle-slider{position:absolute;inset:0;background:#2a2035;border-radius:12px;cursor:pointer;transition:background 0.2s;}
-  .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;background:#7a6070;border-radius:50%;top:3px;left:3px;transition:all 0.2s;}
+  .toggle-slider::before{content:'';position:absolute;width18px;height:18px;background:#7a6070;border-radius:50%;top:3px;left:3px;transition:all 0.2s;}
   .toggle input:checked+.toggle-slider{background:color-mix(in srgb,var(--accent) 40%,transparent)}
   .toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:var(--accent)}
 
   .btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:400;transition:opacity 0.2s,transform 0.1s}
   .btn:active{transform:scale(0.97)}
-  .btn-primary{background:linear-gradient(135deg,var(--accent),#c87eb0);color:#06050a}
+  .btn-primary{background:linear-gradient135deg,var(--accent),#c87eb0);color:#06050a}
   .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
   .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
   .btn:disabled{opacity:0.4;cursor:not-allowed}
@@ -107,10 +107,10 @@
   .dm-row{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border);transition:background 0.15s}
   .dm-row:last-child{border-bottom:none}
   .dm-row:hover{background:#0a0510}
-  .dm-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:44px;flex-shrink:0;line-height:1.6}
+ dm-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:44px;flex-shrink:0;line-height:1.6}
   .dm-info{flex:1;min-width:0}
   .dm-name{font-size:13px;font-weight:400}
-  .dm-msg{font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dm-msg{font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:}
   .dm-amount{font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);flex-shrink:0;min-width:56px;text-align:right}
   .dm-edit-btn{margin-left:8px;width:28px;height:28px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;font-size:12px;color:var(--muted);flex-shrink:0;transition:border-color 0.2s,color 0.2s;display:flex;align-items:center;justify-content:center}
   .dm-edit-btn:hover{border-color:var(--accent);color:var(--accent)}
@@ -124,15 +124,15 @@
   .dm-modal-overlay.show{display:flex}
   .dm-modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:380px;animation:modalIn 0.22s ease}
   @keyframes modalIn{from{opacity:0;transform:translateY(10px) scale(0.97)}to{opacity:1;transform:none}}
-  .dm-modal-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:300;margin-bottom:4px}
+  .dm-modal-title{font-family:'Cormorant Garamond',serif;font-size:20;font-weight:300;margin-bottom:4px}
   .dm-modal-sub{font-size:12px;color:var(--muted);margin-bottom:22px}
   .dm-del-confirm{background:#0d0408;border:1px solid #3a1010;border-radius:10px;padding:12px 14px;margin-top:16px;display:none}
   .dm-del-confirm.show{display:block}
   .dm-del-text{font-size:13px;color:var(--muted);margin-bottom:10px}
-  .dm-del-btn{background:#1a0808;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;font-family:'Noto Sans Thai',sans-serif;transition:background 0.2s}
+  .dm-del-btn{background:#a0808;border:1px solid var(--danger);color:var(--danger);border-radius:8px;padding:8px 16px;cursor:pointer;font-size:13px;font-family:'Noto Sans Thai',sans-serif;transition:background 0.2s}
   .dm-del-btn:hover{background:#2a0d0d}
   .dm-modal-actions{display:flex;gap:8px;margin-top:20px;align-items:center}
-  .btn-danger-outline{background:transparent;border:1px solid var(--danger);color:var(--danger);padding:10px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'Noto Sans Thai',sans-serif;transition:background 0.2s;margin-left:auto}
+  .btn-danger-outline{background:;border:1px solid var(--danger);color:var(--danger);padding:10px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-family:'Noto Sans Thai',sans-serif;transition:background 0.2s;margin-left:auto}
   .btn-danger-outline:hover{background:#1a0808}
 
   @media(max-width:600px){
@@ -179,8 +179,7 @@
     </div>
     <div class="main-area">
 
-      <!-- Dashboard -->
-      <div class="section active" id="sec-dashboard">
+      <!-- Dashboard      <div class="section active" id="sec-dashboard">
         <div class="section-title">Dashboard</div>
         <div class="section-sub">ภาพรวมระบบโดเนท — ส่วนตัว ไม่แสดงสาธารณะ</div>
         <div class="dash-grid">
@@ -189,7 +188,7 @@
           <div class="dash-card"><div class="dash-num" id="dToday">-</div><div class="dash-label">วันนี้</div></div>
           <div class="dash-card"><div class="dash-num" id="dDonors">-</div><div class="dash-label">ผู้โดเนทไม่ซ้ำ</div></div>
         </div>
-        <div style="font-size:12px;color:var(--muted);margin-bottom:12px;letter-spacing:0.06em;text-transform:uppercase">รายการล่าสุด</div>
+       div style="font-size:12px;color:var(--muted);margin-bottom:12px;letter-spacing:0.06em;text-transform:uppercase">รายการล่าสุด</div>
         <div class="recent-list" id="recentList"><div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">กำลังโหลด...</div></div>
       </div>
 
@@ -215,7 +214,7 @@
             <!-- รูปปัจจุบันจาก settings -->
             <div class="current-img-wrap" id="curWrapAvatar">
               <div class="current-img-label">รูปปัจจุบัน</div>
-              <img id="curAvatar" class="current-img-avatar" src="" alt="current avatar">
+              <img idcurAvatar" class="current-img-avatar" src="" alt="current avatar">
             </div>
             <div class="upload-area" onclick="document.getElementById('fileAvatar').click()">
               <div class="upload-icon">👤</div><div class="upload-hint">1:1 ratio · คลิกเพื่อเลือกไฟล์ใหม่</div>
@@ -357,8 +356,8 @@
           </div>
           <div class="field-group" style="margin-bottom:0">
             <div class="field-label">หรือใส่ URL ตรงๆ</div>
-            <input type="text" id="cfgAlertImgUrl" placeholder="https://...">
-          </div>
+            <input type="text" id="cfgAlertImgUrl" placeholder="://...">
+          </>
         </div>
         <div class="field-group">
           <div class="field-label">🎤 Text-to-Speech</div>
@@ -377,7 +376,7 @@
         <div class="field-group">
           <div class="field-label">ระดับเสียง TTS</div>
           <div style="display:flex;align-items:center;gap:12px">
-            <input type="range" id="cfgTtsPitch" min="0.5" max="2" step="0.1" value="1" style="flex:1;accent-color:var(--accent)" oninput="document.getElementById('ttsPitchVal').textContent=this.value">
+            <input type="range" id="cfgTtsPitch" min="0.5" max="2" step="0.1" value="1" style="flex:1;accent-color:var(--accent)" oninput="document.getElementById('PitchVal').textContent=this.value">
             <span id="ttsPitchVal" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);width:30px">1</span>
           </div>
         </div>
@@ -396,13 +395,13 @@
             <option value="bottom-left">ล่างซ้าย</option>
             <option value="bottom-right">ล่างขวา</option>
             <option value="top-left">บนซ้าย</option>
-            <option value="top-right">บนขวา</option>
+            <option value="top-rightบนขวา</option>
             <option value="center">กลาง-ล่าง</option>
           </select>
         </div>
         <div class="field-group">
           <div class="field-label">⏱ ระยะเวลาแสดง Alert (วินาที)</div>
-          <div style="display:flex;align-items:center;gap:12px">
+          <div styledisplay:flex;align-items:center;gap:12px">
             <input type="range" id="cfgDuration" min="3" max="20" step="1" value="8" style="flex:1;accent-color:var(--accent)" oninput="document.getElementById('durationVal').textContent=this.value">
             <span id="durationVal" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);width:30px">8</span>
           </div>
@@ -434,7 +433,7 @@
               <button onclick="dmOpenAdd()" style="background:linear-gradient(135deg,var(--accent),#c87eb0);border:none;border-radius:6px;padding:5px 12px;color:#06050a;font-family:'Noto Sans Thai',sans-serif;font-size:12px;cursor:pointer;font-weight:500;white-space:nowrap">+ เพิ่มรายการ</button>
             </div>
           </div>
-          <div id="dmListBody"><div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">กำลังโหลด...</div></div>
+         div="dmListBody"><div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">กำลังโหลด...</div></div>
         </div>
         <div class="dm-pager" id="dmPager" style="display:none">
           <button id="dmPrevBtn" onclick="dmChangePage(-1)" disabled>← ก่อนหน้า</button>
@@ -454,7 +453,7 @@
     <div class="dm-modal-sub" id="dmModalSub">-</div>
     <div class="field-group"><div class="field-label">ชื่อ</div><input type="text" id="dmEditName"></div>
     <div class="field-group"><div class="field-label">จำนวนเงิน (บาท)</div><input type="number" id="dmEditAmount" min="1" style="font-family:'DM Mono',monospace"></div>
-    <div class="field-group"><div class="field-label">ข้อความ</div><input type="text" id="dmEditMsg"></div>
+    <div class="field-group"><div class="field-label">ข้อความ</div><input type="text"="dmEditMsg"></div>
     <div class="dm-del-confirm" id="dmDelConfirm">
       <div class="dm-del-text">⚠️ ลบรายการนี้ถาวร?</div>
       <button class="dm-del-btn" onclick="dmConfirmDelete()">ยืนยันลบ</button>
@@ -516,24 +515,29 @@ async function loadAll(){
     fetch('/api/history?limit=9999').then(r=>r.json())
   ]);
   currentSettings = s;
-  document.getElementById('topbarName').textContent = s.name||'';
 
-  // Profile
-  document.getElementById('cfgName').value = s.name||'';
-  document.getElementById('cfgGreeting').value = s.greeting||'';
-  document.getElementById('cfgThankyou').value = s.thankyou||'';
+  // แสดงรูปปัจจุบันใน Images section (preview)
+  const imgFields = {
+    prevAvatar: s.avatarUrl,
+    prevBanner: s.bannerUrl,
+    prevBg:     s.bgUrl,
+    prevQr:     s.qrUrl,
+  };
+  for(const [id, url] of Object.entries(imgFields)){
+    if(url){
+      const el = document.getElementById(id);
+      if(el){
+        el.src = url;
+        el.style.display = 'block';
+      }
+    }
+  }
 
-  // Colors
-  document.getElementById('cfgBgColor').value = s.bgColor||'#0a0208';
-  document.getElementById('cfgBgColorHex').value = s.bgColor||'#0a0208';
-  document.getElementById('cfgAccentColor').value = s.accentColor||'#e8a4c8';
-  document.getElementById('cfgAccentColorHex').value = s.accentColor||'#e8a4c8';
-
-  // ── แสดงรูปปัจจุบันใน Images section ──
+  // แสดงรูปปัจจุบันใน Images section (current image)
   const imgMap = [
     { url: s.avatarUrl,       imgId: 'curAvatar',   wrapId: 'curWrapAvatar'   },
     { url: s.bannerUrl,       imgId: 'curBanner',   wrapId: 'curWrapBanner'   },
-    { url: s.bgUrl,           imgId: 'curBg',       wrapId: 'curWrapBg'       },
+    { url: s.bgUrl,          Id: 'curBg',       wrapId: 'curWrapBg'       },
     { url: s.qrUrl,           imgId: 'curQr',       wrapId: 'curWrapQr'       },
     { url: s.overlayImageUrl, imgId: 'curAlertImg', wrapId: 'curWrapAlertImg' },
   ];
@@ -545,6 +549,17 @@ async function loadAll(){
       if (wrap) { wrap.classList.add('show'); }
     }
   });
+
+  // Profile
+  document.getElementById('cfgName').value = s.name||'';
+  document.getElementById('cfgGreeting').value = s.greeting||'';
+  document.getElementById('cfgThankyou').value = s.thankyou||'';
+
+  // Colors
+  document.getElementById('cfgBgColor').value = s.bgColor||'#0a0208';
+  document.getElementById('cfgBgColorHex').value = s.bgColor||'#0a0208';
+  document.getElementById('cfgAccentColor').value = s.accentColor||'#e8a4c8';
+  document.getElementById('cfgAccentColorHex').value = s.accentColor||'#e8a4c8';
 
   // Overlay
   document.getElementById('cfgMinAmount').value = s.overlayMinAmount||20;
@@ -558,8 +573,8 @@ async function loadAll(){
   const pitch = s.ttsPitch||1;
   document.getElementById('cfgTtsPitch').value = pitch;
   document.getElementById('ttsPitchVal').textContent = pitch;
-  document.getElementById('cfgEffect').value = s.overlayEffect||'roses';
-  document.getElementById('cfgPosition').value = s.overlayPosition||'bottom-left';
+ document.getElementById('cfgEffect').value = s.overlayEffect||'roses';
+  document.getElementById('cfgPosition'). = s.overlayPosition||'bottom-left';
   const dur = s.overlayDuration||8;
   document.getElementById('cfgDuration').value = dur;
   document.getElementById('durationVal').textContent = dur;
@@ -618,13 +633,13 @@ function saveProfile(){
 function saveColors(){
   saveSettings({
     bgColor:document.getElementById('cfgBgColorHex').value.trim()||document.getElementById('cfgBgColor').value,
-    accentColor:document.getElementById('cfgAccentColorHex').value.trim()||document.getElementById('cfgAccentColor').value
+   Color:document.getElementById('cfgAccentColorHex').value.trim()||document.getElementById('cfgAccentColor').value
   });
 }
 
 function saveOverlay(){
   saveSettings({
-    overlayMinAmount: parseFloat(document.getElementById('cfgMinAmount').value)||20,
+    overlayMinAmount: parseFloat(document.getById('cfgMinAmount').value)||20,
     overlayAlertSoundUrl: document.getElementById('cfgAlertSoundUrl').value.trim(),
     overlayMinSoundUrl: document.getElementById('cfgMinSoundUrl').value.trim(),
     overlayImageUrl: document.getElementById('cfgAlertImgUrl').value.trim(),
@@ -633,7 +648,7 @@ function saveOverlay(){
     ttsPitch: parseFloat(document.getElementById('cfgTtsPitch').value)||1,
     overlayEffect: document.getElementById('cfgEffect').value,
     overlayPosition: document.getElementById('cfgPosition').value,
-    overlayDuration: parseInt(document.getElementById('cfgDuration').value)||8,
+    overlayDuration: parseInt(document.getElementById('cfgDurationvalue)||8,
   });
 }
 
@@ -669,11 +684,11 @@ function previewAudio(input,previewId){
   audio.style.display='block';
 }
 
-// ── uploadImg รับ curImgId + curWrapId เพื่ออัปเดต preview หลังอัปโหลดสำเร็จ ──
+// uploadImg รับ curImgId + curWrapId เพื่ออัปเดต preview หลังอัปโหลดสำเร็จ
 async function uploadImg(fileInputId, filename, settingKey, curImgId, curWrapId){
   const input = document.getElementById(fileInputId);
   if(!input.files || input.files.length === 0){
-    toast('กรุณาเลือกไฟล์รูปภาพก่อนอัปโหลด', 'error');
+    toast('กรุณาเลือกไฟล์รูปภาพก่อนัปโหลด', 'error');
     return;
   }
   const file = input.files[0];
@@ -693,11 +708,11 @@ async function uploadImg(fileInputId, filename, settingKey, curImgId, curWrapId)
       const j = await res.json();
       if(j.ok){
         toast('อัปโหลดสำเร็จ! 🎉', 'success');
-        // ── อัปเดต preview รูปปัจจุบันทันที ──
+        // อัปเดต preview รูปปัจจุบันทันที
         if(curImgId && j.url){
           const img  = document.getElementById(curImgId);
           const wrap = document.getElementById(curWrapId);
-          if(img)  { img.src = j.url; }
+          if(img  { img.src = j.url; }
           if(wrap) { wrap.classList.add('show'); }
         }
         if(settingKey === 'overlayImageUrl' && document.getElementById('cfgAlertImgUrl')){
@@ -717,9 +732,9 @@ async function uploadImg(fileInputId, filename, settingKey, curImgId, curWrapId)
 }
 
 async function uploadAudio(fileInputId, filename, settingKey){
-  const input = document.getElementById(fileInputId);
+  const input =.getElementById(fileInputId);
   if(!input.files || input.files.length === 0){
-    toast('กรุณาเลือกไฟล์เสียงก่อนอัปโหลด', 'error');
+    toast('กรุณาเลือกไฟเสียงก่อนอัปโหลด', 'error');
     return;
   }
   const file = input.files[0];
@@ -731,7 +746,7 @@ async function uploadAudio(fileInputId, filename, settingKey){
   const reader = new FileReader();
   reader.onload = async (e) => {
     try {
-      const res = await fetch('/api/admin/upload', {
+      const res = await fetch('/api/admin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: pwd, filename, data: e.target.result, type: 'audio', settingKey })
@@ -754,15 +769,14 @@ async function uploadAudio(fileInputId, filename, settingKey){
   reader.readAsDataURL(file);
 }
 
-// ── Donations Manager ──────────────────────────────────────
+// Donations Manager
 function dmFilter(){
   const q=(document.getElementById('dmSearch')?.value||'').toLowerCase().trim();
   const sort=document.getElementById('dmSort')?.value||'date-desc';
   dmFiltered=dmData.filter(d=>!q||d.name.toLowerCase().includes(q)||(d.message||'').toLowerCase().includes(q));
   if(sort==='date-desc') dmFiltered.sort((a,b)=>new Date(b.date)-new Date(a.date));
   else if(sort==='date-asc') dmFiltered.sort((a,b)=>new Date(a.date)-new Date(b.date));
-  else if(sort==='amount-desc') dmFiltered.sort((a,b)=>b.amount-a.amount);
-  else if(sort==='amount-asc') dmFiltered.sort((a,b)=>a.amount-b.amount);
+  else if(sort==='amount-desc') dmFiltered.sort((a,b)=>b.amount-a.amount  else if(sort==='amount-asc') dmFiltered.sort((a,b)=>a.amount-b.amount);
   dmPage=1;dmRender();
 }
 
@@ -778,10 +792,10 @@ function dmRender(){
   const pager=document.getElementById('dmPager');
   badge.textContent=dmFiltered.length.toLocaleString()+' รายการ';
   const max=Math.max(1,Math.ceil(dmFiltered.length/DM_LIMIT));
-  const start=(dmPage-1)*DM_LIMIT;
-  const items=dmFiltered.slice(start,start+DM_LIMIT);
+  const start=(dmPage-1)*_LIMIT;
+  const items=dmFiltered.slice(start,startDM_LIMIT);
   if(max>1){
-    pager.style.display='flex';
+    pager.display='flex';
     document.getElementById('dmPagerInfo').textContent=dmPage+' / '+max;
     document.getElementById('dmPrevBtn').disabled=dmPage<=1;
     document.getElementById('dmNextBtn').disabled=dmPage>=max;
@@ -804,7 +818,7 @@ function dmOpenEdit(id,name,amount,message,date){
   document.getElementById('dmEditAmount').value=amount;
   document.getElementById('dmEditMsg').value=message;
   const dt=new Date(date);
-  document.getElementById('dmModalSub').textContent='โดเนทเมื่อ '+dt.toLocaleDateString('th-TH')+' '+dt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('dmModalSub').textContent='เนทเมื่อ '+dt.toLocaleDateString('th-TH')+' '+dt.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit'});
   document.getElementById('dmDelConfirm').classList.remove('show');
   document.getElementById('dmModalOverlay').classList.add('show');
 }
@@ -818,10 +832,10 @@ async function dmSaveEdit(){
   const amount=parseFloat(document.getElementById('dmEditAmount').value);
   const message=document.getElementById('dmEditMsg').value.trim();
   if(!name||isNaN(amount)||amount<=0){toast('กรอกข้อมูลให้ครบ','error');return}
-  const res=await fetch(`/api/admin/donations/${dmEditId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,name,amount,message})});
+  const res=await fetch(`/api/admin/donations/${dmEditId}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,amount,message})});
   const j=await res.json();
   if(j.ok){dmData=dmData.map(d=>d.id==dmEditId?{...d,name,amount,message}:d);dmCloseModal();dmFilter();toast('แก้ไขแล้ว ✓','success')}
-  else toast('เกิดข้อผิดพลาด','error');
+ else toast('เกิดข้อผิดพลาด','error');
 }
 
 async function dmConfirmDelete(){
@@ -840,7 +854,7 @@ function dmOpenAdd(){
   document.getElementById('dmAddDate').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
   document.getElementById('dmAddModalOverlay').classList.add('show');
 }
-function dmCloseAddModal(){document.getElementById('dmAddModalOverlay').classList.remove('show')}
+function dmCloseModal(){document.getElementById('dmAddModalOverlay').classList.remove('show')}
 
 async function dmSaveAdd(){
   const name=document.getElementById('dmAddName').value.trim();
@@ -848,8 +862,8 @@ async function dmSaveAdd(){
   const message=document.getElementById('dmAddMsg').value.trim();
   const dateVal=document.getElementById('dmAddDate').value;
   if(!name||isNaN(amount)||amount<=0){toast('กรอกข้อมูลให้ครบ','error');return}
-  const date=dateVal?new Date(dateVal).toISOString():new Date().toISOString();
-  const res=await fetch('/api/admin/donations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,name,amount,message,date})});
+  const date=dateVal?new Date(dateVal).toISOString():new Date().to();
+  const res=await fetch('/api/admin/donationsmethod:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,name,amount,message,date})});
   const j=await res.json();
   if(j.ok){
     if(j.donation) dmData.unshift(j.donation);
@@ -873,5 +887,3 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 </script>
 </body>
 </html>
-ENDOFFILE
-echo "Done"
