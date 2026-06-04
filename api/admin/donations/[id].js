@@ -1,28 +1,32 @@
 import { getSupabase, cors, ADMIN_PASSWORD } from '../../../lib/supabase.js';
 
-// ส่ง broadcast ผ่าน Supabase REST API (ทำงานได้จาก serverless)
 async function broadcastDonation(donation) {
   const url = `${process.env.SUPABASE_URL}/realtime/v1/api/broadcast`;
-  await fetch(url, {
+  const body = JSON.stringify({
+    messages: [{
+      topic: 'realtime:donations',
+      event: 'new_donation',
+      payload: {
+        name: donation.name,
+        message: donation.message || '',
+        amount: donation.amount,
+        id: donation.id,
+      },
+    }],
+  });
+  // Supabase broadcast REST ต้องใช้ anon key (ไม่ใช่ service role)
+  const r = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'apikey': process.env.SUPABASE_ANON_KEY,
       'Authorization': `Bearer ${process.env.SUPABASE_ANON_KEY}`,
     },
-    body: JSON.stringify({
-      messages: [{
-        topic: 'realtime:donations',
-        event: 'new_donation',
-        payload: {
-          name: donation.name,
-          message: donation.message || '',
-          amount: donation.amount,
-          id: donation.id,
-        },
-      }],
-    }),
+    body,
   });
+  const text = await r.text();
+  console.log('[broadcast]', r.status, text);
+  return r.status;
 }
 
 export default async function handler(req, res) {
@@ -51,9 +55,12 @@ export default async function handler(req, res) {
         .single();
       if (error) return res.status(500).json({ error: error.message });
 
-      try { await broadcastDonation(donation); } catch(e) { console.warn('broadcast failed', e.message); }
+      const bStatus = await broadcastDonation(donation).catch(e => {
+        console.warn('[broadcast] failed:', e.message);
+        return 0;
+      });
 
-      return res.json({ ok: true, donation });
+      return res.json({ ok: true, donation, broadcastStatus: bStatus });
     }
 
     if (action === 'reject') {
