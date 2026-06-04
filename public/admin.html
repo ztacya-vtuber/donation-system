@@ -193,11 +193,11 @@ async function loadAll(){
   const [s,st,h,p]=await Promise.all([
     fetch('/api/settings?t='+Date.now()).then(r=>r.json()),
     fetch('/api/stats?t='+Date.now()).then(r=>r.json()),
-    fetch('/api/history?limit=500&t='+Date.now()).then(r=>r.json()),
+    fetch('/api/admin/donations?password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]})),
     fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}))
   ]);
   settings=s||{};stats=st||{};
-  // rows = approved only (shown:true)
+
   rows=h.data||[];
   pending=p.data||[];
   fillSettings();renderDash();renderPending();dmFilter(false);updatePendingBadge();
