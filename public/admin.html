@@ -30,7 +30,6 @@
   .section-title{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:300;margin-bottom:4px}
   .section-sub{font-size:12px;color:var(--muted);margin-bottom:28px;letter-spacing:0.04em}
 
-  /* Fields */
   .field-group{margin-bottom:20px}
   .field-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
   .field-hint{font-size:11px;color:var(--muted);margin-top:5px;opacity:0.7}
@@ -43,23 +42,15 @@
   input[type=color]{padding:4px 8px;height:40px;cursor:pointer}
   select{cursor:pointer}
 
-  /* Toggle switch */
   .toggle-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
   .toggle-label{flex:1;font-size:13px}
   .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
   .toggle input{opacity:0;width:0;height:0}
-  .toggle-slider{
-    position:absolute;inset:0;background:#2a2035;border-radius:12px;cursor:pointer;
-    transition:background 0.2s;
-  }
-  .toggle-slider::before{
-    content:'';position:absolute;width:18px;height:18px;
-    background:#7a6070;border-radius:50%;top:3px;left:3px;transition:all 0.2s;
-  }
+  .toggle-slider{position:absolute;inset:0;background:#2a2035;border-radius:12px;cursor:pointer;transition:background 0.2s;}
+  .toggle-slider::before{content:'';position:absolute;width:18px;height:18px;background:#7a6070;border-radius:50%;top:3px;left:3px;transition:all 0.2s;}
   .toggle input:checked+.toggle-slider{background:color-mix(in srgb,var(--accent) 40%,transparent)}
   .toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:var(--accent)}
 
-  /* Buttons */
   .btn{padding:10px 20px;border:none;border-radius:8px;cursor:pointer;font-family:'Noto Sans Thai',sans-serif;font-size:14px;font-weight:400;transition:opacity 0.2s,transform 0.1s}
   .btn:active{transform:scale(0.97)}
   .btn-primary{background:linear-gradient(135deg,var(--accent),#c87eb0);color:#06050a}
@@ -68,24 +59,30 @@
   .btn:disabled{opacity:0.4;cursor:not-allowed}
   .save-row{display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:1px solid var(--border)}
 
-  /* Upload */
+  /* Upload + Preview */
   .upload-area{border:2px dashed var(--border);border-radius:12px;padding:24px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:8px}
   .upload-area:hover,.upload-area.drag{border-color:var(--accent);background:#0a0510}
   .upload-area input[type=file]{display:none}
   .upload-icon{font-size:24px;margin-bottom:6px;opacity:0.5}
   .upload-hint{font-size:12px;color:var(--muted)}
   .preview-img{max-width:100%;max-height:120px;border-radius:8px;margin-top:10px;display:none;border:1px solid var(--border)}
+
+  /* Current image preview (loaded from settings) */
+  .current-img-wrap{margin-bottom:10px;display:none;flex-direction:column;gap:6px}
+  .current-img-wrap.show{display:flex}
+  .current-img-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em}
+  .current-img{width:100%;max-height:100px;object-fit:cover;border-radius:8px;border:1px solid var(--border)}
+  .current-img-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid var(--accent)}
+
   .img-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
   .img-upload-card{background:#06050a;border:1px solid var(--border);border-radius:12px;padding:16px}
   .img-upload-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px}
 
-  /* Toast */
   .toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:10px;font-size:13px;opacity:0;transform:translateY(10px);transition:all 0.3s;z-index:200}
   .toast.show{opacity:1;transform:translateY(0)}
   .toast.success{background:#0d2a1a;border:1px solid #2a6a3a;color:var(--success)}
   .toast.error{background:#2a0d0d;border:1px solid #6a2a2a;color:var(--danger)}
 
-  /* Dashboard */
   .dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
   .dash-card{background:#06050a;border:1px solid var(--border);border-radius:12px;padding:16px}
   .dash-num{font-family:'DM Mono',monospace;font-size:22px;color:var(--accent)}
@@ -97,19 +94,9 @@
   .recent-amt{font-family:'DM Mono',monospace;font-size:13px;color:var(--accent)}
   .recent-date{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace}
 
-  /* Overlay preview box */
-  .overlay-preview{
-    background:#06050a;border:1px solid var(--border);border-radius:12px;
-    padding:16px;margin-bottom:16px;
-    font-size:12px;color:var(--muted);
-  }
-  .overlay-preview code{
-    display:block;background:#0a0510;border:1px solid var(--border);border-radius:6px;
-    padding:8px 12px;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;
-    color:var(--accent);word-break:break-all;
-  }
+  .overlay-preview{background:#06050a;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;font-size:12px;color:var(--muted);}
+  .overlay-preview code{display:block;background:#0a0510;border:1px solid var(--border);border-radius:6px;padding:8px 12px;margin-top:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);word-break:break-all;}
 
-  /* Donations Manager */
   .dm-filter-row{display:flex;gap:8px;margin-bottom:16px}
   .dm-filter-row input{flex:1;background:#06050a;border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-family:'Noto Sans Thai',sans-serif;font-size:13px;outline:none;transition:border-color 0.2s}
   .dm-filter-row input:focus{border-color:var(--accent)}
@@ -133,7 +120,6 @@
   .dm-pager button:disabled{opacity:0.3;cursor:not-allowed}
   .dm-pager-info{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
 
-  /* Modals */
   .dm-modal-overlay{position:fixed;inset:0;background:rgba(6,5,10,0.88);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:24px}
   .dm-modal-overlay.show{display:flex}
   .dm-modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:380px;animation:modalIn 0.22s ease}
@@ -220,44 +206,70 @@
       <!-- Images -->
       <div class="section" id="sec-images">
         <div class="section-title">รูปภาพ</div>
-        <div class="section-sub">อัปโหลดไปยัง Cloudinary อัตโนมัติ</div>
+        <div class="section-sub">อัปโหลดไปยัง Cloudinary อัตโนมัติ · รูปปัจจุบันแสดงด้านบนแต่ละช่อง</div>
         <div class="img-grid">
+
+          <!-- Avatar -->
           <div class="img-upload-card">
             <div class="img-upload-label">Avatar</div>
+            <!-- รูปปัจจุบันจาก settings -->
+            <div class="current-img-wrap" id="curWrapAvatar">
+              <div class="current-img-label">รูปปัจจุบัน</div>
+              <img id="curAvatar" class="current-img-avatar" src="" alt="current avatar">
+            </div>
             <div class="upload-area" onclick="document.getElementById('fileAvatar').click()">
-              <div class="upload-icon">👤</div><div class="upload-hint">1:1 ratio</div>
+              <div class="upload-icon">👤</div><div class="upload-hint">1:1 ratio · คลิกเพื่อเลือกไฟล์ใหม่</div>
               <input type="file" id="fileAvatar" accept="image/*" onchange="previewFile(this,'prevAvatar')">
               <img class="preview-img" id="prevAvatar">
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileAvatar','avatar.png','avatarUrl')">อัปโหลด</button>
+            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileAvatar','avatar.png','avatarUrl','curAvatar','curWrapAvatar')">อัปโหลด</button>
           </div>
+
+          <!-- Banner -->
           <div class="img-upload-card">
             <div class="img-upload-label">Banner</div>
+            <div class="current-img-wrap" id="curWrapBanner">
+              <div class="current-img-label">รูปปัจจุบัน</div>
+              <img id="curBanner" class="current-img" src="" alt="current banner">
+            </div>
             <div class="upload-area" onclick="document.getElementById('fileBanner').click()">
-              <div class="upload-icon">🖼</div><div class="upload-hint">16:5 ratio</div>
+              <div class="upload-icon">🖼</div><div class="upload-hint">16:5 ratio · คลิกเพื่อเลือกไฟล์ใหม่</div>
               <input type="file" id="fileBanner" accept="image/*" onchange="previewFile(this,'prevBanner')">
               <img class="preview-img" id="prevBanner">
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileBanner','banner.png','bannerUrl')">อัปโหลด</button>
+            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileBanner','banner.png','bannerUrl','curBanner','curWrapBanner')">อัปโหลด</button>
           </div>
+
+          <!-- Background -->
           <div class="img-upload-card">
             <div class="img-upload-label">Background</div>
+            <div class="current-img-wrap" id="curWrapBg">
+              <div class="current-img-label">รูปปัจจุบัน</div>
+              <img id="curBg" class="current-img" src="" alt="current bg">
+            </div>
             <div class="upload-area" onclick="document.getElementById('fileBg').click()">
-              <div class="upload-icon">🌌</div><div class="upload-hint">รูปพื้นหลัง</div>
+              <div class="upload-icon">🌌</div><div class="upload-hint">รูปพื้นหลัง · คลิกเพื่อเลือกไฟล์ใหม่</div>
               <input type="file" id="fileBg" accept="image/*" onchange="previewFile(this,'prevBg')">
               <img class="preview-img" id="prevBg">
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileBg','bg.jpg','bgUrl')">อัปโหลด</button>
+            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileBg','bg.jpg','bgUrl','curBg','curWrapBg')">อัปโหลด</button>
           </div>
+
+          <!-- QR -->
           <div class="img-upload-card">
             <div class="img-upload-label">QR Code</div>
+            <div class="current-img-wrap" id="curWrapQr">
+              <div class="current-img-label">รูปปัจจุบัน</div>
+              <img id="curQr" class="current-img" src="" alt="current qr">
+            </div>
             <div class="upload-area" onclick="document.getElementById('fileQr').click()">
-              <div class="upload-icon">📱</div><div class="upload-hint">QR ถุงเงิน</div>
+              <div class="upload-icon">📱</div><div class="upload-hint">QR ถุงเงิน · คลิกเพื่อเลือกไฟล์ใหม่</div>
               <input type="file" id="fileQr" accept="image/*" onchange="previewFile(this,'prevQr')">
               <img class="preview-img" id="prevQr">
             </div>
-            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileQr','qr.png','qrUrl')">อัปโหลด</button>
+            <button class="btn btn-primary" style="width:100%" onclick="uploadImg('fileQr','qr.png','qrUrl','curQr','curWrapQr')">อัปโหลด</button>
           </div>
+
         </div>
       </div>
 
@@ -282,28 +294,20 @@
         <div class="save-row"><button class="btn btn-primary" onclick="saveColors()">บันทึก</button></div>
       </div>
 
-      <!-- ═══════════════════════════════════════════════════
-           OVERLAY SETTINGS
-      ═══════════════════════════════════════════════════ -->
+      <!-- Overlay -->
       <div class="section" id="sec-overlay">
         <div class="section-title">Overlay OBS</div>
         <div class="section-sub">ตั้งค่าทุกอย่างสำหรับ OBS Browser Source</div>
-
-        <!-- URL -->
         <div class="overlay-preview">
           <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px">URL สำหรับ OBS Browser Source</div>
           <code id="overlayUrlCode">-</code>
           <div style="margin-top:10px;font-size:11px;color:var(--muted)">Width: 1920 · Height: 1080 · ✓ Custom CSS: body{background:transparent!important}</div>
         </div>
-
-        <!-- Min Amount -->
         <div class="field-group">
           <div class="field-label">ยอดขั้นต่ำสำหรับ TTS + เสียงพิเศษ (บาท)</div>
           <input type="number" id="cfgMinAmount" min="1" placeholder="20">
           <div class="field-hint">โดเนทที่ถึงยอดนี้จะเล่น TTS + เสียงพิเศษ + เอฟเฟกต์</div>
         </div>
-
-        <!-- Alert Sound (below min) -->
         <div class="field-group">
           <div class="field-label">🔔 เสียงแจ้งเตือนปกติ (ต่ำกว่าขั้นต่ำ)</div>
           <div class="img-upload-card" style="margin-bottom:8px">
@@ -320,8 +324,6 @@
             <input type="text" id="cfgAlertSoundUrl" placeholder="https://...">
           </div>
         </div>
-
-        <!-- Min Sound (at/above min) -->
         <div class="field-group">
           <div class="field-label">✨ เสียงแจ้งเตือนพิเศษ (ถึงขั้นต่ำ)</div>
           <div class="img-upload-card" style="margin-bottom:8px">
@@ -338,26 +340,26 @@
             <input type="text" id="cfgMinSoundUrl" placeholder="https://...">
           </div>
         </div>
-
-        <!-- Alert Image/GIF -->
         <div class="field-group">
           <div class="field-label">🖼 รูป/GIF ใน Alert Card</div>
           <div class="img-upload-card" style="margin-bottom:8px">
+            <div class="current-img-wrap" id="curWrapAlertImg">
+              <div class="current-img-label">รูปปัจจุบัน</div>
+              <img id="curAlertImg" class="current-img" src="" alt="current alert img">
+            </div>
             <div class="upload-area" onclick="document.getElementById('fileAlertImg').click()">
               <div class="upload-icon">✨</div>
               <div class="upload-hint">รูปหรือ GIF แสดงใน card โดเนท</div>
               <input type="file" id="fileAlertImg" accept="image/*,image/gif" onchange="previewFile(this,'prevAlertImg')">
               <img class="preview-img" id="prevAlertImg">
             </div>
-            <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="uploadImg('fileAlertImg','alert-img.gif','overlayImageUrl')">อัปโหลด</button>
+            <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="uploadImg('fileAlertImg','alert-img.gif','overlayImageUrl','curAlertImg','curWrapAlertImg')">อัปโหลด</button>
           </div>
           <div class="field-group" style="margin-bottom:0">
             <div class="field-label">หรือใส่ URL ตรงๆ</div>
             <input type="text" id="cfgAlertImgUrl" placeholder="https://...">
           </div>
         </div>
-
-        <!-- TTS -->
         <div class="field-group">
           <div class="field-label">🎤 Text-to-Speech</div>
           <div class="toggle-row">
@@ -379,8 +381,6 @@
             <span id="ttsPitchVal" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);width:30px">1</span>
           </div>
         </div>
-
-        <!-- Effects -->
         <div class="field-group">
           <div class="field-label">✨ เอฟเฟกต์พิเศษ (เมื่อถึงขั้นต่ำ)</div>
           <select id="cfgEffect">
@@ -390,8 +390,6 @@
             <option value="both">🌸💫 ทั้งสองอย่าง</option>
           </select>
         </div>
-
-        <!-- Position -->
         <div class="field-group">
           <div class="field-label">📍 ตำแหน่ง Alert Card</div>
           <select id="cfgPosition">
@@ -402,8 +400,6 @@
             <option value="center">กลาง-ล่าง</option>
           </select>
         </div>
-
-        <!-- Duration -->
         <div class="field-group">
           <div class="field-label">⏱ ระยะเวลาแสดง Alert (วินาที)</div>
           <div style="display:flex;align-items:center;gap:12px">
@@ -411,7 +407,6 @@
             <span id="durationVal" style="font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);width:30px">8</span>
           </div>
         </div>
-
         <div class="save-row">
           <button class="btn btn-primary" onclick="saveOverlay()">💾 บันทึก Overlay Settings</button>
           <button class="btn btn-ghost" onclick="testOverlay()">🧪 ทดสอบ</button>
@@ -499,7 +494,6 @@ let dmEditId = null;
 let dmPage = 1;
 const DM_LIMIT = 30;
 
-// ── Login ────────────────────────────────────────────────
 async function doLogin(){
   const p = document.getElementById('pwdInput').value;
   const res = await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})});
@@ -515,7 +509,6 @@ async function doLogin(){
   }
 }
 
-// ── Load All Data ────────────────────────────────────────
 async function loadAll(){
   const [s, stats, hist] = await Promise.all([
     fetch('/api/settings').then(r=>r.json()),
@@ -525,7 +518,7 @@ async function loadAll(){
   currentSettings = s;
   document.getElementById('topbarName').textContent = s.name||'';
 
-  // Profile fields
+  // Profile
   document.getElementById('cfgName').value = s.name||'';
   document.getElementById('cfgGreeting').value = s.greeting||'';
   document.getElementById('cfgThankyou').value = s.thankyou||'';
@@ -535,6 +528,23 @@ async function loadAll(){
   document.getElementById('cfgBgColorHex').value = s.bgColor||'#0a0208';
   document.getElementById('cfgAccentColor').value = s.accentColor||'#e8a4c8';
   document.getElementById('cfgAccentColorHex').value = s.accentColor||'#e8a4c8';
+
+  // ── แสดงรูปปัจจุบันใน Images section ──
+  const imgMap = [
+    { url: s.avatarUrl,       imgId: 'curAvatar',   wrapId: 'curWrapAvatar'   },
+    { url: s.bannerUrl,       imgId: 'curBanner',   wrapId: 'curWrapBanner'   },
+    { url: s.bgUrl,           imgId: 'curBg',       wrapId: 'curWrapBg'       },
+    { url: s.qrUrl,           imgId: 'curQr',       wrapId: 'curWrapQr'       },
+    { url: s.overlayImageUrl, imgId: 'curAlertImg', wrapId: 'curWrapAlertImg' },
+  ];
+  imgMap.forEach(({ url, imgId, wrapId }) => {
+    if (url) {
+      const img  = document.getElementById(imgId);
+      const wrap = document.getElementById(wrapId);
+      if (img)  { img.src = url; }
+      if (wrap) { wrap.classList.add('show'); }
+    }
+  });
 
   // Overlay
   document.getElementById('cfgMinAmount').value = s.overlayMinAmount||20;
@@ -576,7 +586,6 @@ async function loadAll(){
       </div>`).join('');
   }
 
-  // DM
   dmData = rows;
   dmPage = 1;
   dmFilter();
@@ -590,7 +599,6 @@ function showSection(id,el){
   if(id==='donations') loadAll();
 }
 
-// ── Save Helpers ─────────────────────────────────────────
 async function saveSettings(partial){
   const res = await fetch('/api/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,...partial})});
   const j = await res.json();
@@ -634,7 +642,6 @@ function testOverlay(){
   window.open('/overlay.html','_blank');
 }
 
-// ── Color sync ───────────────────────────────────────────
 function syncColorFromText(colorId,hexId){
   const val = document.getElementById(hexId).value;
   if(/^#[0-9a-fA-F]{6}$/.test(val)) document.getElementById(colorId).value=val;
@@ -648,7 +655,6 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
-// ── Upload ───────────────────────────────────────────────
 function previewFile(input,previewId){
   const f=input.files[0];if(!f)return;
   const reader=new FileReader();
@@ -663,10 +669,11 @@ function previewAudio(input,previewId){
   audio.style.display='block';
 }
 
-async function uploadImg(fileInputId, filename, settingKey){
+// ── uploadImg รับ curImgId + curWrapId เพื่ออัปเดต preview หลังอัปโหลดสำเร็จ ──
+async function uploadImg(fileInputId, filename, settingKey, curImgId, curWrapId){
   const input = document.getElementById(fileInputId);
   if(!input.files || input.files.length === 0){
-    showToast('กรุณาเลือกไฟล์รูปภาพก่อนอัปโหลด', 'error');
+    toast('กรุณาเลือกไฟล์รูปภาพก่อนอัปโหลด', 'error');
     return;
   }
   const file = input.files[0];
@@ -681,26 +688,26 @@ async function uploadImg(fileInputId, filename, settingKey){
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          password: pwd,
-          filename: filename,
-          data: e.target.result,
-          type: 'image',
-          settingKey: settingKey
-        })
+        body: JSON.stringify({ password: pwd, filename, data: e.target.result, type: 'image', settingKey })
       });
       const j = await res.json();
       if(j.ok){
-        showToast('อัปโหลดและบันทึกรูปภาพสำเร็จแล้ว! 🎉', 'success');
+        toast('อัปโหลดสำเร็จ! 🎉', 'success');
+        // ── อัปเดต preview รูปปัจจุบันทันที ──
+        if(curImgId && j.url){
+          const img  = document.getElementById(curImgId);
+          const wrap = document.getElementById(curWrapId);
+          if(img)  { img.src = j.url; }
+          if(wrap) { wrap.classList.add('show'); }
+        }
         if(settingKey === 'overlayImageUrl' && document.getElementById('cfgAlertImgUrl')){
           document.getElementById('cfgAlertImgUrl').value = j.url;
         }
       } else {
-        showToast(j.error || 'อัปโหลดล้มเหลว', 'error');
+        toast(j.error || 'อัปโหลดล้มเหลว', 'error');
       }
     } catch(err) {
-      showToast('ระบบเครือข่ายมีปัญหา', 'error');
-      console.error(err);
+      toast('ระบบเครือข่ายมีปัญหา', 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = oldText;
@@ -712,7 +719,7 @@ async function uploadImg(fileInputId, filename, settingKey){
 async function uploadAudio(fileInputId, filename, settingKey){
   const input = document.getElementById(fileInputId);
   if(!input.files || input.files.length === 0){
-    showToast('กรุณาเลือกไฟล์เสียงก่อนอัปโหลด', 'error');
+    toast('กรุณาเลือกไฟล์เสียงก่อนอัปโหลด', 'error');
     return;
   }
   const file = input.files[0];
@@ -727,29 +734,18 @@ async function uploadAudio(fileInputId, filename, settingKey){
       const res = await fetch('/api/admin/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          password: pwd,
-          filename: filename,
-          data: e.target.result,
-          type: 'audio',
-          settingKey: settingKey
-        })
+        body: JSON.stringify({ password: pwd, filename, data: e.target.result, type: 'audio', settingKey })
       });
       const j = await res.json();
       if(j.ok){
-        showToast('อัปโหลดและบันทึกเสียงสำเร็จแล้ว! 🎉', 'success');
-        if(settingKey === 'overlayAlertSoundUrl' && document.getElementById('cfgAlertSoundUrl')){
-          document.getElementById('cfgAlertSoundUrl').value = j.url;
-        }
-        if(settingKey === 'overlayMinSoundUrl' && document.getElementById('cfgMinSoundUrl')){
-          document.getElementById('cfgMinSoundUrl').value = j.url;
-        }
+        toast('อัปโหลดเสียงสำเร็จ! 🎉', 'success');
+        if(settingKey === 'overlayAlertSoundUrl') document.getElementById('cfgAlertSoundUrl').value = j.url;
+        if(settingKey === 'overlayMinSoundUrl')   document.getElementById('cfgMinSoundUrl').value   = j.url;
       } else {
-        showToast(j.error || 'อัปโหลดล้มเหลว', 'error');
+        toast(j.error || 'อัปโหลดล้มเหลว', 'error');
       }
     } catch(err) {
-      showToast('ระบบเครือข่ายมีปัญหา', 'error');
-      console.error(err);
+      toast('ระบบเครือข่ายมีปัญหา', 'error');
     } finally {
       btn.disabled = false;
       btn.textContent = oldText;
@@ -758,7 +754,7 @@ async function uploadAudio(fileInputId, filename, settingKey){
   reader.readAsDataURL(file);
 }
 
-// ── Donations Manager ─────────────────────────────────────
+// ── Donations Manager ──────────────────────────────────────
 function dmFilter(){
   const q=(document.getElementById('dmSearch')?.value||'').toLowerCase().trim();
   const sort=document.getElementById('dmSort')?.value||'date-desc';
@@ -861,12 +857,10 @@ async function dmSaveAdd(){
   } else toast('เกิดข้อผิดพลาด: '+(j.error||'unknown'),'error');
 }
 
-// Close modals on outside click
 ['dmModalOverlay','dmAddModalOverlay'].forEach(id=>{
   document.getElementById(id).addEventListener('click',function(e){if(e.target===this) this.classList.remove('show')});
 });
 
-// Toast
 let _toastTimer;
 function toast(msg,type='success'){
   const el=document.getElementById('toast');
@@ -874,13 +868,10 @@ function toast(msg,type='success'){
   clearTimeout(_toastTimer);
   _toastTimer=setTimeout(()=>el.classList.remove('show'),3000);
 }
-
-// พี่เพิ่มฟังก์ชันนี้ต่อท้ายให้เรียบร้อยแล้วครับ ดึงไปใช้งานได้เลย!
-function showToast(msg, type) { 
-  toast(msg, type); 
-}
-
+function showToast(msg,type){toast(msg,type);}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/'/g,'&#39;').replace(/"/g,'&quot;')}
 </script>
 </body>
 </html>
+ENDOFFILE
+echo "Done"
