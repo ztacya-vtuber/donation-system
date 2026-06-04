@@ -15,14 +15,14 @@ export default async function handler(req, res) {
     const { data, error } = await sb
       .from('donations')
       .select('*')
-      .order('date', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) return res.status(500).json({ error: error.message });
     return res.json({ ok: true, data: data || [] });
   }
 
   if (req.method === 'POST') {
-    const { name, amount, message, date } = req.body || {};
+    const { name, amount, message } = req.body || {};
     const parsed = parseFloat(amount);
 
     if (!name?.trim() || isNaN(parsed) || parsed <= 0) {
@@ -35,8 +35,7 @@ export default async function handler(req, res) {
         name: name.trim(),
         amount: parsed,
         message: (message || '').trim(),
-        date: date || new Date().toISOString(),
-        status: 'approved',
+        shown: true,
       })
       .select()
       .single();
@@ -48,7 +47,7 @@ export default async function handler(req, res) {
       event: 'new_donation',
       payload: {
         name: donation.name,
-        message: donation.message,
+        message: donation.message || '',
         amount: donation.amount,
         id: donation.id,
       },
