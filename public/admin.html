@@ -281,10 +281,10 @@ async function approveDonation(id){
   const el=document.getElementById('pitem-'+id);
   if(el){el.style.opacity='.4';el.style.pointerEvents='none'}
   try{
-    const res=await fetch('/api/admin/donations/'+id+'/approve',{
-      method:'POST',
+    const res=await fetch('/api/admin/donations/'+id,{
+      method:'PATCH',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({password:pwd})
+      body:JSON.stringify({password:pwd,action:'approve'})
     });
     const j=await res.json().catch(()=>({}));
     if(res.ok&&j.ok){
@@ -315,9 +315,9 @@ async function confirmReject(){
   if(el){el.style.opacity='.4';el.style.pointerEvents='none'}
   try{
     const res=await fetch('/api/admin/donations/'+id,{
-      method:'DELETE',
+      method:'PATCH',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({password:pwd})
+      body:JSON.stringify({password:pwd,action:'reject'})
     });
     const j=await res.json().catch(()=>({}));
     if(res.ok&&j.ok){toast('ปฏิเสธและลบรายการแล้ว','warn');await loadAll()}
