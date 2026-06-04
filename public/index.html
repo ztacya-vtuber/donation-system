@@ -88,11 +88,11 @@
 <body>
 
   <div class="banner">
-    <img id="bannerImg" src="/banner.png" alt="banner" onerror="this.style.opacity='0'"/>
+    <img id="bannerImg" src="" alt="banner"/>
   </div>
 
   <div class="profile">
-    <img id="avatarImg" class="avatar" src="/avatar.png" alt="avatar" onerror="this.style.opacity='0'"/>
+    <img id="avatarImg" class="avatar" src="" alt="avatar"/>
     <div>
       <div id="streamerName" class="streamer-name">&#8203;</div>
       <div id="streamerSub" class="streamer-sub">At this very hour, you are most welcome.</div>
@@ -106,16 +106,14 @@
       <div class="dot" id="d2"></div>
     </div>
 
-    <!-- PAGE 1: QR -->
     <div class="page active" id="page1">
       <div class="qr-wrap">
-        <img id="qrImg" src="/qr.png" alt="QR ถุงเงิน"/>
+        <img id="qrImg" src="" alt="QR"/>
         <div class="qr-label">สแกน QR แล้วโอนเงินตามใจชอบ ♡</div>
       </div>
       <button class="btn" onclick="goTo(2)">โอนแล้ว → กรอกข้อมูล</button>
     </div>
 
-    <!-- PAGE 2: FORM -->
     <div class="page" id="page2">
       <div class="section-title">โดเนท</div>
       <div class="field">
@@ -138,7 +136,6 @@
       <button class="btn-ghost" onclick="goTo(1)">← กลับ</button>
     </div>
 
-    <!-- PAGE 3: PENDING -->
     <div class="page" id="page3">
       <div class="pending-box">
         <div class="pending-symbol">♡</div>
@@ -159,82 +156,112 @@
   </div>
 
   <script>
-    // โหลด settings แล้วใส่รูป + สี + ชื่อ
-    fetch('/api/settings').then(r => r.json()).then(s => {
-      // ชื่อ + greeting
-      if (s.name)     document.getElementById('streamerName').textContent = s.name;
-      if (s.greeting) document.getElementById('streamerSub').textContent  = s.greeting;
+    fetch('/api/settings?t=' + Date.now(), { cache: 'no-store' })
+      .then(r => r.json())
+      .then(s => {
+        if (s.name) {
+          document.getElementById('streamerName').textContent = s.name;
+        }
 
-      // รูปภาพ — ถ้ามี URL จาก Cloudinary ให้ใช้, ถ้าไม่มีก็ใช้ไฟล์ local เดิม
-      if (s.bannerUrl) document.getElementById('bannerImg').src = s.bannerUrl;
-      if (s.avatarUrl) document.getElementById('avatarImg').src = s.avatarUrl;
-      if (s.qrUrl)     document.getElementById('qrImg').src     = s.qrUrl;
+        if (s.greeting) {
+          document.getElementById('streamerSub').textContent = s.greeting;
+        }
 
-      // พื้นหลังเว็บ
-      if (s.bgUrl) {
-        document.body.style.backgroundImage = `url('${s.bgUrl}')`;
-        document.body.style.backgroundSize  = 'cover';
-        document.body.style.backgroundAttachment = 'fixed';
-      }
+        if (s.accentColor) {
+          document.documentElement.style.setProperty('--accent', s.accentColor);
+        }
 
-      // สี accent
-      if (s.accentColor) {
-        document.documentElement.style.setProperty('--accent', s.accentColor);
-      }
-      if (s.bgColor) {
-        document.documentElement.style.setProperty('--page-bg', s.bgColor);
-        document.body.style.background = s.bgUrl
-          ? `url('${s.bgUrl}') center/cover fixed`
-          : s.bgColor;
-      }
-    }).catch(() => {
-      // fallback ถ้า API ไม่ตอบ — ใช้ค่า default ที่กำหนดใน CSS อยู่แล้ว
-    });
+        if (s.bgColor) {
+          document.documentElement.style.setProperty('--page-bg', s.bgColor);
+          document.body.style.background = s.bgColor;
+        }
+
+        if (s.bgUrl) {
+          document.body.style.background = `url("${s.bgUrl}") center / cover fixed`;
+        }
+
+        const bannerImg = document.getElementById('bannerImg');
+        const avatarImg = document.getElementById('avatarImg');
+        const qrImg = document.getElementById('qrImg');
+
+        if (s.bannerUrl) {
+          bannerImg.src = s.bannerUrl;
+          bannerImg.style.opacity = '0.6';
+        }
+
+        if (s.avatarUrl) {
+          avatarImg.src = s.avatarUrl;
+          avatarImg.style.opacity = '1';
+        }
+
+        if (s.qrUrl) {
+          qrImg.src = s.qrUrl;
+          qrImg.style.opacity = '1';
+        }
+      })
+      .catch(err => {
+        console.error('[settings]', err);
+      });
 
     function goTo(n) {
       [1,2,3].forEach(i => {
         document.getElementById('page'+i).classList.toggle('active', i===n);
       });
+
       const states = n===1 ? ['active','',''] : n===2 ? ['done','active',''] : ['done','done','active'];
+
       ['d0','d1','d2'].forEach((id,i) => {
         document.getElementById(id).className = 'dot ' + states[i];
       });
     }
 
     async function submitDonation() {
-      const name     = document.getElementById('name').value.trim();
-      const message  = document.getElementById('message').value.trim();
-      const amount   = parseFloat(document.getElementById('amount').value);
+      const name = document.getElementById('name').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
       const statusEl = document.getElementById('formStatus');
-      const btn      = document.getElementById('submitBtn');
+      const btn = document.getElementById('submitBtn');
 
-      if (!name)               { statusEl.textContent = 'กรุณากรอกชื่อ'; return; }
-      if (!amount || amount<=0){ statusEl.textContent = 'กรุณากรอกจำนวนเงิน'; return; }
+      if (!name) {
+        statusEl.textContent = 'กรุณากรอกชื่อ';
+        return;
+      }
+
+      if (!amount || amount <= 0) {
+        statusEl.textContent = 'กรุณากรอกจำนวนเงิน';
+        return;
+      }
+
       statusEl.textContent = '';
-      btn.disabled    = true;
+      btn.disabled = true;
       btn.textContent = 'กำลังส่ง...';
 
       try {
-        const res  = await fetch('/api/donate', {
-          method:  'POST',
+        const res = await fetch('/api/donate', {
+          method: 'POST',
           headers: {'Content-Type':'application/json'},
-          body:    JSON.stringify({display_name: name, message, amount})
+          body: JSON.stringify({display_name: name, message, amount})
         });
+
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
+
+        if (!res.ok) {
+          throw new Error(data.error || 'เกิดข้อผิดพลาด');
+        }
+
         goTo(3);
       } catch(err) {
         statusEl.textContent = err.message;
       } finally {
-        btn.disabled    = false;
+        btn.disabled = false;
         btn.textContent = 'ยืนยัน ✓';
       }
     }
 
     function resetAll() {
-      document.getElementById('name').value    = '';
+      document.getElementById('name').value = '';
       document.getElementById('message').value = '';
-      document.getElementById('amount').value  = '';
+      document.getElementById('amount').value = '';
       document.getElementById('formStatus').textContent = '';
       goTo(1);
     }
