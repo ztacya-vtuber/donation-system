@@ -1,158 +1,242 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Donate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;1,300&display=swap" rel="stylesheet"/>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Sarabun', sans-serif;
-      background: #0f0f0f;
-      color: #fff;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 24px 16px;
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:'Sarabun',sans-serif;
+      background:#0d0508;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding-bottom:40px;
+      transition:background 0.3s;
     }
-    .card {
-      background: #1a1a1a;
-      border-radius: 16px;
-      padding: 28px 24px;
-      width: 100%;
-      max-width: 420px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+    .banner{width:100%;max-width:520px;height:200px;position:relative;overflow:hidden;background:#1a0a0e;}
+    .banner img{width:100%;height:100%;object-fit:cover;opacity:0.6;transition:opacity 0.3s;}
+    .banner::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,var(--page-bg,#0d0508));}
+    .profile{
+      width:100%;max-width:520px;
+      display:flex;align-items:center;gap:14px;
+      padding:0 20px 16px;
+      margin-top:-36px;position:relative;z-index:2;
     }
-    h1 { text-align: center; font-size: 1.4rem; color: #e0aaff; }
-    .qr-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
+    .avatar{width:68px;height:68px;border-radius:50%;border:2px solid var(--accent,#c06080);object-fit:cover;background:#2a1020;flex-shrink:0;}
+    .streamer-name{font-family:'Cormorant Garamond',serif;font-size:22px;color:#f0d0d8;font-weight:400;}
+    .streamer-sub{font-size:13px;color:#886070;font-style:italic;}
+    .card{
+      width:100%;max-width:520px;
+      background:#150810;
+      border:1px solid #3a1a22;
+      border-radius:16px;
+      padding:24px 20px 28px;
+      margin:0 16px;
     }
-    .qr-wrap img {
-      width: 220px;
-      height: 220px;
-      border-radius: 12px;
-      background: #fff;
-      padding: 8px;
+    .dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px;}
+    .dot{width:6px;height:6px;border-radius:50%;background:#2a1020;border:1px solid #3a1a22;transition:background 0.3s;}
+    .dot.active{background:var(--accent,#c06080);border-color:var(--accent,#c06080);}
+    .dot.done{background:#4a2030;border-color:#4a2030;}
+    .page{display:none;flex-direction:column;gap:16px;}
+    .page.active{display:flex;}
+    .qr-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0 4px;}
+    .qr-wrap img{width:200px;height:200px;border-radius:10px;background:#fff;padding:8px;object-fit:contain;}
+    .qr-label{font-size:13px;color:#886070;text-align:center;}
+    .section-title{font-size:13px;color:#c08090;letter-spacing:2px;text-transform:uppercase;font-weight:300;}
+    .field label{font-size:12px;color:#886070;display:block;margin-bottom:5px;}
+    .field input,.field textarea{
+      width:100%;background:#0d0508;
+      border:1px solid #3a1a22;border-radius:8px;
+      color:#e0c0c8;padding:10px 12px;font-size:15px;
+      font-family:'Sarabun',sans-serif;outline:none;
+      transition:border-color 0.2s;
     }
-    .qr-label { font-size: 0.85rem; color: #aaa; }
-    label { font-size: 0.9rem; color: #ccc; display: block; margin-bottom: 4px; }
-    input, textarea {
-      width: 100%;
-      background: #2a2a2a;
-      border: 1px solid #333;
-      border-radius: 8px;
-      color: #fff;
-      padding: 10px 12px;
-      font-size: 1rem;
-      outline: none;
-      transition: border-color 0.2s;
+    .field input:focus,.field textarea:focus{border-color:var(--accent,#c06080);}
+    .field textarea{resize:vertical;min-height:72px;}
+    .amount-wrap{position:relative;}
+    .amount-wrap input{padding-right:36px;}
+    .amount-unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#886070;font-size:13px;}
+    .btn{
+      background:linear-gradient(90deg,var(--accent,#c06080),#9a4060);
+      border:none;border-radius:10px;
+      color:#fff;font-family:'Sarabun',sans-serif;
+      font-size:15px;padding:13px;cursor:pointer;
+      transition:opacity 0.2s;letter-spacing:0.5px;
     }
-    input:focus, textarea:focus { border-color: #e0aaff; }
-    textarea { resize: vertical; min-height: 72px; }
-    .amount-wrap { position: relative; }
-    .amount-wrap input { padding-right: 40px; }
-    .amount-unit {
-      position: absolute; right: 12px; top: 50%;
-      transform: translateY(-50%);
-      color: #888; font-size: 0.9rem;
+    .btn:disabled{opacity:0.5;cursor:not-allowed;}
+    .btn-ghost{
+      background:transparent;border:1px solid #3a1a22;border-radius:10px;
+      color:#886070;font-family:'Sarabun',sans-serif;
+      font-size:14px;padding:10px;cursor:pointer;
     }
-    button {
-      background: #e0aaff;
-      color: #000;
-      border: none;
-      border-radius: 10px;
-      padding: 13px;
-      font-size: 1rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .status { text-align: center; font-size: 0.95rem; min-height: 24px; }
-    .status.success { color: #a0f0a0; }
-    .status.error { color: #f0a0a0; }
-    a.top-link {
-      color: #e0aaff; font-size: 0.85rem;
-      text-decoration: none; text-align: center;
-    }
+    .pending-box{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 0 16px;text-align:center;}
+    .pending-symbol{font-size:36px;color:var(--accent,#c06080);}
+    .pending-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:#f0d0d8;}
+    .pending-sub{font-size:13px;color:#886070;line-height:1.7;}
+    .status{font-size:13px;min-height:18px;text-align:center;}
+    .status.error{color:#f08080;}
+    .footer{margin-top:20px;text-align:center;}
+    .footer a{color:#4a2030;font-size:12px;text-decoration:none;letter-spacing:1px;}
+    .ornament{color:#3a1a22;font-size:11px;text-align:center;margin-top:12px;}
   </style>
 </head>
 <body>
+
+  <div class="banner">
+    <img id="bannerImg" src="/banner.png" alt="banner" onerror="this.style.opacity='0'"/>
+  </div>
+
+  <div class="profile">
+    <img id="avatarImg" class="avatar" src="/avatar.png" alt="avatar" onerror="this.style.opacity='0'"/>
+    <div>
+      <div id="streamerName" class="streamer-name">&#8203;</div>
+      <div id="streamerSub" class="streamer-sub">At this very hour, you are most welcome.</div>
+    </div>
+  </div>
+
   <div class="card">
-    <h1>💜 Donate</h1>
-
-    <div class="qr-wrap">
-      <img src="/qr.png" alt="QR Code ถุงเงิน" />
-      <span class="qr-label">สแกน QR แล้วโอนตามใจชอบ ♡</span>
+    <div class="dots">
+      <div class="dot active" id="d0"></div>
+      <div class="dot" id="d1"></div>
+      <div class="dot" id="d2"></div>
     </div>
 
-    <div>
-      <label>ชื่อที่จะขึ้นจอ *</label>
-      <input id="name" type="text" placeholder="ชื่อเล่นของคุณ" maxlength="50" />
-    </div>
-
-    <div>
-      <label>ข้อความ (ไม่บังคับ)</label>
-      <textarea id="message" placeholder="ฝากข้อความถึง streamer..."></textarea>
-    </div>
-
-    <div>
-      <label>จำนวนเงินที่โอน *</label>
-      <div class="amount-wrap">
-        <input id="amount" type="number" placeholder="0" min="1" max="99999" />
-        <span class="amount-unit">฿</span>
+    <!-- PAGE 1: QR -->
+    <div class="page active" id="page1">
+      <div class="qr-wrap">
+        <img id="qrImg" src="/qr.png" alt="QR ถุงเงิน"/>
+        <div class="qr-label">สแกน QR แล้วโอนเงินตามใจชอบ ♡</div>
       </div>
+      <button class="btn" onclick="goTo(2)">โอนแล้ว → กรอกข้อมูล</button>
     </div>
 
-    <button id="submitBtn" onclick="submitDonation()">ส่ง ✓</button>
-    <div class="status" id="status"></div>
-    <a class="top-link" href="/top.html">🏆 Top Donors</a>
+    <!-- PAGE 2: FORM -->
+    <div class="page" id="page2">
+      <div class="section-title">โดเนท</div>
+      <div class="field">
+        <label>ชื่อที่จะขึ้นจอ *</label>
+        <input id="name" type="text" placeholder="ชื่อของคุณ" maxlength="50"/>
+      </div>
+      <div class="field">
+        <label>ข้อความ (ไม่บังคับ)</label>
+        <textarea id="message" placeholder="ข้อความถึง streamer..."></textarea>
+      </div>
+      <div class="field">
+        <label>จำนวนเงินที่โอน *</label>
+        <div class="amount-wrap">
+          <input id="amount" type="number" placeholder="0" min="1" max="99999"/>
+          <span class="amount-unit">฿</span>
+        </div>
+      </div>
+      <div class="status error" id="formStatus"></div>
+      <button class="btn" id="submitBtn" onclick="submitDonation()">ยืนยัน ✓</button>
+      <button class="btn-ghost" onclick="goTo(1)">← กลับ</button>
+    </div>
+
+    <!-- PAGE 3: PENDING -->
+    <div class="page" id="page3">
+      <div class="pending-box">
+        <div class="pending-symbol">♡</div>
+        <div class="pending-title">ขอบคุณนะคะ</div>
+        <div class="pending-sub">
+          ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว<br/>
+          กำลังรอ streamer ตรวจสอบและอนุมัติ ♡
+        </div>
+      </div>
+      <button class="btn-ghost" onclick="resetAll()">โดเนทอีกครั้ง</button>
+    </div>
+
+    <div class="ornament">✦</div>
+  </div>
+
+  <div class="footer">
+    <a href="/top.html">🏆 TOP DONORS</a>
   </div>
 
   <script>
+    // โหลด settings แล้วใส่รูป + สี + ชื่อ
+    fetch('/api/settings').then(r => r.json()).then(s => {
+      // ชื่อ + greeting
+      if (s.name)     document.getElementById('streamerName').textContent = s.name;
+      if (s.greeting) document.getElementById('streamerSub').textContent  = s.greeting;
+
+      // รูปภาพ — ถ้ามี URL จาก Cloudinary ให้ใช้, ถ้าไม่มีก็ใช้ไฟล์ local เดิม
+      if (s.bannerUrl) document.getElementById('bannerImg').src = s.bannerUrl;
+      if (s.avatarUrl) document.getElementById('avatarImg').src = s.avatarUrl;
+      if (s.qrUrl)     document.getElementById('qrImg').src     = s.qrUrl;
+
+      // พื้นหลังเว็บ
+      if (s.bgUrl) {
+        document.body.style.backgroundImage = `url('${s.bgUrl}')`;
+        document.body.style.backgroundSize  = 'cover';
+        document.body.style.backgroundAttachment = 'fixed';
+      }
+
+      // สี accent
+      if (s.accentColor) {
+        document.documentElement.style.setProperty('--accent', s.accentColor);
+      }
+      if (s.bgColor) {
+        document.documentElement.style.setProperty('--page-bg', s.bgColor);
+        document.body.style.background = s.bgUrl
+          ? `url('${s.bgUrl}') center/cover fixed`
+          : s.bgColor;
+      }
+    }).catch(() => {
+      // fallback ถ้า API ไม่ตอบ — ใช้ค่า default ที่กำหนดใน CSS อยู่แล้ว
+    });
+
+    function goTo(n) {
+      [1,2,3].forEach(i => {
+        document.getElementById('page'+i).classList.toggle('active', i===n);
+      });
+      const states = n===1 ? ['active','',''] : n===2 ? ['done','active',''] : ['done','done','active'];
+      ['d0','d1','d2'].forEach((id,i) => {
+        document.getElementById(id).className = 'dot ' + states[i];
+      });
+    }
+
     async function submitDonation() {
-      const name = document.getElementById('name').value.trim();
-      const message = document.getElementById('message').value.trim();
-      const amount = parseFloat(document.getElementById('amount').value);
-      const status = document.getElementById('status');
-      const btn = document.getElementById('submitBtn');
+      const name     = document.getElementById('name').value.trim();
+      const message  = document.getElementById('message').value.trim();
+      const amount   = parseFloat(document.getElementById('amount').value);
+      const statusEl = document.getElementById('formStatus');
+      const btn      = document.getElementById('submitBtn');
 
-      if (!name) { showStatus('กรุณากรอกชื่อ', 'error'); return; }
-      if (!amount || amount <= 0) { showStatus('กรุณากรอกจำนวนเงิน', 'error'); return; }
-
-      btn.disabled = true;
-      showStatus('กำลังส่ง...', '');
+      if (!name)               { statusEl.textContent = 'กรุณากรอกชื่อ'; return; }
+      if (!amount || amount<=0){ statusEl.textContent = 'กรุณากรอกจำนวนเงิน'; return; }
+      statusEl.textContent = '';
+      btn.disabled    = true;
+      btn.textContent = 'กำลังส่ง...';
 
       try {
-        const res = await fetch('/api/donate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ display_name: name, message, amount })
+        const res  = await fetch('/api/donate', {
+          method:  'POST',
+          headers: {'Content-Type':'application/json'},
+          body:    JSON.stringify({display_name: name, message, amount})
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
-
-        showStatus('ส่งข้อมูลสำเร็จแล้ว ขอบคุณนะคะ 💜', 'success');
-        document.getElementById('name').value = '';
-        document.getElementById('message').value = '';
-        document.getElementById('amount').value = '';
-      } catch (err) {
-        showStatus(err.message, 'error');
+        goTo(3);
+      } catch(err) {
+        statusEl.textContent = err.message;
       } finally {
-        btn.disabled = false;
+        btn.disabled    = false;
+        btn.textContent = 'ยืนยัน ✓';
       }
     }
 
-    function showStatus(msg, type) {
-      const el = document.getElementById('status');
-      el.textContent = msg;
-      el.className = 'status ' + type;
+    function resetAll() {
+      document.getElementById('name').value    = '';
+      document.getElementById('message').value = '';
+      document.getElementById('amount').value  = '';
+      document.getElementById('formStatus').textContent = '';
+      goTo(1);
     }
   </script>
 </body>
