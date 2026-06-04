@@ -2,24 +2,24 @@ import { getSupabase, cors, ADMIN_PASSWORD } from '../../lib/supabase.js';
 
 export default async function handler(req, res) {
   cors(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (!ADMIN_PASSWORD) {
-    return res.status(500).json({ error: 'ADMIN_PASSWORD is not set' });
-  }
-
-  const password = req.method === 'GET'
-    ? req.query?.password
-    : req.body?.password;
-
-  if (String(password || '') !== String(ADMIN_PASSWORD)) {
+  const password = req.method === 'GET' ? req.query?.password : req.body?.password;
+  if (String(password || '') !== String(ADMIN_PASSWORD || '')) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
   const sb = getSupabase();
+
+  if (req.method === 'GET') {
+    const { data, error } = await sb
+      .from('donations')
+      .select('*')
+      .order('date', { ascending: false });
+
+    if (error) return res.status(500).json({ error: error.message });
+    return res.json({ ok: true, data: data || [] });
+  }
 
   if (req.method === 'POST') {
     const { name, amount, message, date } = req.body || {};
@@ -36,13 +36,12 @@ export default async function handler(req, res) {
         amount: parsed,
         message: (message || '').trim(),
         date: date || new Date().toISOString(),
+        status: 'approved',
       })
       .select()
       .single();
 
-    if (error) {
-      return res.status(500).json({ error: error.message });
-    }
+    if (error) return res.status(500).json({ error: error.message });
 
     await sb.channel('donations').send({
       type: 'broadcast',
