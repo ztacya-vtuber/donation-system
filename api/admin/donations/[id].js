@@ -20,7 +20,7 @@ export default async function handler(req, res) {
     if (action === 'approve') {
       const { data: donation, error } = await sb
         .from('donations')
-        .update({ status: 'approved' })
+        .update({ shown: true })
         .eq('id', id)
         .select()
         .single();
@@ -44,7 +44,7 @@ export default async function handler(req, res) {
     if (action === 'reject') {
       const { error } = await sb
         .from('donations')
-        .update({ status: 'rejected' })
+        .delete()
         .eq('id', id);
 
       if (error) return res.status(500).json({ error: error.message });
