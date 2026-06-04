@@ -1,642 +1,159 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Donate</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Sans+Thai:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#0a0208;--accent:#e8a4c8;--accent2:#c87eb0;
-    --card:#12070f;--border:#2a1520;--text:#f0e8ec;--muted:#7a6070;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{
-    min-height:100vh;background:var(--bg);
-    font-family:'Noto Sans Thai',sans-serif;font-weight:300;
-    color:var(--text);display:flex;flex-direction:column;
-    align-items:center;position:relative;overflow-x:hidden;
-  }
-  .bg-layer{
-    position:fixed;inset:0;
-    background-image:var(--bg-image,none);
-    background-size:cover;background-position:center;
-    filter:brightness(0.18) saturate(0.6);z-index:0;
-  }
-  .bg-noise{
-    position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.4;
-    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-  }
-  .content{position:relative;z-index:1;width:100%;max-width:480px;padding:32px 16px 60px}
-
-  .banner-wrap{
-    width:calc(100% + 32px);margin:0 -16px 0;
-    height:180px;overflow:hidden;position:relative;z-index:1;
-  }
-  .banner-wrap img{width:100%;height:100%;object-fit:cover;object-position:center top;display:none;position:absolute;inset:0}
-  .banner-wrap::after{
-    content:'';position:absolute;bottom:0;left:0;right:0;height:120px;
-    background:linear-gradient(to bottom,transparent,var(--bg));pointer-events:none;
-  }
-  .banner-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#1a0510,#0f021a,#180510)}
-
-  .profile-row{
-    display:flex;align-items:flex-end;gap:16px;
-    margin-top:-48px;margin-bottom:20px;padding:0 4px;
-    position:relative;z-index:2;
-  }
-  .avatar-wrap{
-    width:80px;height:80px;border-radius:50%;
-    border:3px solid var(--accent);overflow:hidden;flex-shrink:0;
-    background:var(--card);position:relative;
-    box-shadow:0 0 24px color-mix(in srgb,var(--accent) 30%,transparent);
-  }
-  .avatar-wrap img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none}
-  .avatar-placeholder{width:100%;height:100%;background:linear-gradient(135deg,#2a1020,#1a0818)}
-  .profile-info{padding-bottom:6px}
-  .profile-name{
-    font-family:'Cormorant Garamond',serif;
-    font-size:22px;font-weight:600;letter-spacing:0.04em;
-  }
-  .profile-greeting{
-    font-size:12px;color:var(--accent);margin-top:3px;
-    font-style:italic;font-family:'Cormorant Garamond',serif;
-  }
-
-  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-  .page{display:none}
-  .page.active{display:block}
-
-  /* Step indicator */
-  .steps{
-    display:flex;align-items:center;justify-content:center;
-    gap:0;padding:18px 24px 0;
-  }
-  .step-dot{
-    width:8px;height:8px;border-radius:50%;
-    background:var(--border);transition:background 0.3s,transform 0.3s;
-    flex-shrink:0;
-  }
-  .step-dot.active{background:var(--accent);transform:scale(1.3)}
-  .step-dot.done{background:color-mix(in srgb,var(--accent) 50%,transparent)}
-  .step-line{flex:1;height:1px;background:var(--border);max-width:48px}
-
-  .form-inner{padding:20px 24px 24px}
-  .form-title{
-    font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;
-    color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:20px;
-  }
-  label{display:block;font-size:11px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;margin-top:16px}
-  label:first-of-type{margin-top:0}
-  input[type=text],textarea{
-    width:100%;background:#080508;border:1px solid var(--border);border-radius:8px;
-    padding:11px 14px;color:var(--text);
-    font-family:'Noto Sans Thai',sans-serif;font-size:15px;font-weight:300;
-    outline:none;transition:border-color 0.2s;
-  }
-  input[type=text]:focus,textarea:focus{border-color:var(--accent)}
-  textarea{resize:none;height:76px}
-  .btn{
-    width:100%;margin-top:22px;padding:13px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    border:none;border-radius:10px;
-    color:#0a0208;font-family:'Noto Sans Thai',sans-serif;
-    font-size:15px;font-weight:500;cursor:pointer;
-    transition:opacity 0.2s,transform 0.1s;letter-spacing:0.02em;
-  }
-  .btn:hover{opacity:0.9}
-  .btn:active{transform:scale(0.98)}
-  .btn:disabled{opacity:0.5;cursor:not-allowed}
-  .btn-ghost{
-    width:100%;margin-top:10px;padding:11px;
-    background:transparent;border:1px solid var(--border);border-radius:10px;
-    color:var(--muted);font-family:'Noto Sans Thai',sans-serif;font-size:14px;
-    cursor:pointer;transition:border-color 0.2s,color 0.2s;
-  }
-  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
-  .error-msg{
-    margin-top:10px;padding:9px 12px;
-    background:#1a0808;border:1px solid #4a1010;
-    border-radius:8px;color:#f07070;font-size:13px;display:none;
-  }
-
-  /* Page 2 - QR */
-  .qr-inner{padding:20px 24px 24px}
-  .donor-badge{
-    display:flex;align-items:center;gap:12px;
-    background:#080508;border:1px solid var(--border);border-radius:10px;
-    padding:12px 14px;margin-bottom:20px;
-  }
-  .donor-icon{
-    width:36px;height:36px;border-radius:50%;flex-shrink:0;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:flex;align-items:center;justify-content:center;color:#0a0208;font-size:16px;
-  }
-  .donor-name-show{font-size:15px;font-weight:400}
-  .donor-msg-show{font-size:12px;color:var(--muted);margin-top:2px}
-  .qr-box{
-    background:white;border-radius:12px;padding:16px;
-    text-align:center;margin-bottom:12px;
-  }
-  .qr-box img{width:100%;max-width:220px;height:auto;display:block;margin:0 auto;object-fit:contain}
-  .qr-hint{text-align:center;font-size:12px;color:var(--muted);margin-bottom:16px}
-
-  /* Page 3 - Upload slip */
-  .slip-inner{padding:20px 24px 24px}
-  .slip-title{
-    font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:300;
-    color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px;
-  }
-  .slip-sub{font-size:12px;color:var(--muted);margin-bottom:20px}
-
-  .upload-area{
-    border:2px dashed var(--border);border-radius:12px;
-    padding:28px 16px;text-align:center;cursor:pointer;
-    transition:border-color 0.2s,background 0.2s;position:relative;
-    margin-bottom:12px;
-  }
-  .upload-area:hover,.upload-area.drag{border-color:var(--accent);background:#0a0510}
-  .upload-area input[type=file]{
-    position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
-  }
-  .upload-icon{font-size:28px;margin-bottom:8px}
-  .upload-label{font-size:13px;color:var(--muted)}
-  .upload-label span{color:var(--accent)}
-
-  .slip-preview{
-    display:none;margin-bottom:12px;
-    border-radius:10px;overflow:hidden;border:1px solid var(--border);
-    position:relative;
-  }
-  .slip-preview img{width:100%;max-height:240px;object-fit:contain;display:block;background:#080508}
-  .slip-preview-remove{
-    position:absolute;top:8px;right:8px;
-    background:rgba(6,5,10,0.85);border:1px solid var(--border);
-    border-radius:6px;padding:4px 10px;font-size:11px;color:var(--muted);
-    cursor:pointer;transition:color 0.2s,border-color 0.2s;
-  }
-  .slip-preview-remove:hover{color:var(--accent);border-color:var(--accent)}
-
-  .upload-progress{
-    display:none;margin-top:8px;
-    background:#080508;border-radius:6px;overflow:hidden;height:3px;
-  }
-  .upload-progress-bar{
-    height:100%;width:0%;
-    background:linear-gradient(90deg,var(--accent),var(--accent2));
-    transition:width 0.3s;
-  }
-
-  /* Page 4 - Waiting */
-  .wait-inner{padding:32px 24px}
-  .wait-anim{
-    display:flex;align-items:center;justify-content:center;gap:6px;
-    margin-bottom:20px;
-  }
-  .wait-dot{
-    width:6px;height:6px;background:var(--accent);border-radius:50%;
-    animation:blink 1.2s infinite;
-  }
-  .wait-dot:nth-child(2){animation-delay:0.2s}
-  .wait-dot:nth-child(3){animation-delay:0.4s}
-  @keyframes blink{0%,100%{opacity:0.2;transform:scale(0.7)}50%{opacity:1;transform:scale(1.1)}}
-  .wait-title{
-    font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;
-    text-align:center;margin-bottom:8px;
-  }
-  .wait-sub{font-size:13px;color:var(--muted);text-align:center;line-height:1.6}
-  .wait-slip-thumb{
-    margin:16px auto 0;
-    width:80px;height:80px;border-radius:8px;overflow:hidden;
-    border:1px solid var(--border);
-  }
-  .wait-slip-thumb img{width:100%;height:100%;object-fit:cover;display:block}
-
-  /* Page 5 - Success */
-  .success-wrap{padding:40px 24px;text-align:center}
-  .success-icon{font-size:48px;margin-bottom:16px}
-  .success-title{
-    font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;
-    margin-bottom:8px;
-  }
-  .success-name{color:var(--accent);font-size:18px;margin-bottom:4px}
-  .success-amount{font-size:14px;color:var(--muted)}
-
-  .nav-links{
-    display:flex;justify-content:center;gap:20px;margin-top:24px;
-    padding-top:20px;border-top:1px solid var(--border);
-  }
-  .nav-links a{
-    font-size:11px;color:var(--muted);text-decoration:none;
-    letter-spacing:0.08em;text-transform:uppercase;transition:color 0.2s;
-  }
-  .nav-links a:hover{color:var(--accent)}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Sarabun', sans-serif;
+      background: #0f0f0f;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+    .card {
+      background: #1a1a1a;
+      border-radius: 16px;
+      padding: 28px 24px;
+      width: 100%;
+      max-width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    h1 { text-align: center; font-size: 1.4rem; color: #e0aaff; }
+    .qr-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .qr-wrap img {
+      width: 220px;
+      height: 220px;
+      border-radius: 12px;
+      background: #fff;
+      padding: 8px;
+    }
+    .qr-label { font-size: 0.85rem; color: #aaa; }
+    label { font-size: 0.9rem; color: #ccc; display: block; margin-bottom: 4px; }
+    input, textarea {
+      width: 100%;
+      background: #2a2a2a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #fff;
+      padding: 10px 12px;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, textarea:focus { border-color: #e0aaff; }
+    textarea { resize: vertical; min-height: 72px; }
+    .amount-wrap { position: relative; }
+    .amount-wrap input { padding-right: 40px; }
+    .amount-unit {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: #888; font-size: 0.9rem;
+    }
+    button {
+      background: #e0aaff;
+      color: #000;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status { text-align: center; font-size: 0.95rem; min-height: 24px; }
+    .status.success { color: #a0f0a0; }
+    .status.error { color: #f0a0a0; }
+    a.top-link {
+      color: #e0aaff; font-size: 0.85rem;
+      text-decoration: none; text-align: center;
+    }
+  </style>
 </head>
 <body>
-<div class="bg-layer" id="bgLayer"></div>
-<div class="bg-noise"></div>
-<div class="content">
-  <div class="banner-wrap" id="bannerWrap">
-    <div class="banner-placeholder" id="bannerPlaceholder"></div>
-    <img id="bannerImg" alt="banner">
-  </div>
-  <div class="profile-row">
-    <div class="avatar-wrap">
-      <div class="avatar-placeholder" id="avatarPlaceholder"></div>
-      <img id="avatarImg" alt="avatar">
-    </div>
-    <div class="profile-info">
-      <div class="profile-name" id="profileName">Loading...</div>
-      <div class="profile-greeting" id="profileGreeting"></div>
-    </div>
-  </div>
-
   <div class="card">
+    <h1>💜 Donate</h1>
 
-    <!-- ── PAGE 1: กรอกชื่อ ── -->
-    <div class="page active" id="page1">
-      <div class="steps">
-        <div class="step-dot active" id="s1"></div>
-        <div class="step-line"></div>
-        <div class="step-dot" id="s2"></div>
-        <div class="step-line"></div>
-        <div class="step-dot" id="s3"></div>
-        <div class="step-line"></div>
-        <div class="step-dot" id="s4"></div>
-      </div>
-      <div class="form-inner">
-        <div class="form-title">โดเนท</div>
-        <label>ชื่อที่จะขึ้นจอ</label>
-        <input type="text" id="name" placeholder="ชื่อของคุณ" maxlength="30" autocomplete="off">
-        <label>ข้อความ <span style="color:#3a2030">(ไม่บังคับ)</span></label>
-        <textarea id="message" placeholder="ข้อความ..."></textarea>
-        <div class="error-msg" id="errorMsg1"></div>
-        <button class="btn" id="nextBtn1" onclick="goToQR()">ถัดไป →</button>
+    <div class="qr-wrap">
+      <img src="/qr.png" alt="QR Code ถุงเงิน" />
+      <span class="qr-label">สแกน QR แล้วโอนตามใจชอบ ♡</span>
+    </div>
+
+    <div>
+      <label>ชื่อที่จะขึ้นจอ *</label>
+      <input id="name" type="text" placeholder="ชื่อเล่นของคุณ" maxlength="50" />
+    </div>
+
+    <div>
+      <label>ข้อความ (ไม่บังคับ)</label>
+      <textarea id="message" placeholder="ฝากข้อความถึง streamer..."></textarea>
+    </div>
+
+    <div>
+      <label>จำนวนเงินที่โอน *</label>
+      <div class="amount-wrap">
+        <input id="amount" type="number" placeholder="0" min="1" max="99999" />
+        <span class="amount-unit">฿</span>
       </div>
     </div>
 
-    <!-- ── PAGE 2: แสกน QR ── -->
-    <div class="page" id="page2">
-      <div class="steps">
-        <div class="step-dot done"></div>
-        <div class="step-line"></div>
-        <div class="step-dot active"></div>
-        <div class="step-line"></div>
-        <div class="step-dot"></div>
-        <div class="step-line"></div>
-        <div class="step-dot"></div>
-      </div>
-      <div class="qr-inner">
-        <div class="donor-badge">
-          <div class="donor-icon">✦</div>
-          <div>
-            <div class="donor-name-show" id="showName"></div>
-            <div class="donor-msg-show" id="showMsg"></div>
-          </div>
-        </div>
-        <div class="qr-box">
-          <img id="qrImg" src="/qr.png" alt="QR">
-        </div>
-        <p class="qr-hint">แสกน QR แล้วโอนเงินได้เลย</p>
-        <button class="btn" onclick="goToUpload()">โอนแล้ว → แนบสลิป</button>
-        <button class="btn-ghost" onclick="goBack(1)">← แก้ไขข้อมูล</button>
-      </div>
-    </div>
-
-    <!-- ── PAGE 3: อัปโหลดสลิป ── -->
-    <div class="page" id="page3">
-      <div class="steps">
-        <div class="step-dot done"></div>
-        <div class="step-line"></div>
-        <div class="step-dot done"></div>
-        <div class="step-line"></div>
-        <div class="step-dot active"></div>
-        <div class="step-line"></div>
-        <div class="step-dot"></div>
-      </div>
-      <div class="slip-inner">
-        <div class="slip-title">แนบสลิป</div>
-        <div class="slip-sub">ถ่ายรูปหรือเลือกสลิปจาก gallery</div>
-
-        <div class="upload-area" id="uploadArea">
-          <input type="file" id="slipFile" accept="image/*" capture="environment" onchange="previewSlip(this)">
-          <div class="upload-icon">📎</div>
-          <div class="upload-label">แตะเพื่อเลือกสลิป<br><span>รองรับ JPG, PNG, GIF</span></div>
-        </div>
-
-        <div class="slip-preview" id="slipPreview">
-          <img id="slipPreviewImg" alt="slip">
-          <div class="slip-preview-remove" onclick="removeSlip()">✕ เอาออก</div>
-        </div>
-
-        <div class="upload-progress" id="uploadProgress">
-          <div class="upload-progress-bar" id="uploadProgressBar"></div>
-        </div>
-
-        <div class="error-msg" id="errorMsg3"></div>
-        <button class="btn" id="submitBtn" onclick="submitSlip()">ส่งสลิป ✓</button>
-        <button class="btn-ghost" onclick="goBack(2)">← กลับ</button>
-      </div>
-    </div>
-
-    <!-- ── PAGE 4: รอ admin ยืนยัน ── -->
-    <div class="page" id="page4">
-      <div class="steps">
-        <div class="step-dot done"></div>
-        <div class="step-line"></div>
-        <div class="step-dot done"></div>
-        <div class="step-line"></div>
-        <div class="step-dot done"></div>
-        <div class="step-line"></div>
-        <div class="step-dot active"></div>
-      </div>
-      <div class="wait-inner">
-        <div class="wait-anim">
-          <div class="wait-dot"></div>
-          <div class="wait-dot"></div>
-          <div class="wait-dot"></div>
-        </div>
-        <div class="wait-title">รอการยืนยัน</div>
-        <div class="wait-sub">สลิปถูกส่งแล้ว<br>กำลังรอ streamer ตรวจสอบ ♡</div>
-        <div class="wait-slip-thumb" id="waitSlipThumb" style="display:none">
-          <img id="waitSlipImg" alt="slip">
-        </div>
-      </div>
-    </div>
-
-    <!-- ── PAGE 5: สำเร็จ ── -->
-    <div class="page" id="page5">
-      <div class="success-wrap">
-        <div class="success-icon">✦</div>
-        <div class="success-title">ขอบคุณมากนะคะ</div>
-        <div class="success-name" id="successName"></div>
-        <div class="success-amount" id="successAmount"></div>
-      </div>
-    </div>
-
-  </div><!-- /card -->
-
-  <div class="nav-links">
-    <a href="/top.html">🏆 Top Donors</a>
+    <button id="submitBtn" onclick="submitDonation()">ส่ง ✓</button>
+    <div class="status" id="status"></div>
+    <a class="top-link" href="/top.html">🏆 Top Donors</a>
   </div>
-</div><!-- /content -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script>
-// ── Config (injected by server or set here) ──────────────
-const SUPABASE_URL  = window.__SUPABASE_URL__  || '%%SUPABASE_URL%%';
-const SUPABASE_ANON = window.__SUPABASE_ANON__ || '%%SUPABASE_ANON%%';
+  <script>
+    async function submitDonation() {
+      const name = document.getElementById('name').value.trim();
+      const message = document.getElementById('message').value.trim();
+      const amount = parseFloat(document.getElementById('amount').value);
+      const status = document.getElementById('status');
+      const btn = document.getElementById('submitBtn');
 
-let currentName    = '';
-let currentMessage = '';
-let pendingId      = null;
-let slipFile       = null;
-let realtimeSub    = null;
+      if (!name) { showStatus('กรุณากรอกชื่อ', 'error'); return; }
+      if (!amount || amount <= 0) { showStatus('กรุณากรอกจำนวนเงิน', 'error'); return; }
 
-// ── Load settings ─────────────────────────────────────────
-async function loadSettings(){
-  try{
-    const s = await fetch('/api/settings').then(r=>r.json());
-    document.documentElement.style.setProperty('--bg', s.bgColor||'#0a0208');
-    document.documentElement.style.setProperty('--accent', s.accentColor||'#e8a4c8');
-    document.documentElement.style.setProperty('--accent2',(s.accentColor||'#e8a4c8')+'cc');
-    document.getElementById('profileName').textContent    = s.name||'';
-    document.getElementById('profileGreeting').textContent = s.greeting||'';
-    if(s.bannerUrl){
-      document.getElementById('bannerImg').src=s.bannerUrl;
-      document.getElementById('bannerImg').style.display='block';
-      document.getElementById('bannerPlaceholder').style.display='none';
-    }
-    if(s.avatarUrl){
-      document.getElementById('avatarImg').src=s.avatarUrl;
-      document.getElementById('avatarImg').style.display='block';
-      document.getElementById('avatarPlaceholder').style.display='none';
-    }
-    if(s.bgUrl) document.getElementById('bgLayer').style.backgroundImage=`url(${s.bgUrl})`;
-    if(s.qrUrl) document.getElementById('qrImg').src=s.qrUrl;
-  }catch(e){console.error(e)}
-}
+      btn.disabled = true;
+      showStatus('กำลังส่ง...', '');
 
-// ── PAGE 1 → 2: กรอกชื่อ → QR ──────────────────────────
-async function goToQR(){
-  const name    = document.getElementById('name').value.trim();
-  const message = document.getElementById('message').value.trim();
-  const err     = document.getElementById('errorMsg1');
-  if(!name){ err.textContent='กรุณาใส่ชื่อด้วยนะ ♡'; err.style.display='block'; return; }
-  err.style.display='none';
-  const btn=document.getElementById('nextBtn1');
-  btn.disabled=true; btn.textContent='กำลังบันทึก...';
-  try{
-    const res = await fetch('/api/donate',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({name,message})
-    });
-    const j = await res.json();
-    if(j.ok){
-      currentName    = name;
-      currentMessage = message;
-      pendingId      = j.pendingId || null;
-      document.getElementById('showName').textContent = name;
-      document.getElementById('showMsg').textContent  = message;
-      showPage(2);
-    } else {
-      err.textContent='เกิดข้อผิดพลาด กรุณาลองใหม่'; err.style.display='block';
-    }
-  }catch(e){
-    err.textContent='เกิดข้อผิดพลาด'; err.style.display='block';
-  }
-  btn.disabled=false; btn.textContent='ถัดไป →';
-}
+      try {
+        const res = await fetch('/api/donate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ display_name: name, message, amount })
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'เกิดข้อผิดพลาด');
 
-// ── PAGE 2 → 3: QR → แนบสลิป ──────────────────────────
-function goToUpload(){
-  showPage(3);
-}
-
-// ── Preview สลิป ──────────────────────────────────────────
-function previewSlip(input){
-  const file = input.files[0];
-  if(!file) return;
-  slipFile = file;
-  const reader = new FileReader();
-  reader.onload = e => {
-    document.getElementById('slipPreviewImg').src = e.target.result;
-    document.getElementById('slipPreview').style.display = 'block';
-    document.getElementById('uploadArea').style.display  = 'none';
-  };
-  reader.readAsDataURL(file);
-}
-
-function removeSlip(){
-  slipFile = null;
-  document.getElementById('slipFile').value = '';
-  document.getElementById('slipPreview').style.display = 'none';
-  document.getElementById('uploadArea').style.display  = 'block';
-}
-
-// ── PAGE 3 → 4: ส่งสลิป ──────────────────────────────────
-async function submitSlip(){
-  const err = document.getElementById('errorMsg3');
-  if(!slipFile){ err.textContent='กรุณาแนบสลิปก่อนนะคะ ♡'; err.style.display='block'; return; }
-  err.style.display='none';
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled=true; btn.textContent='กำลังส่ง...';
-
-  // Progress animation
-  const prog = document.getElementById('uploadProgress');
-  const bar  = document.getElementById('uploadProgressBar');
-  prog.style.display='block';
-  let pct=0;
-  const fakeProgress = setInterval(()=>{ pct=Math.min(pct+8,85); bar.style.width=pct+'%'; },200);
-
-  try{
-    // อ่านเป็น base64
-    const b64 = await new Promise((res,rej)=>{
-      const r = new FileReader();
-      r.onload  = () => res(r.result);
-      r.onerror = () => rej(new Error('read failed'));
-      r.readAsDataURL(slipFile);
-    });
-
-    const payload = {
-      slipBase64: b64,
-      pendingId,
-      name:    currentName,
-      message: currentMessage,
-    };
-
-    const res = await fetch('/api/slip',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const j = await res.json();
-    clearInterval(fakeProgress);
-
-    if(j.ok){
-      bar.style.width='100%';
-      setTimeout(()=>{ prog.style.display='none'; },400);
-
-      // บันทึก pendingId ของสลิปที่ส่งไป
-      const sentPendingId = j.donation?.id || pendingId;
-
-      // แสดง thumb ใน page 4
-      const thumbSrc = document.getElementById('slipPreviewImg').src;
-      document.getElementById('waitSlipImg').src  = thumbSrc;
-      document.getElementById('waitSlipThumb').style.display = 'block';
-
-      showPage(4);
-      listenForApproval(sentPendingId);
-    } else {
-      clearInterval(fakeProgress);
-      bar.style.width='0%'; prog.style.display='none';
-      err.textContent = j.error || 'เกิดข้อผิดพลาด กรุณาลองใหม่';
-      err.style.display='block';
-    }
-  }catch(e){
-    clearInterval(fakeProgress);
-    prog.style.display='none';
-    err.textContent='เกิดข้อผิดพลาด'; err.style.display='block';
-  }
-
-  btn.disabled=false; btn.textContent='ส่งสลิป ✓';
-}
-
-// ── Realtime: รอ admin ยืนยัน ──────────────────────────
-function listenForApproval(pid){
-  if(!SUPABASE_URL || SUPABASE_URL.includes('%%')) {
-    console.warn('Supabase not configured');
-    return;
-  }
-  
-  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
-
-  // ฟัง pending_donations table - เมื่อสลิปได้รับการยืนยัน status เปลี่ยน
-  realtimeSub = sb
-    .channel(`pending:${pid}`)
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'pending_donations',
-        filter: `id=eq.${pid}`
-      },
-      (payload) => {
-        console.log('pending_donations changed:', payload);
-        // ถ้า status เปลี่ยนจาก pending_admin ให้ move ไป success
-        if(payload.new.status !== 'pending_admin'){
-          showSuccess({
-            name: currentName,
-            amount: payload.new.amount
-          });
-        }
+        showStatus('ส่งข้อมูลสำเร็จแล้ว ขอบคุณนะคะ 💜', 'success');
+        document.getElementById('name').value = '';
+        document.getElementById('message').value = '';
+        document.getElementById('amount').value = '';
+      } catch (err) {
+        showStatus(err.message, 'error');
+      } finally {
+        btn.disabled = false;
       }
-    )
-    .subscribe();
+    }
 
-  // Fallback: ฟัง donations table - เมื่อ admin approve บันทึกลงนี่
-  realtimeSub = sb
-    .channel('donations:all')
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'donations'
-      },
-      (payload) => {
-        console.log('new donation:', payload);
-        if(payload.new.name === currentName){
-          showSuccess({
-            name: payload.new.name,
-            amount: payload.new.amount
-          });
-        }
-      }
-    )
-    .subscribe();
-}
-
-function showSuccess(donation){
-  if(realtimeSub) realtimeSub.unsubscribe();
-  document.getElementById('successName').textContent   = donation.name;
-  document.getElementById('successAmount').textContent = donation.amount
-    ? 'โดเนท ฿'+Number(donation.amount).toLocaleString()
-    : 'โดเนทสำเร็จแล้วค่ะ ♡';
-  showPage(5);
-}
-
-// ── Navigation helpers ──────────────────────────────────
-function showPage(n){
-  for(let i=1;i<=5;i++){
-    document.getElementById('page'+i).classList.toggle('active', i===n);
-  }
-}
-
-function goBack(toPage){
-  showPage(toPage);
-}
-
-// ── Drag & drop ─────────────────────────────────────────
-const uploadArea = document.getElementById('uploadArea');
-['dragenter','dragover'].forEach(ev=>uploadArea.addEventListener(ev,e=>{ e.preventDefault(); uploadArea.classList.add('drag'); }));
-['dragleave','drop'].forEach(ev=>uploadArea.addEventListener(ev,e=>{ e.preventDefault(); uploadArea.classList.remove('drag'); }));
-uploadArea.addEventListener('drop',e=>{
-  const f = e.dataTransfer?.files?.[0];
-  if(f && f.type.startsWith('image/')){
-    slipFile=f;
-    const reader=new FileReader();
-    reader.onload=ev=>{ document.getElementById('slipPreviewImg').src=ev.target.result; document.getElementById('slipPreview').style.display='block'; uploadArea.style.display='none'; };
-    reader.readAsDataURL(f);
-  }
-});
-
-document.getElementById('name').addEventListener('keydown',e=>{ if(e.key==='Enter') goToQR(); });
-loadSettings();
-</script>
+    function showStatus(msg, type) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.className = 'status ' + type;
+    }
+  </script>
 </body>
 </html>
