@@ -2,275 +2,93 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Admin Panel</title>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Noto+Sans+Thai:wght@300;400;600&family=DM+Mono&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#07040a;--card:#120b14;--line:#322336;--text:#f4e8ee;--muted:#aa8798;--accent:#e8a4c8;--bad:#ff8a8a;--good:#8ee0aa}
+:root{--bg:#06050a;--card:#0e0b12;--panel:#09060d;--border:#2a2035;--text:#f0e8ec;--muted:#9b7b8b;--accent:#e8a4c8;--danger:#ef7b7b;--good:#86d6a3}
 *{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sans-serif}
-.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.login-card,.panel{background:var(--card);border:1px solid var(--line);border-radius:16px}
-.login-card{width:100%;max-width:360px;padding:30px;text-align:center}
-h1,h2{font-family:'Cormorant Garamond',serif;font-weight:400}
-h1{font-size:30px;margin-bottom:6px} h2{font-size:26px;margin-bottom:4px}
-.sub{color:var(--muted);font-size:13px;margin-bottom:18px}
-input,textarea,select{width:100%;background:#07040a;border:1px solid var(--line);border-radius:9px;color:var(--text);padding:10px 12px;font-family:inherit;font-size:14px;outline:none}
-input:focus,textarea:focus,select:focus{border-color:var(--accent)}
-textarea{min-height:70px;resize:vertical}
-button{border:0;border-radius:9px;padding:10px 14px;font-family:inherit;cursor:pointer}
-.btn{background:linear-gradient(90deg,var(--accent),#b86591);color:#14080f;font-weight:600}
-.btn2{background:transparent;border:1px solid var(--line);color:var(--muted)}
-.err{display:none;color:var(--bad);font-size:13px;margin-top:12px}
-.shell{display:none;min-height:100vh}
-.shell.show{display:block}
-.top{height:58px;display:flex;align-items:center;gap:14px;padding:0 20px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:5}
-.top a{color:var(--muted);text-decoration:none;font-size:13px}
-.top-title{flex:1;font-family:'Cormorant Garamond',serif;font-size:22px}
-.wrap{display:grid;grid-template-columns:210px 1fr;min-height:calc(100vh - 58px)}
-.nav{border-right:1px solid var(--line);background:#100911;padding:18px 0}
-.nav button{display:block;width:100%;background:transparent;color:var(--muted);text-align:left;border-radius:0;padding:12px 20px}
-.nav button.active,.nav button:hover{color:var(--accent);background:#09050b}
-.main{padding:26px;max-width:900px}
-.sec{display:none}.sec.active{display:block}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
-.card{background:#09050b;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
-.label{font-size:12px;color:var(--muted);margin-bottom:7px}
-.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
-.preview{max-width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:none;margin:10px 0}
-.avatar-preview{width:84px;height:84px;border-radius:50%;object-fit:cover}
-.toast{position:fixed;right:18px;bottom:18px;padding:12px 16px;border-radius:10px;background:#102318;color:var(--good);border:1px solid #275a38;display:none;z-index:20}
-.toast.bad{background:#281010;color:var(--bad);border-color:#6a2b2b}
-@media(max-width:700px){.wrap{grid-template-columns:1fr}.nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--line)}.nav button{white-space:nowrap}.grid{grid-template-columns:1fr}.main{padding:18px}}
+body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto Sans Thai',sans-serif;font-weight:300}
+.login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-card{width:100%;max-width:360px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:34px;text-align:center}
+h1,h2{font-family:'Cormorant Garamond',serif;font-weight:400}h1{font-size:30px}h2{font-size:28px;margin-bottom:4px}
+.sub{font-size:12px;color:var(--muted);margin-bottom:22px}.err{display:none;color:var(--danger);font-size:13px;margin-top:12px}
+input,textarea,select{width:100%;background:#06050a;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font:14px 'Noto Sans Thai',sans-serif;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--accent)}textarea{min-height:72px;resize:vertical}
+button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;border-radius:8px;padding:10px 16px;background:linear-gradient(135deg,var(--accent),#c87eb0);color:#08040a;font-weight:600}.btn2{background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--muted)}.btn2:hover{border-color:var(--accent);color:var(--accent)}.danger{border-color:#6b2b34;color:var(--danger)}
+.shell{display:none;min-height:100vh}.shell.show{display:block}.top{height:58px;background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:14px;padding:0 22px;position:sticky;top:0;z-index:10}.top a{color:var(--muted);text-decoration:none;font-size:13px}.top-title{flex:1;font-family:'Cormorant Garamond',serif;font-size:22px}
+.layout{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 58px)}.nav{background:var(--card);border-right:1px solid var(--border);padding:22px 0}.nav button{display:block;width:100%;background:transparent;border:0;color:var(--muted);text-align:left;padding:11px 22px;border-left:2px solid transparent}.nav button.active,.nav button:hover{color:var(--accent);background:#09050d;border-left-color:var(--accent)}
+.main{padding:30px 24px;max-width:920px}.sec{display:none}.sec.active{display:block}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.card{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:16px}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}.hint{font-size:11px;color:var(--muted);margin-top:6px}.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
+.preview{display:none;width:100%;height:110px;object-fit:cover;border-radius:9px;border:1px solid var(--border);margin-bottom:10px}.avatar{width:74px;height:74px;border-radius:50%}.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.num{font:24px 'DM Mono',monospace;color:var(--accent)}.small{font-size:11px;color:var(--muted)}
+.list{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}.item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border)}.item:last-child{border-bottom:0}.grow{flex:1;min-width:0}.amt{font:14px 'DM Mono',monospace;color:var(--accent);white-space:nowrap}.msg{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toolbar{display:flex;gap:10px;margin:18px 0}.toolbar input{flex:1}.pager{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:14px}.modal-bg{position:fixed;inset:0;background:rgba(6,5,10,.85);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-bg.show{display:flex}.modal{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}.toast{position:fixed;right:20px;bottom:20px;display:none;padding:12px 18px;border-radius:10px;background:#102418;color:var(--good);border:1px solid #2e6b40;z-index:99}.toast.bad{background:#2a1010;color:var(--danger);border-color:#6b2b2b}
+@media(max-width:760px){.layout{grid-template-columns:1fr}.nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap}.grid,.dash{grid-template-columns:1fr 1fr}.main{padding:20px 16px}}
 </style>
 </head>
 <body>
-
-<div class="login" id="loginScreen">
-  <div class="login-card">
-    <h1>Admin Panel</h1>
-    <div class="sub">ใส่รหัสผ่านเพื่อจัดการหน้าเว็บ</div>
-    <input type="password" id="pwdInput" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="btn" style="width:100%;margin-top:12px" onclick="doLogin()">เข้าสู่ระบบ</button>
-    <div class="err" id="loginErr">รหัสผ่านไม่ถูกต้อง หรือ API login มีปัญหา</div>
-  </div>
-</div>
+<div class="login" id="loginScreen"><div class="login-card"><h1>Admin Panel</h1><div class="sub">ใส่รหัสผ่านเพื่อจัดการระบบโดเนท</div><input id="pwdInput" type="password" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()"><button class="btn" style="width:100%;margin-top:12px" onclick="doLogin()">เข้าสู่ระบบ</button><div class="err" id="loginErr">รหัสผ่านไม่ถูกต้อง</div></div></div>
 
 <div class="shell" id="adminShell">
-  <div class="top">
-    <a href="/">← หน้าโดเนท</a>
-    <div class="top-title">Admin Panel</div>
-    <button class="btn2" onclick="location.reload()">ออก</button>
-  </div>
-
-  <div class="wrap">
-    <div class="nav">
-      <button class="active" onclick="showSec('profile',this)">โปรไฟล์</button>
-      <button onclick="showSec('images',this)">รูปภาพ</button>
-      <button onclick="showSec('theme',this)">สีและธีม</button>
-      <button onclick="showSec('overlay',this)">Overlay</button>
-    </div>
-
-    <div class="main">
-      <section class="sec active" id="sec-profile">
-        <h2>โปรไฟล์</h2><div class="sub">ชื่อและข้อความบนหน้าโดเนท</div>
-        <div class="card"><div class="label">ชื่อ</div><input id="cfgName"></div>
-        <div class="card"><div class="label">ข้อความทักทาย</div><input id="cfgGreeting"></div>
-        <div class="card"><div class="label">ข้อความขอบคุณ</div><input id="cfgThankyou"></div>
-        <button class="btn" onclick="saveProfile()">บันทึกโปรไฟล์</button>
-      </section>
-
-      <section class="sec" id="sec-images">
-        <h2>รูปภาพ</h2><div class="sub">อัปโหลด Avatar, Banner, Background, QR Code</div>
-        <div class="grid">
-          <div class="card">
-            <div class="label">Avatar</div><img id="curAvatar" class="preview avatar-preview">
-            <input type="file" id="fileAvatar" accept="image/*" onchange="previewFile(this,'curAvatar')">
-            <button class="btn" style="width:100%;margin-top:10px" onclick="uploadImg('fileAvatar','avatar.png','avatarUrl','curAvatar')">อัปโหลด Avatar</button>
-          </div>
-          <div class="card">
-            <div class="label">Banner</div><img id="curBanner" class="preview">
-            <input type="file" id="fileBanner" accept="image/*" onchange="previewFile(this,'curBanner')">
-            <button class="btn" style="width:100%;margin-top:10px" onclick="uploadImg('fileBanner','banner.jpg','bannerUrl','curBanner')">อัปโหลด Banner</button>
-          </div>
-          <div class="card">
-            <div class="label">Background</div><img id="curBg" class="preview">
-            <input type="file" id="fileBg" accept="image/*" onchange="previewFile(this,'curBg')">
-            <button class="btn" style="width:100%;margin-top:10px" onclick="uploadImg('fileBg','bg.jpg','bgUrl','curBg')">อัปโหลด Background</button>
-          </div>
-          <div class="card">
-            <div class="label">QR Code</div><img id="curQr" class="preview">
-            <input type="file" id="fileQr" accept="image/*" onchange="previewFile(this,'curQr')">
-            <button class="btn" style="width:100%;margin-top:10px" onclick="uploadImg('fileQr','qr.png','qrUrl','curQr')">อัปโหลด QR</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="sec" id="sec-theme">
-        <h2>สีและธีม</h2><div class="sub">สีพื้นหลังและสีหลัก</div>
-        <div class="card"><div class="label">Background Color</div><input type="color" id="cfgBgColor"></div>
-        <div class="card"><div class="label">Accent Color</div><input type="color" id="cfgAccentColor"></div>
-        <button class="btn" onclick="saveTheme()">บันทึกสี</button>
-      </section>
-
-      <section class="sec" id="sec-overlay">
-        <h2>Overlay</h2><div class="sub">ตั้งค่าแจ้งเตือน OBS</div>
-        <div class="card"><div class="label">ยอดขั้นต่ำสำหรับเสียง/TTS</div><input type="number" id="cfgMinAmount" min="0"></div>
-        <div class="card"><div class="label">ระยะเวลาแสดงผล วินาที</div><input type="number" id="cfgDuration" min="1"></div>
-        <div class="card"><div class="label">ตำแหน่ง</div><select id="cfgPosition"><option value="center">center</option><option value="bottom-left">bottom-left</option><option value="bottom-right">bottom-right</option></select></div>
-        <div class="card"><div class="label">เอฟเฟกต์</div><select id="cfgEffect"><option value="roses">roses</option><option value="glow">glow</option><option value="both">both</option><option value="none">none</option></select></div>
-        <div class="card"><div class="label">Alert Image URL</div><input id="cfgAlertImgUrl"></div>
-        <button class="btn" onclick="saveOverlay()">บันทึก Overlay</button>
-      </section>
-    </div>
-  </div>
+<div class="top"><a href="/">← หน้าโดเนท</a><div class="top-title">Admin Panel</div><button class="btn2" onclick="location.reload()">ออก</button></div>
+<div class="layout">
+<div class="nav">
+<button class="active" onclick="showSec('dashboard',this)">Dashboard</button>
+<button onclick="showSec('profile',this)">โปรไฟล์</button>
+<button onclick="showSec('images',this)">รูปภาพ</button>
+<button onclick="showSec('colors',this)">สีและธีม</button>
+<button onclick="showSec('overlay',this)">Overlay OBS</button>
+<button onclick="showSec('donations',this)">จัดการรายการ</button>
 </div>
+<div class="main">
+<section class="sec active" id="sec-dashboard"><h2>Dashboard</h2><div class="sub">ภาพรวมยอดโดเนท</div><div class="dash"><div class="card"><div class="num" id="dTotal">-</div><div class="small">ยอดรวม</div></div><div class="card"><div class="num" id="dCount">-</div><div class="small">จำนวนครั้ง</div></div><div class="card"><div class="num" id="dToday">-</div><div class="small">วันนี้</div></div><div class="card"><div class="num" id="dDonors">-</div><div class="small">ผู้โดเนทไม่ซ้ำ</div></div></div><div class="label" style="margin-top:18px">รายการล่าสุด</div><div class="list" id="recentList"></div></section>
 
+<section class="sec" id="sec-profile"><h2>โปรไฟล์</h2><div class="sub">ชื่อและข้อความที่แสดงบนหน้าเว็บ</div><div class="card"><div class="label">ชื่อ</div><input id="cfgName"></div><div class="card"><div class="label">ข้อความทักทาย</div><input id="cfgGreeting"></div><div class="card"><div class="label">ข้อความขอบคุณ</div><input id="cfgThankyou"></div><button class="btn" onclick="saveProfile()">บันทึก</button></section>
+
+<section class="sec" id="sec-images"><h2>รูปภาพ</h2><div class="sub">อัปโหลดไป Cloudinary และบันทึกเข้า settings</div><div class="grid">
+<div class="card"><div class="label">Avatar</div><img id="curAvatar" class="preview avatar"><input type="file" id="fileAvatar" accept="image/*" onchange="previewFile(this,'curAvatar')"><button class="btn" style="width:100%;margin-top:10px" onclick="uploadFile('fileAvatar','avatar.png','image','avatarUrl','curAvatar')">อัปโหลด Avatar</button></div>
+<div class="card"><div class="label">Banner</div><img id="curBanner" class="preview"><input type="file" id="fileBanner" accept="image/*" onchange="previewFile(this,'curBanner')"><button class="btn" style="width:100%;margin-top:10px" onclick="uploadFile('fileBanner','banner.jpg','image','bannerUrl','curBanner')">อัปโหลด Banner</button></div>
+<div class="card"><div class="label">Background</div><img id="curBg" class="preview"><input type="file" id="fileBg" accept="image/*" onchange="previewFile(this,'curBg')"><button class="btn" style="width:100%;margin-top:10px" onclick="uploadFile('fileBg','bg.jpg','image','bgUrl','curBg')">อัปโหลด Background</button></div>
+<div class="card"><div class="label">QR Code</div><img id="curQr" class="preview"><input type="file" id="fileQr" accept="image/*" onchange="previewFile(this,'curQr')"><button class="btn" style="width:100%;margin-top:10px" onclick="uploadFile('fileQr','qr.png','image','qrUrl','curQr')">อัปโหลด QR</button></div>
+</div></section>
+
+<section class="sec" id="sec-colors"><h2>สีและธีม</h2><div class="sub">สีหลักของหน้าเว็บ</div><div class="grid"><div class="card"><div class="label">Background Color</div><input type="color" id="cfgBgColor"></div><div class="card"><div class="label">Accent Color</div><input type="color" id="cfgAccentColor"></div></div><button class="btn" onclick="saveColors()">บันทึกสี</button></section>
+
+<section class="sec" id="sec-overlay"><h2>Overlay OBS</h2><div class="sub">ตั้งค่า alert, เสียง, TTS และเอฟเฟกต์</div>
+<div class="grid"><div class="card"><div class="label">ยอดขั้นต่ำสำหรับเสียงพิเศษ/TTS</div><input type="number" id="cfgMinAmount" min="0"></div><div class="card"><div class="label">ระยะเวลาแสดงผล วินาที</div><input type="number" id="cfgDuration" min="1"></div><div class="card"><div class="label">ตำแหน่ง</div><select id="cfgPosition"><option value="center">center</option><option value="bottom-left">bottom-left</option><option value="bottom-right">bottom-right</option></select></div><div class="card"><div class="label">เอฟเฟกต์</div><select id="cfgEffect"><option value="roses">roses</option><option value="glow">glow</option><option value="both">both</option><option value="none">none</option></select></div></div>
+<div class="card"><div class="label">Alert Image URL</div><input id="cfgAlertImgUrl"><div class="hint">หรืออัปโหลดรูปด้านล่าง</div><input type="file" id="fileAlertImg" accept="image/*" onchange="previewFile(this,'curAlertImg')"><img id="curAlertImg" class="preview"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileAlertImg','alert-img.webp','image','overlayImageUrl','curAlertImg','cfgAlertImgUrl')">อัปโหลด Alert Image</button></div>
+<div class="grid"><div class="card"><div class="label">เสียงทั่วไป URL</div><input id="cfgAlertSoundUrl"><input type="file" id="fileAlertSound" accept="audio/*"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileAlertSound','alert.mp3','audio','overlayAlertSoundUrl',null,'cfgAlertSoundUrl')">อัปโหลดเสียงทั่วไป</button></div><div class="card"><div class="label">เสียงยอดขั้นต่ำ URL</div><input id="cfgMinSoundUrl"><input type="file" id="fileMinSound" accept="audio/*"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileMinSound','alert-min.mp3','audio','overlayMinSoundUrl',null,'cfgMinSoundUrl')">อัปโหลดเสียงพิเศษ</button></div></div>
+<div class="card"><div class="row"><label><input type="checkbox" id="cfgTtsEnabled" style="width:auto"> เปิด TTS</label><input type="number" step="0.1" id="cfgTtsRate" placeholder="rate"><input type="number" step="0.1" id="cfgTtsPitch" placeholder="pitch"></div></div><button class="btn" onclick="saveOverlay()">บันทึก Overlay</button><button class="btn2" onclick="window.open('/overlay.html','_blank')" style="margin-left:8px">เปิด Overlay</button></section>
+
+<section class="sec" id="sec-donations"><h2>จัดการรายการ</h2><div class="sub">เพิ่ม แก้ไข หรือลบรายการโดเนท</div><div class="toolbar"><input id="dmSearch" placeholder="ค้นหาชื่อ/ข้อความ" oninput="dmFilter()"><select id="dmSort" onchange="dmFilter()"><option value="date-desc">ใหม่สุด</option><option value="date-asc">เก่าสุด</option><option value="amount-desc">ยอดมากสุด</option><option value="amount-asc">ยอดน้อยสุด</option></select><button class="btn" onclick="openAdd()">เพิ่มรายการ</button></div><div class="list" id="dmList"></div><div class="pager"><button class="btn2" id="prevBtn" onclick="changePage(-1)">ก่อนหน้า</button><span class="small" id="pageInfo">1/1</span><button class="btn2" id="nextBtn" onclick="changePage(1)">ถัดไป</button></div></section>
+</div></div></div>
+
+<div class="modal-bg" id="editModal"><div class="modal"><h2 id="modalTitle">แก้ไขรายการ</h2><div class="card"><div class="label">ชื่อ</div><input id="mName"></div><div class="card"><div class="label">จำนวนเงิน</div><input id="mAmount" type="number"></div><div class="card"><div class="label">ข้อความ</div><textarea id="mMsg"></textarea></div><div class="row"><button class="btn" onclick="saveDonation()">บันทึก</button><button class="btn2 danger" id="deleteBtn" onclick="deleteDonation()">ลบ</button><button class="btn2" onclick="closeModal()">ปิด</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script>
-let pwd = '';
-let currentSettings = {};
-
-async function doLogin(){
-  const p = document.getElementById('pwdInput').value;
-  const err = document.getElementById('loginErr');
-  try{
-    const res = await fetch('/api/admin/login', {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({password:p})
-    });
-    const j = await res.json().catch(()=>({}));
-    if(!res.ok || !j.ok){
-      err.textContent = j.error || 'รหัสผ่านไม่ถูกต้อง';
-      err.style.display = 'block';
-      return;
-    }
-    pwd = p;
-    err.style.display = 'none';
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminShell').classList.add('show');
-    await loadSettings();
-  }catch(e){
-    err.textContent = 'เชื่อมต่อ Login API ไม่ได้: ' + e.message;
-    err.style.display = 'block';
-  }
-}
-
-function showSec(id,btn){
-  document.querySelectorAll('.sec').forEach(el=>el.classList.remove('active'));
-  document.querySelectorAll('.nav button').forEach(el=>el.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  btn.classList.add('active');
-}
-
-async function loadSettings(){
-  const s = await fetch('/api/settings?t=' + Date.now(), {cache:'no-store'}).then(r=>r.json());
-  currentSettings = s || {};
-  setVal('cfgName', s.name);
-  setVal('cfgGreeting', s.greeting);
-  setVal('cfgThankyou', s.thankyou);
-  setVal('cfgBgColor', s.bgColor || '#0a0208');
-  setVal('cfgAccentColor', s.accentColor || '#e8a4c8');
-  setVal('cfgMinAmount', s.overlayMinAmount || 20);
-  setVal('cfgDuration', s.overlayDuration || 8);
-  setVal('cfgPosition', s.overlayPosition || 'center');
-  setVal('cfgEffect', s.overlayEffect || 'both');
-  setVal('cfgAlertImgUrl', s.overlayImageUrl || '');
-  setImg('curAvatar', s.avatarUrl);
-  setImg('curBanner', s.bannerUrl);
-  setImg('curBg', s.bgUrl);
-  setImg('curQr', s.qrUrl);
-}
-
-function setVal(id,val){const el=document.getElementById(id); if(el) el.value = val || '';}
-function setImg(id,url){const el=document.getElementById(id); if(el && url){el.src=url; el.style.display='block';}}
-
-async function saveSettings(partial){
-  const res = await fetch('/api/admin/settings', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({password:pwd, ...partial})
-  });
-  const j = await res.json().catch(()=>({}));
-  if(res.ok && j.ok){ toast('บันทึกแล้ว'); currentSettings = j.settings || currentSettings; return true; }
-  toast(j.error || 'บันทึกไม่สำเร็จ','bad'); return false;
-}
-
-function saveProfile(){
-  saveSettings({
-    name:document.getElementById('cfgName').value.trim(),
-    greeting:document.getElementById('cfgGreeting').value.trim(),
-    thankyou:document.getElementById('cfgThankyou').value.trim()
-  });
-}
-
-function saveTheme(){
-  saveSettings({
-    bgColor:document.getElementById('cfgBgColor').value,
-    accentColor:document.getElementById('cfgAccentColor').value
-  });
-}
-
-function saveOverlay(){
-  saveSettings({
-    overlayMinAmount:Number(document.getElementById('cfgMinAmount').value)||20,
-    overlayDuration:Number(document.getElementById('cfgDuration').value)||8,
-    overlayPosition:document.getElementById('cfgPosition').value,
-    overlayEffect:document.getElementById('cfgEffect').value,
-    overlayImageUrl:document.getElementById('cfgAlertImgUrl').value.trim()
-  });
-}
-
-function previewFile(input,imgId){
-  const file = input.files?.[0];
-  if(!file) return;
-  const img = document.getElementById(imgId);
-  img.src = URL.createObjectURL(file);
-  img.style.display = 'block';
-}
-
-async function uploadImg(fileInputId, filename, settingKey, imgId){
-  const input = document.getElementById(fileInputId);
-  const file = input.files?.[0];
-  if(!file){ toast('เลือกไฟล์ก่อนอัปโหลด','bad'); return; }
-
-  const btn = input.parentElement.querySelector('button');
-  const old = btn.textContent;
-  btn.disabled = true;
-  btn.textContent = 'กำลังอัปโหลด...';
-
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try{
-      const res = await fetch('/api/admin/upload', {
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({password:pwd, filename, data:e.target.result, type:'image', settingKey})
-      });
-      const j = await res.json().catch(()=>({}));
-      if(!res.ok || !j.ok) throw new Error(j.error || 'Upload failed');
-      setImg(imgId, j.url);
-      toast('อัปโหลดสำเร็จ');
-    }catch(err){
-      toast(err.message,'bad');
-    }finally{
-      btn.disabled = false;
-      btn.textContent = old;
-    }
-  };
-  reader.readAsDataURL(file);
-}
-
-function toast(msg,type='good'){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast' + (type === 'bad' ? ' bad' : '');
-  el.style.display = 'block';
-  clearTimeout(window.__toastTimer);
-  window.__toastTimer = setTimeout(()=>el.style.display='none',3000);
-}
+let pwd='',settings={},stats={},rows=[],filtered=[],page=1,editId=null,isAdd=false,renderItems=[];const LIMIT=30;
+async function doLogin(){const p=pwdInput.value,err=loginErr;try{const res=await fetch('/api/admin/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:p})});const j=await res.json().catch(()=>({}));if(!res.ok||!j.ok){err.style.display='block';return}pwd=p;loginScreen.style.display='none';adminShell.classList.add('show');await loadAll()}catch(e){err.textContent='Login API error: '+e.message;err.style.display='block'}}
+function showSec(id,b){document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));document.getElementById('sec-'+id).classList.add('active');b.classList.add('active');if(id==='dashboard'||id==='donations')loadAll()}
+async function loadAll(){const [s,st,h]=await Promise.all([fetch('/api/settings?t='+Date.now()).then(r=>r.json()),fetch('/api/stats?t='+Date.now()).then(r=>r.json()),fetch('/api/history?limit=500&t='+Date.now()).then(r=>r.json())]);settings=s||{};stats=st||{};rows=h.data||[];fillSettings();renderDash();dmFilter(false)}
+function fillSettings(){v('cfgName',settings.name);v('cfgGreeting',settings.greeting);v('cfgThankyou',settings.thankyou);v('cfgBgColor',settings.bgColor||'#0a0208');v('cfgAccentColor',settings.accentColor||'#e8a4c8');v('cfgMinAmount',settings.overlayMinAmount||20);v('cfgDuration',settings.overlayDuration||8);v('cfgPosition',settings.overlayPosition||'center');v('cfgEffect',settings.overlayEffect||'both');v('cfgAlertImgUrl',settings.overlayImageUrl);v('cfgAlertSoundUrl',settings.overlayAlertSoundUrl);v('cfgMinSoundUrl',settings.overlayMinSoundUrl);v('cfgTtsRate',settings.ttsRate||1);v('cfgTtsPitch',settings.ttsPitch||1);cfgTtsEnabled.checked=!!settings.ttsEnabled;img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl)}
+function v(id,val){const e=document.getElementById(id);if(e)e.value=val||''}function img(id,url){const e=document.getElementById(id);if(e&&url){e.src=url;e.style.display='block'}}
+function renderDash(){dTotal.textContent='฿'+Number(stats.totalAmount||0).toLocaleString();dCount.textContent=Number(stats.totalCount||0).toLocaleString();dToday.textContent='฿'+Number(stats.todayAmount||0).toLocaleString();dDonors.textContent=Number(stats.uniqueDonors||0).toLocaleString();recentList.innerHTML=(rows.slice(0,8).map(itemHtml).join('')||'<div class="item"><div class="small">ยังไม่มีรายการ</div></div>')}
+function itemHtml(d){return `<div class="item"><div class="grow"><div>${esc(d.name)}</div><div class="msg">${esc(d.message||'')}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="small">${new Date(d.date).toLocaleDateString('th-TH')}</div></div>`}
+async function saveSettings(partial){const res=await fetch('/api/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,...partial})});const j=await res.json().catch(()=>({}));if(res.ok&&j.ok){toast('บันทึกแล้ว');settings=j.settings||settings;return true}toast(j.error||'บันทึกไม่สำเร็จ','bad');return false}
+function saveProfile(){saveSettings({name:cfgName.value.trim(),greeting:cfgGreeting.value.trim(),thankyou:cfgThankyou.value.trim()})}
+function saveColors(){saveSettings({bgColor:cfgBgColor.value,accentColor:cfgAccentColor.value})}
+function saveOverlay(){saveSettings({overlayMinAmount:Number(cfgMinAmount.value)||20,overlayDuration:Number(cfgDuration.value)||8,overlayPosition:cfgPosition.value,overlayEffect:cfgEffect.value,overlayImageUrl:cfgAlertImgUrl.value.trim(),overlayAlertSoundUrl:cfgAlertSoundUrl.value.trim(),overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1})}
+function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
+async function uploadFile(inputId,filename,type,settingKey,imgId,urlInputId){const input=document.getElementById(inputId),f=input.files?.[0];if(!f){toast('เลือกไฟล์ก่อน','bad');return}const btn=input.parentElement.querySelector('button');const old=btn.textContent;btn.disabled=true;btn.textContent='กำลังอัปโหลด...';const rd=new FileReader();rd.onload=async e=>{try{const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type,settingKey})});const j=await res.json().catch(()=>({}));if(!res.ok||!j.ok)throw new Error(j.error||'Upload failed');if(imgId)img(imgId,j.url);if(urlInputId)v(urlInputId,j.url);toast('อัปโหลดสำเร็จ')}catch(err){toast(err.message,'bad')}finally{btn.disabled=false;btn.textContent=old}};rd.readAsDataURL(f)}
+function dmFilter(reset=true){const q=(dmSearch?.value||'').toLowerCase().trim(),sort=dmSort?.value||'date-desc';filtered=rows.filter(d=>!q||String(d.name).toLowerCase().includes(q)||String(d.message||'').toLowerCase().includes(q));if(sort==='date-desc')filtered.sort((a,b)=>new Date(b.date)-new Date(a.date));if(sort==='date-asc')filtered.sort((a,b)=>new Date(a.date)-new Date(b.date));if(sort==='amount-desc')filtered.sort((a,b)=>Number(b.amount)-Number(a.amount));if(sort==='amount-asc')filtered.sort((a,b)=>Number(a.amount)-Number(b.amount));if(reset)page=1;renderDonations()}
+function renderDonations(){const max=Math.max(1,Math.ceil(filtered.length/LIMIT));page=Math.min(page,max);renderItems=filtered.slice((page-1)*LIMIT,page*LIMIT);dmList.innerHTML=renderItems.map((d,i)=>`<div class="item"><div class="grow"><div>${esc(d.name)}</div><div class="msg">${esc(d.message||'')}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><button class="btn2" onclick="openEdit(${i})">แก้</button></div>`).join('')||'<div class="item"><div class="small">ไม่พบรายการ</div></div>';pageInfo.textContent=page+' / '+max;prevBtn.disabled=page<=1;nextBtn.disabled=page>=max}
+function changePage(n){page+=n;renderDonations()}function openAdd(){isAdd=true;editId=null;modalTitle.textContent='เพิ่มรายการ';deleteBtn.style.display='none';mName.value='';mAmount.value='';mMsg.value='';editModal.classList.add('show')}
+function openEdit(i){const d=renderItems[i];isAdd=false;editId=d.id;modalTitle.textContent='แก้ไขรายการ';deleteBtn.style.display='block';mName.value=d.name||'';mAmount.value=d.amount||'';mMsg.value=d.message||'';editModal.classList.add('show')}
+function closeModal(){editModal.classList.remove('show')}
+async function saveDonation(){const body={password:pwd,name:mName.value.trim(),amount:Number(mAmount.value),message:mMsg.value.trim()};const url=isAdd?'/api/admin/donations':'/api/admin/donations/'+editId;const method=isAdd?'POST':'PUT';const res=await fetch(url,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});const j=await res.json().catch(()=>({}));if(res.ok&&(j.ok||isAdd)){toast('บันทึกแล้ว');closeModal();await loadAll()}else toast(j.error||'บันทึกไม่สำเร็จ','bad')}
+async function deleteDonation(){if(!confirm('ลบรายการนี้?'))return;const res=await fetch('/api/admin/donations/'+editId,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})});const j=await res.json().catch(()=>({}));if(res.ok&&j.ok){toast('ลบแล้ว');closeModal();await loadAll()}else toast(j.error||'ลบไม่สำเร็จ','bad')}
+function toast(msg,type='good'){const e=document.getElementById('toast');e.textContent=msg;e.className='toast'+(type==='bad'?' bad':'');e.style.display='block';clearTimeout(window.__t);window.__t=setTimeout(()=>e.style.display='none',3000)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
 </script>
 </body>
 </html>
