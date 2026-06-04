@@ -12,7 +12,8 @@ export default async function handler(req, res) {
 
   try {
     const baseName = filename.replace(/\.[^.]+$/, '');
-    const publicId = 'donation/' + baseName + '_' + Date.now();  // ← เพิ่ม timestamp
+    const publicId = 'donation/' + baseName + '_' + Date.now();
+
     let url;
     if (type === 'audio') {
       url = await uploadAudioToCloudinary(data, publicId);
@@ -22,9 +23,29 @@ export default async function handler(req, res) {
 
     if (settingKey) {
       const sb = getSupabase();
-      const { error } = await sb.rpc('set_setting_key', { p_key: settingKey, p_value: url });
+
+      const { data: existing } = await sb
+        .from('settings')
+        .select('value')
+        .eq('key', 'site')
+        .single();
+
+      const current = existing?.value || {};
+      const merged = {
+        ...current,
+        [settingKey]: url,
+      };
+
+      const { error } = await sb
+        .from('settings')
+        .upsert({
+          key: 'site',
+          value: merged,
+          updated_at: new Date().toISOString(),
+        });
+
       if (error) {
-        console.error('[upload] rpc error:', error);
+        console.error('[upload] settings save error:', error);
         return res.status(500).json({ error: error.message });
       }
     }
