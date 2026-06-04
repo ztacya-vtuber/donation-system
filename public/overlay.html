@@ -7,313 +7,139 @@
 <style>
   :root{--accent:#e8a4c8;--accent2:#c87eb0}
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{
-    background:transparent;
-    width:1920px;height:1080px;
-    overflow:hidden;position:relative;
-  }
-
-  /* ══ FULL ALERT (รูปใหญ่ + ข้อความใหญ่) ══ */
-  .alert{
-    position:absolute;
-    top:50%;left:50%;
-    transform:translate(-50%,-50%) scale(0.9);
-    width:700px;
-    opacity:0;
-    transition:opacity 0.4s ease, transform 0.6s cubic-bezier(0.34,1.56,0.64,1);
-    text-align:center;
-  }
-  .alert.show{
-    opacity:1;
-    transform:translate(-50%,-50%) scale(1);
-  }
-  .alert.hide{
-    opacity:0 !important;
-    transform:translate(-50%,-50%) scale(0.95) !important;
-    transition:transform 0.4s ease,opacity 0.35s ease !important;
-  }
-
-  /* รูปใหญ่ด้านบน */
-  .alert-image-wrap{
-    width:720px;height:480px;
-    margin:0 auto 24px;
-    border-radius:24px;
-    overflow:hidden;
-    border:3px solid rgba(232,164,200,0.4);
-    box-shadow:0 0 60px rgba(232,164,200,0.3), 0 20px 60px rgba(0,0,0,0.8);
-    display:none;
-  }
+  html,body{background:transparent;width:1920px;height:1080px;overflow:hidden;position:relative;}
+  .alert{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.9);width:700px;opacity:0;transition:opacity 0.4s ease, transform 0.6s cubic-bezier(0.34,1.56,0.64,1);text-align:center;}
+  .alert.show{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  .alert.hide{opacity:0 !important;transform:translate(-50%,-50%) scale(0.95) !important;transition:transform 0.4s ease,opacity 0.35s ease !important;}
+  .alert-image-wrap{width:720px;height:480px;margin:0 auto 24px;border-radius:24px;overflow:hidden;border:3px solid rgba(232,164,200,0.4);box-shadow:0 0 60px rgba(232,164,200,0.3),0 20px 60px rgba(0,0,0,0.8);display:none;}
   .alert-image-wrap.show{display:block}
   .alert-image-wrap img{width:100%;height:100%;object-fit:cover}
-
-  /* ชื่อใหญ่ */
-  .alert-name{
-    font-family:'Cormorant Garamond',serif;
-    font-size:70px;font-weight:600;
-    color:#fff;
-    letter-spacing:0.02em;
-    line-height:1;
-    text-shadow:0 4px 30px rgba(0,0,0,0.8), 0 0 60px rgba(232,164,200,0.4);
-    margin-bottom:8px;
-  }
-  .alert-name.name-glow{
-    color:var(--accent);
-    text-shadow:0 0 30px color-mix(in srgb,var(--accent) 80%,transparent),
-                0 0 60px color-mix(in srgb,var(--accent) 40%,transparent),
-                0 4px 30px rgba(0,0,0,0.8);
-  }
-
-  /* ข้อความกลาง */
-  .alert-verb{
-    font-family:'Noto Sans Thai',sans-serif;
-    font-size:32px;font-weight:300;
-    color:rgba(255,255,255,0.7);
-    margin-bottom:8px;
-    text-shadow:0 2px 20px rgba(0,0,0,0.8);
-  }
-
-  /* ยอดเงินใหญ่ */
-  .alert-amount{
-    font-family:'DM Mono',monospace;
-    font-size:100px;font-weight:400;
-    color:var(--accent);
-    line-height:1;
-    filter:drop-shadow(0 0 30px color-mix(in srgb,var(--accent) 70%,transparent));
-    text-shadow:0 4px 30px rgba(0,0,0,0.8);
-    margin-bottom:16px;
-  }
-
-  /* ข้อความโดเนท */
-  .alert-msg{
-    font-family:'Noto Sans Thai',sans-serif;
-    font-size:28px;font-weight:300;
-    color:rgba(255,255,255,0.6);
-    text-shadow:0 2px 20px rgba(0,0,0,0.8);
-    line-height:1.5;
-  }
-
-  /* Particles */
-  #particles{
-    position:fixed;inset:0;
-    pointer-events:none;overflow:hidden;
-    z-index:10;
-  }
-  .petal{
-    position:absolute;top:-60px;
-    font-size:20px;
-    animation:fallPetal linear forwards;
-    opacity:0;
-  }
-  @keyframes fallPetal{
-    0%  {opacity:0;transform:translateY(0) rotate(0deg) scale(0.8)}
-    8%  {opacity:1}
-    90% {opacity:0.7}
-    100%{opacity:0;transform:translateY(1200px) rotate(720deg) scale(1.1)}
-  }
-
-  /* Test button */
-  #testBtn{
-    position:fixed;bottom:12px;right:12px;
-    padding:6px 14px;border:1px solid rgba(232,164,200,0.3);
-    border-radius:8px;background:rgba(10,2,8,0.8);
-    color:rgba(232,164,200,0.7);font-size:11px;
-    cursor:pointer;font-family:'DM Mono',monospace;
-    z-index:999;
-  }
+  .alert-name{font-family:'Cormorant Garamond',serif;font-size:70px;font-weight:600;color:#fff;letter-spacing:0.02em;line-height:1;text-shadow:0 4px 30px rgba(0,0,0,0.8),0 0 60px rgba(232,164,200,0.4);margin-bottom:8px;}
+  .alert-name.name-glow{color:var(--accent);text-shadow:0 0 30px color-mix(in srgb,var(--accent) 80%,transparent),0 0 60px color-mix(in srgb,var(--accent) 40%,transparent),0 4px 30px rgba(0,0,0,0.8);}
+  .alert-verb{font-family:'Noto Sans Thai',sans-serif;font-size:32px;font-weight:300;color:rgba(255,255,255,0.7);margin-bottom:8px;text-shadow:0 2px 20px rgba(0,0,0,0.8);}
+  .alert-amount{font-family:'DM Mono',monospace;font-size:100px;font-weight:400;color:var(--accent);line-height:1;filter:drop-shadow(0 0 30px color-mix(in srgb,var(--accent) 70%,transparent));text-shadow:0 4px 30px rgba(0,0,0,0.8);margin-bottom:16px;}
+  .alert-msg{font-family:'Noto Sans Thai',sans-serif;font-size:28px;font-weight:300;color:rgba(255,255,255,0.6);text-shadow:0 2px 20px rgba(0,0,0,0.8);line-height:1.5;}
+  #particles{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:10;}
+  .petal{position:absolute;top:-60px;font-size:20px;animation:fallPetal linear forwards;opacity:0;}
+  @keyframes fallPetal{0%{opacity:0;transform:translateY(0) rotate(0deg) scale(0.8)}8%{opacity:1}90%{opacity:0.7}100%{opacity:0;transform:translateY(1200px) rotate(720deg) scale(1.1)}}
+  #testBtn{position:fixed;bottom:12px;right:12px;padding:6px 14px;border:1px solid rgba(232,164,200,0.3);border-radius:8px;background:rgba(10,2,8,0.8);color:rgba(232,164,200,0.7);font-size:11px;cursor:pointer;font-family:'DM Mono',monospace;z-index:999;}
   #testBtn:hover{border-color:var(--accent);color:var(--accent)}
+  #dot{position:fixed;bottom:12px;left:12px;width:8px;height:8px;border-radius:50%;background:#444;z-index:999;transition:background .3s}
 </style>
 </head>
 <body>
-
 <div id="particles"></div>
-
 <div class="alert" id="alert">
-  <div class="alert-image-wrap" id="alertImgWrap">
-    <img id="alertImg" alt="">
-  </div>
+  <div class="alert-image-wrap" id="alertImgWrap"><img id="alertImg" alt=""></div>
   <div class="alert-name" id="donorName">-</div>
   <div class="alert-verb">โดเนท</div>
   <div class="alert-amount" id="donorAmount">฿0</div>
   <div class="alert-msg" id="donorMsg"></div>
 </div>
-
+<div id="dot" title="realtime status"></div>
 <button id="testBtn" onclick="testDonation()">⟳ Test</button>
-
 <audio id="sfxAlert" preload="auto"></audio>
 <audio id="sfxMin" preload="auto"></audio>
 
 <script>
-const SUPABASE_URL = window.__SUPABASE_URL__ || '%%SUPABASE_URL%%';
-const SUPABASE_ANON = window.__SUPABASE_ANON__ || '%%SUPABASE_ANON%%';
+// ===== แก้ 2 บรรทัดนี้ =====
+const SUPABASE_URL  = 'https://idmnppkltddrfxwhvnwa.supabase.co';   // <- ใส่ URL จริง
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkbW5wcGtsdGRkcmZ4d2h2bndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTI2ODQsImV4cCI6MjA5NTc4ODY4NH0.p5JYw0boVmoKLACbLcRwK3FeO9yLZi1HSd7N_1c5Lu0'; // <- ใส่ anon key จริง
+// ===========================
 
-let settings = {
-  accentColor: '#e8a4c8',
-  thankyou: 'ขอบคุณมากนะคะ ♡',
-  overlayMinAmount: 20,
-  overlayAlertSoundUrl: '',
-  overlayMinSoundUrl: '',
-  overlayImageUrl: '',
-  ttsEnabled: true,
-  ttsRate: 1,
-  ttsPitch: 1,
-  overlayDuration: 8,
-  overlayEffect: 'roses',
-};
+let settings={accentColor:'#e8a4c8',thankyou:'ขอบคุณมากนะคะ ♡',overlayMinAmount:20,overlayAlertSoundUrl:'',overlayMinSoundUrl:'',overlayImageUrl:'',ttsEnabled:true,ttsRate:1,ttsPitch:1,overlayDuration:8,overlayEffect:'roses'};
+let queue=[],showing=false;
 
-let queue = [];
-let showing = false;
-
-async function init() {
-  await loadSettings();
+async function init(){
+  try{const s=await fetch('/api/settings').then(r=>r.json());applySettings(s);}catch(e){}
   connectRealtime();
 }
 
-async function loadSettings() {
-  try {
-    const s = await fetch('/api/settings').then(r => r.json());
-    applySettings(s);
-  } catch(e) {
-    console.warn('[overlay] Settings load failed');
-  }
+function applySettings(s){
+  settings={...settings,...s};
+  document.documentElement.style.setProperty('--accent',s.accentColor||'#e8a4c8');
+  document.documentElement.style.setProperty('--accent2',(s.accentColor||'#e8a4c8')+'cc');
+  if(settings.overlayAlertSoundUrl)document.getElementById('sfxAlert').src=settings.overlayAlertSoundUrl;
+  if(settings.overlayMinSoundUrl)document.getElementById('sfxMin').src=settings.overlayMinSoundUrl;
+  const wrap=document.getElementById('alertImgWrap'),img=document.getElementById('alertImg');
+  if(settings.overlayImageUrl){img.src=settings.overlayImageUrl;wrap.classList.add('show');}
+  else wrap.classList.remove('show');
 }
 
-function applySettings(s) {
-  settings = { ...settings, ...s };
-  const accent = s.accentColor || '#e8a4c8';
-  document.documentElement.style.setProperty('--accent', accent);
-  document.documentElement.style.setProperty('--accent2', accent + 'cc');
-
-  if (settings.overlayAlertSoundUrl)
-    document.getElementById('sfxAlert').src = settings.overlayAlertSoundUrl;
-  if (settings.overlayMinSoundUrl)
-    document.getElementById('sfxMin').src = settings.overlayMinSoundUrl;
-
-  const wrap = document.getElementById('alertImgWrap');
-  const img = document.getElementById('alertImg');
-  if (settings.overlayImageUrl) {
-    img.src = settings.overlayImageUrl;
-    wrap.classList.add('show');
-  } else {
-    wrap.classList.remove('show');
-  }
-}
-
-function connectRealtime() {
-  if (!SUPABASE_URL || SUPABASE_URL.includes('%%')) return;
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-  script.onload = () => {
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+function connectRealtime(){
+  const script=document.createElement('script');
+  script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  script.onload=()=>{
+    const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
     sb.channel('donations')
-      .on('broadcast', { event: 'new_donation' }, ({ payload }) => {
+      .on('broadcast',{event:'new_donation'},({payload})=>{
+        console.log('[overlay] received:',payload);
         queue.push(payload);
-        if (!showing) processQueue();
+        if(!showing)processQueue();
       })
-      .on('broadcast', { event: 'settings_update' }, ({ payload }) => {
-        applySettings(payload);
-      })
-      .subscribe();
+      .on('broadcast',{event:'settings_update'},({payload})=>applySettings(payload))
+      .subscribe(status=>{
+        console.log('[overlay] status:',status);
+        document.getElementById('dot').style.background=status==='SUBSCRIBED'?'var(--accent)':'#444';
+      });
   };
   document.head.appendChild(script);
 }
 
-function processQueue() {
-  if (!queue.length) { showing = false; return; }
-  showing = true;
-  showDonation(queue.shift());
-}
+function processQueue(){if(!queue.length){showing=false;return;}showing=true;showDonation(queue.shift());}
 
-function showDonation({ name, message, amount }) {
-  const alert = document.getElementById('alert');
-  const isMin = Number(amount) >= Number(settings.overlayMinAmount);
-
-  document.getElementById('donorName').textContent = name;
-  document.getElementById('donorAmount').textContent = '฿' + Number(amount).toLocaleString();
-  document.getElementById('donorMsg').textContent = message || settings.thankyou || '';
-
-  const nameEl = document.getElementById('donorName');
-  const shouldGlow = isMin && (settings.overlayEffect === 'glow' || settings.overlayEffect === 'both');
-  nameEl.classList.toggle('name-glow', shouldGlow);
-
-  alert.classList.remove('hide');
-  void alert.offsetWidth;
-  alert.classList.add('show');
-
+function showDonation({name,message,amount}){
+  const alertEl=document.getElementById('alert');
+  const isMin=Number(amount)>=Number(settings.overlayMinAmount);
+  document.getElementById('donorName').textContent=name;
+  document.getElementById('donorAmount').textContent='฿'+Number(amount).toLocaleString();
+  document.getElementById('donorMsg').textContent=message||settings.thankyou||'';
+  document.getElementById('donorName').classList.toggle('name-glow',isMin&&(settings.overlayEffect==='glow'||settings.overlayEffect==='both'));
+  alertEl.classList.remove('hide');void alertEl.offsetWidth;alertEl.classList.add('show');
   playSound(isMin);
-
-  if (isMin && settings.ttsEnabled)
-    setTimeout(() => speakTTS(name, message, amount), 800);
-
-  if (isMin && (settings.overlayEffect === 'roses' || settings.overlayEffect === 'both'))
-    launchPetals(60);
-
-  const dur = (Number(settings.overlayDuration) || 8) * 1000;
-  setTimeout(() => {
-    alert.classList.remove('show');
-    alert.classList.add('hide');
-    setTimeout(processQueue, 500);
-  }, dur);
+  if(isMin&&settings.ttsEnabled)setTimeout(()=>speakTTS(name,message,amount),800);
+  if(isMin&&(settings.overlayEffect==='roses'||settings.overlayEffect==='both'))launchPetals(60);
+  setTimeout(()=>{alertEl.classList.remove('show');alertEl.classList.add('hide');setTimeout(processQueue,500);},(Number(settings.overlayDuration)||8)*1000);
 }
 
-function playSound(isMin) {
-  try {
-    if (isMin && settings.overlayMinSoundUrl) {
-      const sfx = document.getElementById('sfxMin');
-      sfx.currentTime = 0; sfx.play().catch(()=>{});
-    } else if (settings.overlayAlertSoundUrl) {
-      const sfx = document.getElementById('sfxAlert');
-      sfx.currentTime = 0; sfx.play().catch(()=>{});
-    }
-  } catch(e) {}
+function playSound(isMin){
+  try{
+    if(isMin&&settings.overlayMinSoundUrl){const s=document.getElementById('sfxMin');s.currentTime=0;s.play().catch(()=>{});}
+    else if(settings.overlayAlertSoundUrl){const s=document.getElementById('sfxAlert');s.currentTime=0;s.play().catch(()=>{});}
+  }catch(e){}
 }
 
-function speakTTS(name, message, amount) {
-  if (!window.speechSynthesis) return;
+function speakTTS(name,message,amount){
+  if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
-  const text = message
-    ? `${name} โดเนท ${Number(amount).toLocaleString()} บาท พูดว่า ${message}`
-    : `${name} โดเนท ${Number(amount).toLocaleString()} บาท ขอบคุณมากนะคะ`;
-  const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'th-TH';
-  utt.rate = Number(settings.ttsRate) || 1;
-  utt.pitch = Number(settings.ttsPitch) || 1;
-  const voices = window.speechSynthesis.getVoices();
-  const v = voices.find(v => v.lang === 'th-TH');
-  if (v) utt.voice = v;
+  const text=message?`${name} โดเนท ${Number(amount).toLocaleString()} บาท พูดว่า ${message}`:`${name} โดเนท ${Number(amount).toLocaleString()} บาท ขอบคุณมากนะคะ`;
+  const utt=new SpeechSynthesisUtterance(text);
+  utt.lang='th-TH';utt.rate=Number(settings.ttsRate)||1;utt.pitch=Number(settings.ttsPitch)||1;
+  const v=window.speechSynthesis.getVoices().find(v=>v.lang==='th-TH');if(v)utt.voice=v;
   window.speechSynthesis.speak(utt);
 }
 
-const PETALS = ['🌸','🌹','🌺','✿','❀','🌷','💮','🏵️'];
-function launchPetals(count) {
-  const container = document.getElementById('particles');
-  for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      const p = document.createElement('div');
-      p.className = 'petal';
-      p.textContent = PETALS[Math.floor(Math.random() * PETALS.length)];
-      p.style.left = Math.random() * 1920 + 'px';
-      p.style.fontSize = (14 + Math.random() * 18) + 'px';
-      const dur = 4 + Math.random() * 5;
-      p.style.animationDuration = dur + 's';
-      container.appendChild(p);
-      setTimeout(() => p.remove(), dur * 1000 + 200);
-    }, Math.random() * 2000);
+const PETALS=['🌸','🌹','🌺','✿','❀','🌷','💮','🏵️'];
+function launchPetals(count){
+  const c=document.getElementById('particles');
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const p=document.createElement('div');p.className='petal';
+      p.textContent=PETALS[Math.floor(Math.random()*PETALS.length)];
+      p.style.left=Math.random()*1920+'px';p.style.fontSize=(14+Math.random()*18)+'px';
+      const dur=4+Math.random()*5;p.style.animationDuration=dur+'s';
+      c.appendChild(p);setTimeout(()=>p.remove(),dur*1000+200);
+    },Math.random()*2000);
   }
 }
 
-function testDonation() {
-  const testData = [
-    { name: 'TestUser', message: 'ทดสอบระบบ overlay นะคะ', amount: settings.overlayMinAmount || 20 },
-    { name: 'ผู้ใจดี', message: 'สวัสดีค่ะ ♡', amount: 5 },
-  ];
-  const pick = testData[Math.floor(Math.random() * testData.length)];
-  queue.push(pick);
-  if (!showing) processQueue();
+function testDonation(){
+  const pick=[{name:'TestUser',message:'ทดสอบระบบ overlay นะคะ',amount:settings.overlayMinAmount||20},{name:'ผู้ใจดี',message:'สวัสดีค่ะ ♡',amount:5}][Math.floor(Math.random()*2)];
+  queue.push(pick);if(!showing)processQueue();
 }
 
 window.speechSynthesis?.getVoices();
-window.speechSynthesis?.addEventListener?.('voiceschanged', () => window.speechSynthesis.getVoices());
-
+window.speechSynthesis?.addEventListener?.('voiceschanged',()=>window.speechSynthesis.getVoices());
 init();
 </script>
 </body>
