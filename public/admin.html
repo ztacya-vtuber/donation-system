@@ -198,7 +198,7 @@ async function loadAll(){
   ]);
   settings=s||{};stats=st||{};
   // rows = approved only (shown:true)
-  rows=(h.data||[]).filter(d=>d.shown!==false);
+  rows=h.data||[];
   pending=p.data||[];
   fillSettings();renderDash();renderPending();dmFilter(false);updatePendingBadge();
 }
