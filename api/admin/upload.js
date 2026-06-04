@@ -3,12 +3,28 @@ import { uploadToCloudinary, uploadAudioToCloudinary } from '../../lib/cloudinar
 
 export default async function handler(req, res) {
   cors(res);
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  if (!ADMIN_PASSWORD) {
+    return res.status(500).json({ error: 'ADMIN_PASSWORD is not set' });
+  }
 
   const { password, filename, data, type, settingKey } = req.body || {};
-  if (password !== ADMIN_PASSWORD) return res.status(401).json({ error: 'Unauthorized' });
-  if (!filename || !data) return res.status(400).json({ error: 'Missing fields' });
+
+  if (String(password || '') !== String(ADMIN_PASSWORD)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  if (!filename || !data) {
+    return res.status(400).json({ error: 'Missing fields' });
+  }
 
   try {
     const baseName = filename.replace(/\.[^.]+$/, '');
@@ -36,12 +52,14 @@ export default async function handler(req, res) {
         updated_at: new Date().toISOString(),
       });
 
-      if (error) return res.status(500).json({ error: error.message });
+      if (error) {
+        return res.status(500).json({ error: error.message });
+      }
     }
 
-    res.json({ ok: true, url });
+    return res.json({ ok: true, url });
   } catch (e) {
     console.error('[upload]', e);
-    res.status(500).json({ error: e.message });
+    return res.status(500).json({ error: e.message });
   }
 }
