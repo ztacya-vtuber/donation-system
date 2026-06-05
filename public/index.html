@@ -8,211 +8,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&family=Cormorant+Garamond:ital,wght@0,400;1,300&display=swap" rel="stylesheet"/>
   <style>
     *{box-sizing:border-box;margin:0;padding:0;}
-
-    :root{
-      --page-bg:#0d0508;
-      --accent:#c06080;
-      --bg-image:#0d0508;
-    }
-
-    body{
-      font-family:'Sarabun',sans-serif;
-      background:var(--page-bg);
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      padding-bottom:40px;
-      transition:background 0.3s;
-      position:relative;
-      overflow-x:hidden;
-    }
-
-    body::before{
-      content:'';
-      position:fixed;
-      inset:-28px;
-      z-index:-3;
-      background:var(--bg-image) center / cover fixed;
-      filter:blur(2px) saturate(1.18) brightness(0.72);
-      transform:scale(1.05);
-    }
-
-    body::after{
-      content:'';
-      position:fixed;
-      inset:0;
-      z-index:-2;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at 50% 16%, rgba(228,185,208,0.18), transparent 34%),
-        radial-gradient(circle at 18% 78%, rgba(154,64,96,0.18), transparent 30%),
-        linear-gradient(180deg, rgba(13,5,8,0.42), rgba(13,5,8,0.9)),
-        repeating-linear-gradient(
-          0deg,
-          rgba(255,255,255,0.018) 0px,
-          rgba(255,255,255,0.018) 1px,
-          transparent 1px,
-          transparent 4px
-        );
-    }
-
-    .banner{
-      width:100%;
-      max-width:520px;
-      height:200px;
-      position:relative;
-      overflow:hidden;
-      background:#1a0a0e;
-      box-shadow:0 20px 70px rgba(0,0,0,0.28);
-    }
-
-    .banner img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      opacity:0.72;
-      transition:opacity 0.3s;
-    }
-
-    .banner::after{
-      content:'';
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, transparent 28%, var(--page-bg)),
-        linear-gradient(90deg, rgba(13,5,8,0.35), transparent 35%, rgba(13,5,8,0.28));
-    }
-
-    .profile{
-      width:100%;
-      max-width:520px;
-      display:flex;
-      align-items:center;
-      gap:14px;
-      padding:0 20px 16px;
-      margin-top:-36px;
-      position:relative;
-      z-index:2;
-    }
-
-    .avatar{
-      width:68px;
-      height:68px;
-      border-radius:50%;
-      border:2px solid var(--accent);
-      object-fit:cover;
-      background:#2a1020;
-      flex-shrink:0;
-      box-shadow:0 8px 30px rgba(0,0,0,0.38);
-    }
-
-    .streamer-name{
-      font-family:'Cormorant Garamond',serif;
-      font-size:22px;
-      color:#f0d0d8;
-      font-weight:400;
-      text-shadow:0 2px 18px rgba(0,0,0,0.55);
-    }
-
-    .streamer-sub{
-      font-size:13px;
-      color:#b98a9b;
-      font-style:italic;
-      text-shadow:0 2px 14px rgba(0,0,0,0.55);
-    }
-
-    .card{
-      width:calc(100% - 32px);
-      max-width:520px;
-      background:rgba(21,8,16,0.82);
-      border:1px solid rgba(228,185,208,0.16);
-      border-radius:16px;
-      padding:24px 20px 28px;
-      margin:0 16px;
-      box-shadow:0 24px 80px rgba(0,0,0,0.34);
-      backdrop-filter:blur(10px);
-    }
-
+    :root{--page-bg:#0d0508;--accent:#c06080;--bg-image:#0d0508;}
+    body{font-family:'Sarabun',sans-serif;background:var(--page-bg);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding-bottom:40px;transition:background 0.3s;position:relative;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:-28px;z-index:-3;background:var(--bg-image) center / cover fixed;filter:blur(2px) saturate(1.18) brightness(0.72);transform:scale(1.05);}
+    body::after{content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;background:radial-gradient(circle at 50% 16%, rgba(228,185,208,0.18), transparent 34%),radial-gradient(circle at 18% 78%, rgba(154,64,96,0.18), transparent 30%),linear-gradient(180deg, rgba(13,5,8,0.42), rgba(13,5,8,0.9)),repeating-linear-gradient(0deg, rgba(255,255,255,0.018) 0px, rgba(255,255,255,0.018) 1px, transparent 1px, transparent 4px);}
+    .banner{width:100%;max-width:520px;height:200px;position:relative;overflow:hidden;background:#1a0a0e;box-shadow:0 20px 70px rgba(0,0,0,0.28);}
+    .banner img{width:100%;height:100%;object-fit:cover;opacity:0.72;transition:opacity 0.3s;}
+    .banner::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg, transparent 28%, var(--page-bg)),linear-gradient(90deg, rgba(13,5,8,0.35), transparent 35%, rgba(13,5,8,0.28));}
+    .profile{width:100%;max-width:520px;display:flex;align-items:center;gap:14px;padding:0 20px 16px;margin-top:-36px;position:relative;z-index:2;}
+    .avatar{width:68px;height:68px;border-radius:50%;border:2px solid var(--accent);object-fit:cover;background:#2a1020;flex-shrink:0;box-shadow:0 8px 30px rgba(0,0,0,0.38);}
+    .streamer-name{font-family:'Cormorant Garamond',serif;font-size:22px;color:#f0d0d8;font-weight:400;text-shadow:0 2px 18px rgba(0,0,0,0.55);}
+    .streamer-sub{font-size:13px;color:#b98a9b;font-style:italic;text-shadow:0 2px 14px rgba(0,0,0,0.55);}
+    .card{width:calc(100% - 32px);max-width:520px;background:rgba(21,8,16,0.82);border:1px solid rgba(228,185,208,0.16);border-radius:16px;padding:24px 20px 28px;margin:0 16px;box-shadow:0 24px 80px rgba(0,0,0,0.34);backdrop-filter:blur(10px);}
     .dots{display:flex;gap:6px;justify-content:center;margin-bottom:20px;}
     .dot{width:6px;height:6px;border-radius:50%;background:#2a1020;border:1px solid #3a1a22;transition:background 0.3s;}
     .dot.active{background:var(--accent);border-color:var(--accent);}
     .dot.done{background:#4a2030;border-color:#4a2030;}
     .page{display:none;flex-direction:column;gap:16px;}
     .page.active{display:flex;}
-
-    .qr-wrap{
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:10px;
-      padding:12px 0 4px;
-    }
-
-    .qr-wrap img{
-      width:200px;
-      height:200px;
-      border-radius:12px;
-      background:#fff;
-      padding:8px;
-      object-fit:contain;
-      box-shadow:0 18px 60px rgba(0,0,0,0.34);
-    }
-
+    .qr-wrap{display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0 4px;}
+    .qr-wrap img{width:200px;height:200px;border-radius:12px;background:#fff;padding:8px;object-fit:contain;box-shadow:0 18px 60px rgba(0,0,0,0.34);}
     .qr-label{font-size:13px;color:#b98a9b;text-align:center;}
     .section-title{font-size:13px;color:#d9a8bc;letter-spacing:2px;text-transform:uppercase;font-weight:300;}
     .field label{font-size:12px;color:#b98a9b;display:block;margin-bottom:5px;}
-
-    .field input,.field textarea{
-      width:100%;
-      background:rgba(13,5,8,0.86);
-      border:1px solid rgba(228,185,208,0.16);
-      border-radius:8px;
-      color:#e0c0c8;
-      padding:10px 12px;
-      font-size:15px;
-      font-family:'Sarabun',sans-serif;
-      outline:none;
-      transition:border-color 0.2s,background 0.2s;
-    }
-
-    .field input:focus,.field textarea:focus{
-      border-color:var(--accent);
-      background:rgba(13,5,8,0.96);
-    }
-
+    .field input,.field textarea{width:100%;background:rgba(13,5,8,0.86);border:1px solid rgba(228,185,208,0.16);border-radius:8px;color:#e0c0c8;padding:10px 12px;font-size:15px;font-family:'Sarabun',sans-serif;outline:none;transition:border-color 0.2s,background 0.2s;}
+    .field input:focus,.field textarea:focus{border-color:var(--accent);background:rgba(13,5,8,0.96);}
     .field textarea{resize:vertical;min-height:72px;}
     .amount-wrap{position:relative;}
     .amount-wrap input{padding-right:36px;}
     .amount-unit{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:#b98a9b;font-size:13px;}
-
-    .btn{
-      background:linear-gradient(90deg,var(--accent),#9a4060);
-      border:none;
-      border-radius:10px;
-      color:#fff;
-      font-family:'Sarabun',sans-serif;
-      font-size:15px;
-      padding:13px;
-      cursor:pointer;
-      transition:opacity 0.2s;
-      letter-spacing:0.5px;
-      box-shadow:0 12px 34px rgba(154,64,96,0.28);
-    }
-
+    .btn{background:linear-gradient(90deg,var(--accent),#9a4060);border:none;border-radius:10px;color:#fff;font-family:'Sarabun',sans-serif;font-size:15px;padding:13px;cursor:pointer;transition:opacity 0.2s;letter-spacing:0.5px;box-shadow:0 12px 34px rgba(154,64,96,0.28);}
     .btn:disabled{opacity:0.5;cursor:not-allowed;}
-
-    .btn-ghost{
-      background:rgba(13,5,8,0.34);
-      border:1px solid rgba(228,185,208,0.16);
-      border-radius:10px;
-      color:#b98a9b;
-      font-family:'Sarabun',sans-serif;
-      font-size:14px;
-      padding:10px;
-      cursor:pointer;
-    }
-
+    .btn-ghost{background:rgba(13,5,8,0.34);border:1px solid rgba(228,185,208,0.16);border-radius:10px;color:#b98a9b;font-family:'Sarabun',sans-serif;font-size:14px;padding:10px;cursor:pointer;}
     .pending-box{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 0 16px;text-align:center;}
     .pending-symbol{font-size:36px;color:var(--accent);}
     .pending-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:#f0d0d8;}
@@ -222,13 +49,23 @@
     .footer{margin-top:20px;text-align:center;}
     .footer a{color:#7a4354;font-size:12px;text-decoration:none;letter-spacing:1px;}
     .ornament{color:#5f2d3e;font-size:11px;text-align:center;margin-top:12px;}
+
+    /* ── Goal Bar ── */
+    #goalSection{display:none;width:calc(100% - 32px);max-width:520px;margin:14px 16px 0;}
+    .goal-card{background:rgba(21,8,16,0.75);border:1px solid rgba(228,185,208,0.14);border-radius:14px;padding:16px 18px 14px;backdrop-filter:blur(10px);}
+    .goal-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+    .goal-name{font-family:'Cormorant Garamond',serif;font-size:17px;color:#f0d0d8;}
+    .goal-nums{font-family:monospace;font-size:13px;color:var(--accent);}
+    .bar-track{width:100%;height:10px;background:rgba(255,255,255,0.07);border-radius:99px;border:1px solid rgba(228,185,208,0.15);overflow:hidden;}
+    .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#c87eb0,var(--accent));width:0%;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 12px rgba(232,164,200,0.4);}
+    .bar-fill.complete{background:linear-gradient(90deg,#5abf80,#86d6a3);box-shadow:0 0 16px rgba(134,214,163,0.5);animation:gpulse 1.5s ease infinite alternate;}
+    @keyframes gpulse{from{box-shadow:0 0 10px rgba(134,214,163,0.4)}to{box-shadow:0 0 24px rgba(134,214,163,0.8)}}
+    .goal-pct{font-size:11px;color:#7a4a5a;text-align:center;margin-top:6px;font-family:monospace;}
   </style>
 </head>
 <body>
 
-  <div class="banner">
-    <img id="bannerImg" src="" alt="banner"/>
-  </div>
+  <div class="banner"><img id="bannerImg" src="" alt="banner"/></div>
 
   <div class="profile">
     <img id="avatarImg" class="avatar" src="" alt="avatar"/>
@@ -281,7 +118,7 @@
         <div class="pending-title">ขอบคุณนะคะ</div>
         <div class="pending-sub">
           ข้อมูลของคุณถูกบันทึกเรียบร้อยแล้ว<br/>
-          กำลังตรวจสอบและอนุมัติ ♡
+          กำลังรอ streamer ตรวจสอบและอนุมัติ ♡
         </div>
       </div>
       <button class="btn-ghost" onclick="resetAll()">โดเนทอีกครั้ง</button>
@@ -290,120 +127,96 @@
     <div class="ornament">✦</div>
   </div>
 
-  <div class="footer">
+  <!-- Goal Bar -->
+  <div id="goalSection">
+    <div class="goal-card">
+      <div class="goal-header">
+        <div class="goal-name" id="goalLabelEl">🎯 เป้าหมาย</div>
+        <div class="goal-nums"><span id="goalCur">฿0</span> / <span id="goalTarget">฿0</span></div>
+      </div>
+      <div class="bar-track">
+        <div class="bar-fill" id="goalBar"></div>
+      </div>
+      <div class="goal-pct" id="goalPct">0%</div>
+    </div>
+  </div>
+
+  <div class="footer" style="margin-top:16px">
     <a href="/top.html">🏆 TOP DONORS</a>
   </div>
 
   <script>
-    fetch('/api/settings?t=' + Date.now(), { cache: 'no-store' })
-      .then(r => r.json())
-      .then(s => {
-        if (s.name) {
-          document.getElementById('streamerName').textContent = s.name;
-        }
+    let goalAmount = 0, goalMode = 'total';
 
-        if (s.greeting) {
-          document.getElementById('streamerSub').textContent = s.greeting;
-        }
+    fetch('/api/settings?t='+Date.now(),{cache:'no-store'})
+      .then(r=>r.json())
+      .then(s=>{
+        if(s.name) document.getElementById('streamerName').textContent=s.name;
+        if(s.greeting) document.getElementById('streamerSub').textContent=s.greeting;
+        if(s.accentColor) document.documentElement.style.setProperty('--accent',s.accentColor);
+        if(s.bgColor){document.documentElement.style.setProperty('--page-bg',s.bgColor);document.documentElement.style.setProperty('--bg-image',s.bgColor);document.body.style.background=s.bgColor;}
+        if(s.bgUrl) document.documentElement.style.setProperty('--bg-image',`url("${s.bgUrl}")`);
+        if(s.bannerUrl){document.getElementById('bannerImg').src=s.bannerUrl;document.getElementById('bannerImg').style.opacity='0.72';}
+        if(s.avatarUrl){document.getElementById('avatarImg').src=s.avatarUrl;document.getElementById('avatarImg').style.opacity='1';}
+        if(s.qrUrl){document.getElementById('qrImg').src=s.qrUrl;document.getElementById('qrImg').style.opacity='1';}
 
-        if (s.accentColor) {
-          document.documentElement.style.setProperty('--accent', s.accentColor);
-        }
-
-        if (s.bgColor) {
-          document.documentElement.style.setProperty('--page-bg', s.bgColor);
-          document.documentElement.style.setProperty('--bg-image', s.bgColor);
-          document.body.style.background = s.bgColor;
-        }
-
-        if (s.bgUrl) {
-          document.documentElement.style.setProperty('--bg-image', `url("${s.bgUrl}")`);
-          document.body.style.background = s.bgColor || '#0d0508';
-        }
-
-        const bannerImg = document.getElementById('bannerImg');
-        const avatarImg = document.getElementById('avatarImg');
-        const qrImg = document.getElementById('qrImg');
-
-        if (s.bannerUrl) {
-          bannerImg.src = s.bannerUrl;
-          bannerImg.style.opacity = '0.72';
-        }
-
-        if (s.avatarUrl) {
-          avatarImg.src = s.avatarUrl;
-          avatarImg.style.opacity = '1';
-        }
-
-        if (s.qrUrl) {
-          qrImg.src = s.qrUrl;
-          qrImg.style.opacity = '1';
+        // Goal bar
+        if(s.goalAmount && Number(s.goalAmount) > 0){
+          goalAmount = Number(s.goalAmount);
+          goalMode   = s.goalMode || 'total';
+          document.getElementById('goalLabelEl').textContent = '🎯 ' + (s.goalLabel || 'เป้าหมาย');
+          document.getElementById('goalTarget').textContent = '฿' + goalAmount.toLocaleString();
+          document.getElementById('goalSection').style.display = 'block';
+          loadGoalStats();
         }
       })
-      .catch(err => {
-        console.error('[settings]', err);
-      });
+      .catch(e=>console.error('[settings]',e));
 
-    function goTo(n) {
-      [1,2,3].forEach(i => {
-        document.getElementById('page'+i).classList.toggle('active', i===n);
-      });
-
-      const states = n===1 ? ['active','',''] : n===2 ? ['done','active',''] : ['done','done','active'];
-
-      ['d0','d1','d2'].forEach((id,i) => {
-        document.getElementById(id).className = 'dot ' + states[i];
-      });
+    function loadGoalStats(){
+      fetch('/api/stats?t='+Date.now())
+        .then(r=>r.json())
+        .then(st=>{
+          const cur = goalMode==='today' ? Number(st.todayAmount||0) : Number(st.totalAmount||0);
+          const pct = goalAmount > 0 ? Math.min(100, (cur/goalAmount)*100) : 0;
+          document.getElementById('goalCur').textContent = '฿'+cur.toLocaleString();
+          document.getElementById('goalPct').textContent = pct.toFixed(1)+'%';
+          const bar = document.getElementById('goalBar');
+          bar.style.width = pct+'%';
+          if(pct>=100) bar.classList.add('complete');
+          else bar.classList.remove('complete');
+        }).catch(()=>{});
     }
 
-    async function submitDonation() {
-      const name = document.getElementById('name').value.trim();
-      const message = document.getElementById('message').value.trim();
-      const amount = parseFloat(document.getElementById('amount').value);
-      const statusEl = document.getElementById('formStatus');
-      const btn = document.getElementById('submitBtn');
+    function goTo(n){
+      [1,2,3].forEach(i=>document.getElementById('page'+i).classList.toggle('active',i===n));
+      const states=n===1?['active','','']:n===2?['done','active','']:['done','done','active'];
+      ['d0','d1','d2'].forEach((id,i)=>document.getElementById(id).className='dot '+states[i]);
+    }
 
-      if (!name) {
-        statusEl.textContent = 'กรุณากรอกชื่อ';
-        return;
-      }
-
-      if (!amount || amount <= 0) {
-        statusEl.textContent = 'กรุณากรอกจำนวนเงิน';
-        return;
-      }
-
-      statusEl.textContent = '';
-      btn.disabled = true;
-      btn.textContent = 'กำลังส่ง...';
-
-      try {
-        const res = await fetch('/api/donate', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({display_name: name, message, amount})
-        });
-
-        const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || 'เกิดข้อผิดพลาด');
-        }
-
+    async function submitDonation(){
+      const name=document.getElementById('name').value.trim();
+      const message=document.getElementById('message').value.trim();
+      const amount=parseFloat(document.getElementById('amount').value);
+      const statusEl=document.getElementById('formStatus');
+      const btn=document.getElementById('submitBtn');
+      if(!name){statusEl.textContent='กรุณากรอกชื่อ';return;}
+      if(!amount||amount<=0){statusEl.textContent='กรุณากรอกจำนวนเงิน';return;}
+      statusEl.textContent='';btn.disabled=true;btn.textContent='กำลังส่ง...';
+      try{
+        const res=await fetch('/api/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({display_name:name,message,amount})});
+        const data=await res.json();
+        if(!res.ok) throw new Error(data.error||'เกิดข้อผิดพลาด');
         goTo(3);
-      } catch(err) {
-        statusEl.textContent = err.message;
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'ยืนยัน ✓';
-      }
+        if(goalAmount>0) setTimeout(loadGoalStats, 1000);
+      }catch(err){statusEl.textContent=err.message;}
+      finally{btn.disabled=false;btn.textContent='ยืนยัน ✓';}
     }
 
-    function resetAll() {
-      document.getElementById('name').value = '';
-      document.getElementById('message').value = '';
-      document.getElementById('amount').value = '';
-      document.getElementById('formStatus').textContent = '';
+    function resetAll(){
+      document.getElementById('name').value='';
+      document.getElementById('message').value='';
+      document.getElementById('amount').value='';
+      document.getElementById('formStatus').textContent='';
       goTo(1);
     }
   </script>
