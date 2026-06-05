@@ -138,6 +138,7 @@
         <div class="bar-fill" id="goalBar"></div>
       </div>
       <div class="goal-pct" id="goalPct">0%</div>
+      <div id="goalCountdown" style="font-size:11px;color:#b98a9b;text-align:center;margin-top:3px;font-family:monospace;"></div>
     </div>
   </div>
 
@@ -146,7 +147,7 @@
   </div>
 
   <script>
-    let goalAmount = 0, goalMode = 'total';
+    let goalAmount = 0, goalMode = 'total', goalFrom = '', goalTo = '';
 
     fetch('/api/settings?t='+Date.now(),{cache:'no-store'})
       .then(r=>r.json())
@@ -165,6 +166,8 @@
           goalAmount = Number(s.goalAmount);
           goalMode   = s.goalMode || 'total';
           document.getElementById('goalLabelEl').textContent = '🎯 ' + (s.goalLabel || 'เป้าหมาย');
+          goalFrom = s.goalFrom||'';
+          goalTo   = s.goalTo||'';
           document.getElementById('goalTarget').textContent = '฿' + goalAmount.toLocaleString();
           document.getElementById('goalSection').style.display = 'block';
           loadGoalStats();
@@ -173,18 +176,40 @@
       .catch(e=>console.error('[settings]',e));
 
     function loadGoalStats(){
-      fetch('/api/stats?t='+Date.now())
-        .then(r=>r.json())
-        .then(st=>{
-          const cur = goalMode==='today' ? Number(st.todayAmount||0) : Number(st.totalAmount||0);
-          const pct = goalAmount > 0 ? Math.min(100, (cur/goalAmount)*100) : 0;
-          document.getElementById('goalCur').textContent = '฿'+cur.toLocaleString();
-          document.getElementById('goalPct').textContent = pct.toFixed(1)+'%';
-          const bar = document.getElementById('goalBar');
-          bar.style.width = pct+'%';
-          if(pct>=100) bar.classList.add('complete');
-          else bar.classList.remove('complete');
-        }).catch(()=>{});
+      let url='/api/stats?t='+Date.now();
+      if(goalMode==='range'&&goalFrom) url+='&from='+goalFrom;
+      if(goalMode==='range'&&goalTo)   url+='&to='+goalTo;
+      fetch(url).then(r=>r.json()).then(st=>{
+        let cur=0;
+        if(goalMode==='today') cur=Number(st.todayAmount||0);
+        else if(goalMode==='range') cur=Number(st.rangeAmount||0);
+        else cur=Number(st.totalAmount||0);
+        const pct = goalAmount>0 ? (cur/goalAmount)*100 : 0;
+        const pctDisplay = pct>100 ? pct.toFixed(0)+'%' : pct.toFixed(1)+'%';
+        document.getElementById('goalCur').textContent='฿'+cur.toLocaleString();
+        document.getElementById('goalPct').textContent=pctDisplay;
+        const bar=document.getElementById('goalBar');
+        // overflow: bar เต็ม + glow แต่ไม่ล้น
+        bar.style.width=Math.min(100,pct)+'%';
+        if(pct>=100) bar.classList.add('complete');
+        else bar.classList.remove('complete');
+        // countdown
+        if(goalTo){
+          const end=new Date(goalTo);end.setHours(23,59,59,999);
+          const now=new Date();
+          const diff=end-now;
+          const cdEl=document.getElementById('goalCountdown');
+          if(cdEl){
+            if(diff<=0){cdEl.textContent='หมดเวลาแล้ว';}
+            else{
+              const days=Math.floor(diff/86400000);
+              const hrs=Math.floor((diff%86400000)/3600000);
+              const mins=Math.floor((diff%3600000)/60000);
+              cdEl.textContent=days>0?days+' วัน '+hrs+' ชม.':hrs>0?hrs+' ชม. '+mins+' นาที':mins+' นาที';
+            }
+          }
+        }
+      }).catch(()=>{});
     }
 
     function goTo(n){
