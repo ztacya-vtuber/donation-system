@@ -141,8 +141,9 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
     <div class="card"><div class="label">เสียงยอดขั้นต่ำ URL</div><input id="cfgMinSoundUrl"><input type="file" id="fileMinSound" accept="audio/*"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileMinSound','alert-min.mp3','audio','overlayMinSoundUrl',null,'cfgMinSoundUrl')">อัปโหลดเสียงพิเศษ</button></div>
   </div>
   <div class="card"><div class="row"><label><input type="checkbox" id="cfgTtsEnabled" style="width:auto"> เปิด TTS</label><input type="number" step="0.1" id="cfgTtsRate" placeholder="rate"><input type="number" step="0.1" id="cfgTtsPitch" placeholder="pitch"></div></div>
-  <button class="btn" onclick="saveOverlay()">บันทึก Overlay</button>
+  <div class="card" style="margin-top:8px"><div class="label">🎯 เป้าหมายโดเนท</div><div class="grid" style="margin-top:10px"><div class="card"><div class="label">ยอดเป้าหมาย (0 = ซ่อนหลอด)</div><input type="number" id="cfgGoalAmount" min="0" placeholder="เช่น 1000"></div><div class="card"><div class="label">นับยอดจาก</div><select id="cfgGoalMode"><option value="total">ยอดรวมทั้งหมด</option><option value="today">ยอดวันนี้</option></select></div></div><div class="card" style="margin-top:0"><div class="label">ชื่อเป้าหมาย</div><input id="cfgGoalLabel" placeholder="เช่น เป้าหมาย Stream นี้"></div><div class="hint">เปิด Goal Overlay ใน OBS: /goal-overlay.html</div></div><button class="btn" onclick="saveOverlay()">บันทึก Overlay</button>
   <button class="btn2" onclick="window.open('/overlay.html','_blank')" style="margin-left:8px">เปิด Overlay</button>
+  <button class="btn2" onclick="window.open('/goal-overlay.html','_blank')" style="margin-left:8px">เปิด Goal Overlay</button>
 </section>
 
 <!-- DONATIONS -->
@@ -219,6 +220,10 @@ function fillSettings(){
   v('cfgAlertImgUrl',settings.overlayImageUrl);v('cfgAlertSoundUrl',settings.overlayAlertSoundUrl);
   v('cfgMinSoundUrl',settings.overlayMinSoundUrl);v('cfgTtsRate',settings.ttsRate||1);
   v('cfgTtsPitch',settings.ttsPitch||1);cfgTtsEnabled.checked=!!settings.ttsEnabled;
+  v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
+  const gm=document.getElementById('cfgGoalMode');if(gm)gm.value=settings.goalMode||'total';
+  v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
+  const gm=document.getElementById('cfgGoalMode');if(gm)gm.value=settings.goalMode||'total';
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
   img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl);
 }
@@ -352,7 +357,7 @@ async function saveSettings(partial){
 }
 function saveProfile(){saveSettings({name:cfgName.value.trim(),greeting:cfgGreeting.value.trim(),thankyou:cfgThankyou.value.trim()})}
 function saveColors(){saveSettings({bgColor:cfgBgColor.value,accentColor:cfgAccentColor.value})}
-function saveOverlay(){saveSettings({overlayMinAmount:Number(cfgMinAmount.value)||20,overlayDuration:Number(cfgDuration.value)||8,overlayPosition:cfgPosition.value,overlayEffect:cfgEffect.value,overlayImageUrl:cfgAlertImgUrl.value.trim(),overlayAlertSoundUrl:cfgAlertSoundUrl.value.trim(),overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1})}
+function saveOverlay(){saveSettings({overlayMinAmount:Number(cfgMinAmount.value)||20,overlayDuration:Number(cfgDuration.value)||8,overlayPosition:cfgPosition.value,overlayEffect:cfgEffect.value,overlayImageUrl:cfgAlertImgUrl.value.trim(),overlayAlertSoundUrl:cfgAlertSoundUrl.value.trim(),overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1,goalAmount:Number(cfgGoalAmount.value)||0,goalMode:cfgGoalMode.value,goalLabel:(cfgGoalLabel.value||'').trim()})}
 
 // ── Image uploads ─────────────────────────────────────────────────────────────
 function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
