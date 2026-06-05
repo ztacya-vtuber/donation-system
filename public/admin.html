@@ -222,6 +222,7 @@ function fillSettings(){
   v('cfgTtsPitch',settings.ttsPitch||1);cfgTtsEnabled.checked=!!settings.ttsEnabled;
   v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
   const gm2=document.getElementById('cfgGoalMode');if(gm2)gm2.value=settings.goalMode||'total';
+  v('cfgGoalFrom',settings.goalFrom||'');v('cfgGoalTo',settings.goalTo||'');
   v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
   const gm=document.getElementById('cfgGoalMode');if(gm)gm.value=settings.goalMode||'total';
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
@@ -357,7 +358,7 @@ async function saveSettings(partial){
 }
 function saveProfile(){saveSettings({name:cfgName.value.trim(),greeting:cfgGreeting.value.trim(),thankyou:cfgThankyou.value.trim()})}
 function saveColors(){saveSettings({bgColor:cfgBgColor.value,accentColor:cfgAccentColor.value})}
-function saveOverlay(){saveSettings({overlayMinAmount:Number(cfgMinAmount.value)||20,overlayDuration:Number(cfgDuration.value)||8,overlayPosition:cfgPosition.value,overlayEffect:cfgEffect.value,overlayImageUrl:cfgAlertImgUrl.value.trim(),overlayAlertSoundUrl:cfgAlertSoundUrl.value.trim(),overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1,goalAmount:Number(cfgGoalAmount.value)||0,goalMode:cfgGoalMode.value,goalLabel:(cfgGoalLabel.value||'').trim()})}
+function saveOverlay(){saveSettings({overlayMinAmount:Number(cfgMinAmount.value)||20,overlayDuration:Number(cfgDuration.value)||8,overlayPosition:cfgPosition.value,overlayEffect:cfgEffect.value,overlayImageUrl:cfgAlertImgUrl.value.trim(),overlayAlertSoundUrl:cfgAlertSoundUrl.value.trim(),overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1,goalAmount:Number(cfgGoalAmount.value)||0,goalMode:cfgGoalMode.value,goalLabel:(cfgGoalLabel.value||'').trim(),goalFrom:cfgGoalFrom.value,goalTo:cfgGoalTo.value})}
 
 // ── Image uploads ─────────────────────────────────────────────────────────────
 function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
