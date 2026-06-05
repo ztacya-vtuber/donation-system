@@ -221,7 +221,7 @@ function fillSettings(){
   v('cfgMinSoundUrl',settings.overlayMinSoundUrl);v('cfgTtsRate',settings.ttsRate||1);
   v('cfgTtsPitch',settings.ttsPitch||1);cfgTtsEnabled.checked=!!settings.ttsEnabled;
   v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
-  const gm=document.getElementById('cfgGoalMode');if(gm)gm.value=settings.goalMode||'total';
+  const gm2=document.getElementById('cfgGoalMode');if(gm2)gm2.value=settings.goalMode||'total';
   v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
   const gm=document.getElementById('cfgGoalMode');if(gm)gm.value=settings.goalMode||'total';
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
