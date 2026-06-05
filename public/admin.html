@@ -196,7 +196,7 @@ async function doLogin(){
     const j=await res.json().catch(()=>({}));
     if(!res.ok||!j.ok){err.style.display='block';return}
     pwd=p;loginScreen.style.display='none';adminShell.classList.add('show');
-    await loadAll();startAutoRefresh();
+    await loadAll();
   }catch(e){err.textContent='Login API error: '+e.message;err.style.display='block'}
 }
 
@@ -204,7 +204,8 @@ function showSec(id,b){
   document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');b.classList.add('active');
-  if(id==='dashboard'||id==='donations'||id==='pending')loadAll();
+  if(id==='pending'){loadPending();startAutoRefresh();}
+  else{stopAutoRefresh();if(id==='dashboard'||id==='donations')loadAll();}
 }
 
 async function loadAll(){
@@ -225,6 +226,10 @@ function updatePendingBadge(){
 }
 
 function fillSettings(){
+  // ถ้า user กำลังพิมพ์ใน overlay section อยู่ ไม่ reset
+  const active=document.activeElement;
+  const inOverlay=active&&active.closest&&active.closest('#sec-overlay');
+  if(inOverlay)return;
   v('cfgName',settings.name);v('cfgGreeting',settings.greeting);v('cfgThankyou',settings.thankyou);
   v('cfgBgColor',settings.bgColor||'#0a0208');v('cfgAccentColor',settings.accentColor||'#e8a4c8');
   v('cfgMinAmount',settings.overlayMinAmount||20);v('cfgDuration',settings.overlayDuration||8);
