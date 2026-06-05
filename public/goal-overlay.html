@@ -5,200 +5,155 @@
 <title>Goal Overlay</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Noto+Sans+Thai:wght@300;400&family=DM+Mono&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --accent:#e8a4c8;
-    --accent2:#c87eb0;
-    --bg:transparent;
-  }
+  :root{--accent:#e8a4c8;--accent2:#c87eb0}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:transparent;width:1920px;height:1080px;overflow:hidden;position:relative;}
 
   .goal-wrap{
-    position:absolute;
-    bottom:40px;
-    left:50%;
+    position:absolute;bottom:40px;left:50%;
     transform:translateX(-50%);
-    width:680px;
-    opacity:0;
+    width:720px;opacity:0;
     transition:opacity 0.6s ease;
   }
   .goal-wrap.show{opacity:1}
 
-  .goal-label{
-    display:flex;
-    justify-content:space-between;
-    align-items:baseline;
-    margin-bottom:10px;
-  }
-  .goal-title{
-    font-family:'Cormorant Garamond',serif;
-    font-size:22px;
-    color:rgba(255,255,255,0.85);
-    letter-spacing:0.05em;
-  }
-  .goal-amounts{
-    font-family:'DM Mono',monospace;
-    font-size:15px;
-    color:var(--accent);
-    letter-spacing:0.03em;
-  }
+  .goal-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+  .goal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:rgba(255,255,255,0.9);letter-spacing:0.04em;}
+  .goal-right{text-align:right;}
+  .goal-amounts{font-family:'DM Mono',monospace;font-size:15px;color:var(--accent);}
+  .goal-countdown{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px;}
 
-  .bar-track{
-    width:100%;
-    height:14px;
-    background:rgba(255,255,255,0.08);
-    border-radius:99px;
-    border:1px solid rgba(232,164,200,0.2);
-    overflow:hidden;
-    position:relative;
-  }
-  .bar-fill{
-    height:100%;
-    border-radius:99px;
-    background:linear-gradient(90deg, var(--accent2), var(--accent), #f4c8e0);
-    width:0%;
-    transition:width 1.4s cubic-bezier(0.4,0,0.2,1);
-    position:relative;
-    box-shadow:0 0 18px rgba(232,164,200,0.5);
-  }
-  .bar-fill::after{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.3) 50%,transparent 100%);
-    animation:shimmer 2.4s infinite;
-  }
-  @keyframes shimmer{
-    0%{transform:translateX(-100%)}
-    100%{transform:translateX(300%)}
-  }
+  .bar-track{width:100%;height:16px;background:rgba(255,255,255,0.08);border-radius:99px;border:1px solid rgba(232,164,200,0.2);overflow:hidden;position:relative;}
+  .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--accent),#f4c8e0);width:0%;transition:width 1.4s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 18px rgba(232,164,200,0.5);position:relative;overflow:hidden;}
+  .bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3) 50%,transparent);animation:shimmer 2.4s infinite;}
+  @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+  .bar-fill.over{background:linear-gradient(90deg,var(--accent2),var(--accent),#ffb3d9,#fff0f8);box-shadow:0 0 28px rgba(232,164,200,0.8);}
 
-  .bar-fill.complete{
-    background:linear-gradient(90deg,#86d6a3,#a8edbe,#86d6a3);
-    box-shadow:0 0 24px rgba(134,214,163,0.6);
-    animation:completePulse 1.5s ease infinite alternate;
-  }
-  @keyframes completePulse{
-    from{box-shadow:0 0 18px rgba(134,214,163,0.5)}
-    to{box-shadow:0 0 36px rgba(134,214,163,0.9)}
-  }
+  .bar-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
+  .goal-pct{font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);}
+  .goal-dates{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.3);}
 
-  .goal-percent{
-    font-family:'DM Mono',monospace;
-    font-size:11px;
-    color:rgba(255,255,255,0.4);
-    text-align:center;
-    margin-top:7px;
-    letter-spacing:0.08em;
-  }
-
-  /* Particles when complete */
-  .particle{
-    position:fixed;
-    pointer-events:none;
-    font-size:18px;
-    animation:floatUp 2.5s ease forwards;
-    opacity:0;
-  }
-  @keyframes floatUp{
-    0%{opacity:0;transform:translateY(0) scale(0.5)}
-    15%{opacity:1}
-    80%{opacity:0.8}
-    100%{opacity:0;transform:translateY(-220px) scale(1.2)}
-  }
+  .particle{position:fixed;pointer-events:none;font-size:18px;animation:floatUp 2.5s ease forwards;opacity:0;}
+  @keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(0.5)}15%{opacity:1}80%{opacity:0.8}100%{opacity:0;transform:translateY(-220px) scale(1.2)}}
 </style>
 </head>
 <body>
 
 <div class="goal-wrap" id="goalWrap">
-  <div class="goal-label">
+  <div class="goal-top">
     <div class="goal-title" id="goalTitle">🎯 เป้าหมาย</div>
-    <div class="goal-amounts"><span id="curAmt">฿0</span> / <span id="targetAmt">฿0</span></div>
+    <div class="goal-right">
+      <div class="goal-amounts"><span id="curAmt">฿0</span> / <span id="targetAmt">฿0</span></div>
+      <div class="goal-countdown" id="goalCountdown"></div>
+    </div>
   </div>
   <div class="bar-track">
     <div class="bar-fill" id="barFill"></div>
   </div>
-  <div class="goal-percent" id="goalPercent">0%</div>
+  <div class="bar-bottom">
+    <div class="goal-pct" id="goalPct">0%</div>
+    <div class="goal-dates" id="goalDates"></div>
+  </div>
 </div>
 
 <script>
-const SUPABASE_URL  = 'https://idmnppkltddrfxwhvnwa.supabase.co';   // <- ใส่ URL จริง
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkbW5wcGtsdGRkcmZ4d2h2bndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTI2ODQsImV4cCI6MjA5NTc4ODY4NH0.p5JYw0boVmoKLACbLcRwK3FeO9yLZi1HSd7N_1c5Lu0'; // <- ใส่ anon key จริง
+// ===== แก้ 2 บรรทัดนี้ =====
+const SUPABASE_URL  = 'https://xxxxxxxx.supabase.co';
+const SUPABASE_ANON = 'eyJ...';
+// ===========================
 
-let goalAmount = 1000;
-let goalMode   = 'total'; // 'total' | 'today'
-let lastPct    = 0;
-let wasComplete = false;
+let settings={};
+let wasOver=false;
 
 async function loadAndRender(){
   try{
-    const [s, st] = await Promise.all([
-      fetch('/api/settings?t='+Date.now()).then(r=>r.json()),
-      fetch('/api/stats?t='+Date.now()).then(r=>r.json()),
-    ]);
+    const s=await fetch('/api/settings?t='+Date.now()).then(r=>r.json());
+    settings=s;
+    const accent=s.accentColor||'#e8a4c8';
+    document.documentElement.style.setProperty('--accent',accent);
+    document.documentElement.style.setProperty('--accent2',accent+'cc');
 
-    goalAmount = Number(s.goalAmount) || 1000;
-    goalMode   = s.goalMode || 'total';
-    const label = s.goalLabel || 'เป้าหมาย';
+    const goalAmount=Number(s.goalAmount)||0;
+    const goalMode=s.goalMode||'total';
+    const goalFrom=s.goalFrom||'';
+    const goalTo=s.goalTo||'';
+    const label=s.goalLabel||'เป้าหมาย';
 
-    const accent = s.accentColor || '#e8a4c8';
-    document.documentElement.style.setProperty('--accent', accent);
-    document.documentElement.style.setProperty('--accent2', accent+'cc');
+    document.getElementById('goalTitle').textContent='🎯 '+label;
+    document.getElementById('targetAmt').textContent='฿'+goalAmount.toLocaleString();
 
-    const current = goalMode === 'today'
-      ? Number(st.todayAmount || 0)
-      : Number(st.totalAmount || 0);
+    // แสดงช่วงวันที่
+    if(goalFrom||goalTo){
+      const fmt=d=>d?new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'}):'';
+      document.getElementById('goalDates').textContent=(goalFrom?fmt(goalFrom):'')+(goalFrom&&goalTo?' – ':'')+( goalTo?fmt(goalTo):'');
+    }
 
-    const pct = Math.min(100, goalAmount > 0 ? (current / goalAmount) * 100 : 0);
+    // countdown
+    if(goalTo){
+      const end=new Date(goalTo);end.setHours(23,59,59,999);
+      const diff=end-new Date();
+      const cdEl=document.getElementById('goalCountdown');
+      if(diff<=0){cdEl.textContent='หมดเวลาแล้ว';}
+      else{
+        const days=Math.floor(diff/86400000);
+        const hrs=Math.floor((diff%86400000)/3600000);
+        const mins=Math.floor((diff%3600000)/60000);
+        cdEl.textContent=days>0?'⏳ '+days+' วัน '+hrs+' ชม.':hrs>0?'⏳ '+hrs+' ชม. '+mins+' นาที':'⏳ '+mins+' นาที';
+      }
+    }
 
-    document.getElementById('goalTitle').textContent = '🎯 ' + label;
-    document.getElementById('curAmt').textContent = '฿' + current.toLocaleString();
-    document.getElementById('targetAmt').textContent = '฿' + goalAmount.toLocaleString();
-    document.getElementById('goalPercent').textContent = pct.toFixed(1) + '%';
-    document.getElementById('barFill').style.width = pct + '%';
+    // fetch stats
+    let url='/api/stats?t='+Date.now();
+    if(goalMode==='range'&&goalFrom) url+='&from='+goalFrom;
+    if(goalMode==='range'&&goalTo)   url+='&to='+goalTo;
+    const st=await fetch(url).then(r=>r.json());
 
-    const fill = document.getElementById('barFill');
-    if(pct >= 100){
-      fill.classList.add('complete');
-      if(!wasComplete) celebrate();
-      wasComplete = true;
+    let cur=0;
+    if(goalMode==='today') cur=Number(st.todayAmount||0);
+    else if(goalMode==='range') cur=Number(st.rangeAmount||0);
+    else cur=Number(st.totalAmount||0);
+
+    document.getElementById('curAmt').textContent='฿'+cur.toLocaleString();
+
+    const pct=goalAmount>0?(cur/goalAmount)*100:0;
+    document.getElementById('goalPct').textContent=pct.toFixed(1)+'%';
+
+    const fill=document.getElementById('barFill');
+    fill.style.width=Math.min(100,pct)+'%';
+    if(pct>=100){
+      fill.classList.add('over');
+      if(!wasOver) celebrate();
+      wasOver=true;
     } else {
-      fill.classList.remove('complete');
-      wasComplete = false;
+      fill.classList.remove('over');
+      wasOver=false;
     }
 
     document.getElementById('goalWrap').classList.add('show');
-    lastPct = pct;
   }catch(e){console.warn('[goal]',e)}
 }
 
 function celebrate(){
-  const emojis = ['✨','🌸','💖','🎉','⭐','💕','🌟'];
-  for(let i=0;i<18;i++){
+  const emojis=['✨','🌸','💖','🎉','⭐','💕','🌟'];
+  for(let i=0;i<20;i++){
     setTimeout(()=>{
-      const p = document.createElement('div');
-      p.className='particle';
-      p.textContent = emojis[Math.floor(Math.random()*emojis.length)];
-      p.style.left = (20+Math.random()*60)+'%';
-      p.style.bottom = '60px';
-      p.style.animationDelay = (Math.random()*0.5)+'s';
-      document.body.appendChild(p);
-      setTimeout(()=>p.remove(), 3000);
-    }, i*80);
+      const p=document.createElement('div');p.className='particle';
+      p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      p.style.left=(15+Math.random()*70)+'%';p.style.bottom='70px';
+      p.style.animationDelay=(Math.random()*0.5)+'s';
+      document.body.appendChild(p);setTimeout(()=>p.remove(),3000);
+    },i*90);
   }
 }
 
-// Realtime update เมื่อมีโดเนทใหม่
 function connectRealtime(){
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-  script.onload = ()=>{
-    if(!SUPABASE_URL || SUPABASE_URL.includes('xxxxxxxx')) return;
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+  const script=document.createElement('script');
+  script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  script.onload=()=>{
+    if(!SUPABASE_URL||SUPABASE_URL.includes('xxxxxxxx'))return;
+    const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
     sb.channel('donations')
-      .on('broadcast',{event:'new_donation'},()=>{
-        setTimeout(loadAndRender, 800); // รอ stats อัปเดต
-      })
+      .on('broadcast',{event:'new_donation'},()=>setTimeout(loadAndRender,1000))
       .subscribe();
   };
   document.head.appendChild(script);
@@ -206,7 +161,7 @@ function connectRealtime(){
 
 loadAndRender();
 connectRealtime();
-setInterval(loadAndRender, 30000); // poll ทุก 30 วิ
+setInterval(loadAndRender,30000);
 </script>
 </body>
 </html>
