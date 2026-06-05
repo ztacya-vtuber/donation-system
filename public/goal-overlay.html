@@ -3,165 +3,409 @@
 <head>
 <meta charset="UTF-8">
 <title>Goal Overlay</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Noto+Sans+Thai:wght@300;400&family=DM+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Noto+Sans+Thai:wght@300;400;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{--accent:#e8a4c8;--accent2:#c87eb0}
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{background:transparent;width:1920px;height:1080px;overflow:hidden;position:relative;}
-
-  .goal-wrap{
-    position:absolute;bottom:40px;left:50%;
-    transform:translateX(-50%);
-    width:720px;opacity:0;
-    transition:opacity 0.6s ease;
+  :root {
+    --accent: #e8a4c8;
+    --accent2: #c87eb0;
+    --accent3: #f4d0e8;
+    --glow: rgba(232,164,200,0.35);
   }
-  .goal-wrap.show{opacity:1}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: transparent;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+    position: relative;
+  }
 
-  .goal-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
-  .goal-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:rgba(255,255,255,0.9);letter-spacing:0.04em;}
-  .goal-right{text-align:right;}
-  .goal-amounts{font-family:'DM Mono',monospace;font-size:15px;color:var(--accent);}
-  .goal-countdown{font-family:'DM Mono',monospace;font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px;}
+  .goal-wrap {
+    position: absolute;
+    bottom: 44px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    width: 760px;
+    opacity: 0;
+    transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.2,0,0,1);
+    will-change: opacity, transform;
+  }
+  .goal-wrap.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
 
-  .bar-track{width:100%;height:16px;background:rgba(255,255,255,0.08);border-radius:99px;border:1px solid rgba(232,164,200,0.2);overflow:hidden;position:relative;}
-  .bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent2),var(--accent),#f4c8e0);width:0%;transition:width 1.4s cubic-bezier(0.4,0,0.2,1);box-shadow:0 0 18px rgba(232,164,200,0.5);position:relative;overflow:hidden;}
-  .bar-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3) 50%,transparent);animation:shimmer 2.4s infinite;}
-  @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
-  .bar-fill.over{background:linear-gradient(90deg,var(--accent2),var(--accent),#ffb3d9,#fff0f8);box-shadow:0 0 28px rgba(232,164,200,0.8);}
+  .goal-card {
+    background: rgba(10,6,16,0.72);
+    border: 1px solid rgba(232,164,200,0.22);
+    border-radius: 18px;
+    padding: 18px 24px 16px;
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    position: relative;
+    overflow: hidden;
+  }
+  .goal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20px; right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.5;
+  }
+  .goal-card::after {
+    content: '';
+    position: absolute;
+    inset: -30px;
+    background: radial-gradient(ellipse 70% 50% at 50% 100%, var(--glow), transparent 70%);
+    z-index: -1;
+    pointer-events: none;
+  }
 
-  .bar-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:7px;}
-  .goal-pct{font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);}
-  .goal-dates{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,0.3);}
+  .goal-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 13px;
+    gap: 12px;
+  }
+  .goal-left { flex: 1; min-width: 0; }
 
-  .particle{position:fixed;pointer-events:none;font-size:18px;animation:floatUp 2.5s ease forwards;opacity:0;}
-  @keyframes floatUp{0%{opacity:0;transform:translateY(0) scale(0.5)}15%{opacity:1}80%{opacity:0.8}100%{opacity:0;transform:translateY(-220px) scale(1.2)}}
+  .goal-icon {
+    font-size: 11px;
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .goal-icon::before {
+    content: '';
+    display: inline-block;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    animation: pulse-dot 2s ease infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  .goal-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.92);
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .goal-right { text-align: right; flex-shrink: 0; }
+  .goal-amounts {
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .goal-amounts .cur { color: var(--accent); }
+  .goal-amounts .sep { color: rgba(255,255,255,0.3); margin: 0 3px; }
+  .goal-amounts .tgt { color: rgba(255,255,255,0.55); }
+
+  .goal-countdown {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(255,255,255,0.38);
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+  }
+
+  .bar-track {
+    width: 100%;
+    height: 14px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 99px;
+    border: 1px solid rgba(232,164,200,0.15);
+    overflow: hidden;
+    position: relative;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    width: 0%;
+    transition: width 1.6s cubic-bezier(0.3,0,0.1,1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 14px var(--glow);
+  }
+  .bar-fill::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: -60%;
+    width: 50%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.28), transparent);
+    animation: shimmer 2.8s ease infinite;
+  }
+  @keyframes shimmer {
+    0%   { left: -60%; }
+    100% { left: 160%; }
+  }
+  .bar-head {
+    position: absolute;
+    top: -1px; bottom: -1px;
+    right: -4px;
+    width: 8px;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.8), transparent 80%);
+    border-radius: 50%;
+    animation: head-glow 1.8s ease infinite;
+  }
+  @keyframes head-glow {
+    0%,100% { opacity: 0.7; }
+    50%      { opacity: 1; }
+  }
+  .bar-fill.over {
+    background: linear-gradient(90deg, var(--accent2), var(--accent), #ffccee, #fff5fa);
+    box-shadow: 0 0 24px rgba(232,164,200,0.7), 0 0 48px rgba(232,164,200,0.25);
+  }
+
+  .bar-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 9px;
+  }
+  .goal-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+  .goal-dates {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.06em;
+  }
+
+  .particle {
+    position: fixed;
+    pointer-events: none;
+    font-size: 16px;
+    animation: floatUp 2.8s ease forwards;
+    opacity: 0;
+    z-index: 100;
+  }
+  @keyframes floatUp {
+    0%   { opacity: 0; transform: translateY(0) scale(0.4) rotate(-10deg); }
+    12%  { opacity: 1; }
+    75%  { opacity: 0.7; }
+    100% { opacity: 0; transform: translateY(-240px) scale(1.3) rotate(15deg); }
+  }
 </style>
 </head>
 <body>
 
 <div class="goal-wrap" id="goalWrap">
-  <div class="goal-top">
-    <div class="goal-title" id="goalTitle">🎯 เป้าหมาย</div>
-    <div class="goal-right">
-      <div class="goal-amounts"><span id="curAmt">฿0</span> / <span id="targetAmt">฿0</span></div>
-      <div class="goal-countdown" id="goalCountdown"></div>
+  <div class="goal-card">
+    <div class="goal-top">
+      <div class="goal-left">
+        <div class="goal-icon" id="goalTag">เป้าหมาย</div>
+        <div class="goal-title" id="goalTitle">—</div>
+      </div>
+      <div class="goal-right">
+        <div class="goal-amounts">
+          <span class="cur" id="curAmt">฿0</span>
+          <span class="sep">/</span>
+          <span class="tgt" id="targetAmt">฿0</span>
+        </div>
+        <div class="goal-countdown" id="goalCountdown"></div>
+      </div>
     </div>
-  </div>
-  <div class="bar-track">
-    <div class="bar-fill" id="barFill"></div>
-  </div>
-  <div class="bar-bottom">
-    <div class="goal-pct" id="goalPct">0%</div>
-    <div class="goal-dates" id="goalDates"></div>
+    <div class="bar-track">
+      <div class="bar-fill" id="barFill">
+        <div class="bar-head" id="barHead"></div>
+      </div>
+    </div>
+    <div class="bar-bottom">
+      <div class="goal-pct" id="goalPct">0%</div>
+      <div class="goal-dates" id="goalDates"></div>
+    </div>
   </div>
 </div>
 
 <script>
-// ===== แก้ 2 บรรทัดนี้ =====
-const SUPABASE_URL  = 'https://xxxxxxxx.supabase.co';
-const SUPABASE_ANON = 'eyJ...';
-// ===========================
+// ====================================================
+// วางไฟล์นี้ใน public/goal-overlay.html
+// เปิดใน OBS: https://your-site.vercel.app/goal-overlay.html
+// ไม่ต้องแก้ไขอะไรในไฟล์นี้เลย
+// ====================================================
 
-let settings={};
-let wasOver=false;
+// Supabase realtime (optional) — ใส่ถ้าต้องการ
+const SUPABASE_URL  = '';
+const SUPABASE_ANON = '';
 
-async function loadAndRender(){
-  try{
-    const s=await fetch('/api/settings?t='+Date.now()).then(r=>r.json());
-    settings=s;
-    const accent=s.accentColor||'#e8a4c8';
-    document.documentElement.style.setProperty('--accent',accent);
-    document.documentElement.style.setProperty('--accent2',accent+'cc');
+let wasOver = false;
 
-    const goalAmount=Number(s.goalAmount)||0;
-    const goalMode=s.goalMode||'total';
-    const goalFrom=s.goalFrom||'';
-    const goalTo=s.goalTo||'';
-    const label=s.goalLabel||'เป้าหมาย';
+async function fetchJSON(path) {
+  const r = await fetch(path);
+  const ct = r.headers.get('content-type') || '';
+  if (!r.ok || !ct.includes('application/json')) {
+    const body = await r.text();
+    throw new Error('non-JSON from ' + path + ' (' + r.status + '): ' + body.slice(0, 80));
+  }
+  return r.json();
+}
 
-    document.getElementById('goalTitle').textContent='🎯 '+label;
-    document.getElementById('targetAmt').textContent='฿'+goalAmount.toLocaleString();
+async function loadAndRender() {
+  try {
+    const s = await fetchJSON('/api/settings?t=' + Date.now());
 
-    // แสดงช่วงวันที่
-    if(goalFrom||goalTo){
-      const fmt=d=>d?new Date(d).toLocaleDateString('th-TH',{day:'numeric',month:'short'}):'';
-      document.getElementById('goalDates').textContent=(goalFrom?fmt(goalFrom):'')+(goalFrom&&goalTo?' – ':'')+( goalTo?fmt(goalTo):'');
+    // apply accent color
+    const accent      = s.accentColor || '#e8a4c8';
+    const accentDark  = shiftColor(accent, -30);
+    const accentLight = shiftColor(accent,  30);
+    document.documentElement.style.setProperty('--accent',  accent);
+    document.documentElement.style.setProperty('--accent2', accentDark);
+    document.documentElement.style.setProperty('--accent3', accentLight);
+    document.documentElement.style.setProperty('--glow',    hexToRgba(accent, 0.35));
+
+    const goalAmount = Number(s.goalAmount) || 0;
+    const goalMode   = s.goalMode  || 'total';
+    const goalFrom   = s.goalFrom  || '';
+    const goalTo     = s.goalTo    || '';
+    const goalLabel  = s.goalLabel || 'เป้าหมาย';
+
+    // ซ่อนทั้งหมดถ้า goalAmount = 0
+    if (!goalAmount) {
+      document.getElementById('goalWrap').classList.remove('show');
+      return;
+    }
+
+    document.getElementById('goalTitle').textContent  = goalLabel;
+    document.getElementById('targetAmt').textContent  = '฿' + goalAmount.toLocaleString();
+
+    // วันที่
+    const fmt = d => new Date(d).toLocaleDateString('th-TH', { day: 'numeric', month: 'short' });
+    if (goalFrom || goalTo) {
+      const parts = [goalFrom && fmt(goalFrom), goalTo && fmt(goalTo)].filter(Boolean);
+      document.getElementById('goalDates').textContent = parts.join(' – ');
+    } else {
+      document.getElementById('goalDates').textContent = goalMode === 'today' ? 'ยอดวันนี้' : 'ยอดรวมทั้งหมด';
     }
 
     // countdown
-    if(goalTo){
-      const end=new Date(goalTo);end.setHours(23,59,59,999);
-      const diff=end-new Date();
-      const cdEl=document.getElementById('goalCountdown');
-      if(diff<=0){cdEl.textContent='หมดเวลาแล้ว';}
-      else{
-        const days=Math.floor(diff/86400000);
-        const hrs=Math.floor((diff%86400000)/3600000);
-        const mins=Math.floor((diff%3600000)/60000);
-        cdEl.textContent=days>0?'⏳ '+days+' วัน '+hrs+' ชม.':hrs>0?'⏳ '+hrs+' ชม. '+mins+' นาที':'⏳ '+mins+' นาที';
+    if (goalTo) {
+      const end  = new Date(goalTo); end.setHours(23, 59, 59, 999);
+      const diff = end - new Date();
+      const cdEl = document.getElementById('goalCountdown');
+      if (diff <= 0) {
+        cdEl.textContent = 'หมดเวลาแล้ว';
+      } else {
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        cdEl.textContent = d > 0 ? '⏳ ' + d + ' วัน ' + h + ' ชม.'
+                         : h > 0 ? '⏳ ' + h + ' ชม. ' + m + ' นาที'
+                         :         '⏳ ' + m + ' นาที';
       }
     }
 
     // fetch stats
-    let url='/api/stats?t='+Date.now();
-    if(goalMode==='range'&&goalFrom) url+='&from='+goalFrom;
-    if(goalMode==='range'&&goalTo)   url+='&to='+goalTo;
-    const st=await fetch(url).then(r=>r.json());
+    let statsPath = '/api/stats?t=' + Date.now();
+    if (goalMode === 'range') {
+      if (goalFrom) statsPath += '&from=' + goalFrom;
+      if (goalTo)   statsPath += '&to='   + goalTo;
+    }
+    const st = await fetchJSON(statsPath);
 
-    let cur=0;
-    if(goalMode==='today') cur=Number(st.todayAmount||0);
-    else if(goalMode==='range') cur=Number(st.rangeAmount||0);
-    else cur=Number(st.totalAmount||0);
+    const cur = goalMode === 'today'  ? Number(st.todayAmount  || 0)
+              : goalMode === 'range'  ? Number(st.rangeAmount  || 0)
+              :                         Number(st.totalAmount  || 0);
 
-    document.getElementById('curAmt').textContent='฿'+cur.toLocaleString();
+    document.getElementById('curAmt').textContent  = '฿' + cur.toLocaleString();
 
-    const pct=goalAmount>0?(cur/goalAmount)*100:0;
-    document.getElementById('goalPct').textContent=pct.toFixed(1)+'%';
+    const pct = goalAmount > 0 ? (cur / goalAmount) * 100 : 0;
+    document.getElementById('goalPct').textContent = pct.toFixed(1) + '%';
 
-    const fill=document.getElementById('barFill');
-    fill.style.width=Math.min(100,pct)+'%';
-    if(pct>=100){
+    const fill = document.getElementById('barFill');
+    fill.style.width = Math.min(100, pct) + '%';
+
+    const head = document.getElementById('barHead');
+    head.style.display = pct >= 100 ? 'none' : 'block';
+
+    if (pct >= 100) {
       fill.classList.add('over');
-      if(!wasOver) celebrate();
-      wasOver=true;
+      if (!wasOver) celebrate();
+      wasOver = true;
     } else {
       fill.classList.remove('over');
-      wasOver=false;
+      wasOver = false;
     }
 
     document.getElementById('goalWrap').classList.add('show');
-  }catch(e){console.warn('[goal]',e)}
-}
 
-function celebrate(){
-  const emojis=['✨','🌸','💖','🎉','⭐','💕','🌟'];
-  for(let i=0;i<20;i++){
-    setTimeout(()=>{
-      const p=document.createElement('div');p.className='particle';
-      p.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-      p.style.left=(15+Math.random()*70)+'%';p.style.bottom='70px';
-      p.style.animationDelay=(Math.random()*0.5)+'s';
-      document.body.appendChild(p);setTimeout(()=>p.remove(),3000);
-    },i*90);
+  } catch (e) {
+    console.warn('[goal-overlay]', e);
   }
 }
 
-function connectRealtime(){
-  const script=document.createElement('script');
-  script.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-  script.onload=()=>{
-    if(!SUPABASE_URL||SUPABASE_URL.includes('xxxxxxxx'))return;
-    const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+function celebrate() {
+  const syms = ['✨','🌸','💖','🎉','⭐','💕','🌟','🎊','💫'];
+  for (let i = 0; i < 24; i++) {
+    setTimeout(() => {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = syms[Math.floor(Math.random() * syms.length)];
+      p.style.cssText = 'left:' + (10 + Math.random() * 80) + '%;bottom:80px;'
+        + 'animation-delay:' + (Math.random() * 0.6) + 's;'
+        + 'font-size:' + (13 + Math.random() * 9) + 'px';
+      document.body.appendChild(p);
+      setTimeout(() => p.remove(), 3200);
+    }, i * 80);
+  }
+}
+
+function hexToRgba(hex, a) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+}
+
+function shiftColor(hex, n) {
+  const c = v => Math.min(255, Math.max(0, v));
+  const r = c(parseInt(hex.slice(1,3),16) + n);
+  const g = c(parseInt(hex.slice(3,5),16) + Math.round(n * 0.7));
+  const b = c(parseInt(hex.slice(5,7),16) + n);
+  return '#' + [r,g,b].map(x => x.toString(16).padStart(2,'0')).join('');
+}
+
+function connectRealtime() {
+  if (!SUPABASE_URL) return;
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  s.onload = () => {
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
     sb.channel('donations')
-      .on('broadcast',{event:'new_donation'},()=>setTimeout(loadAndRender,1000))
+      .on('broadcast', { event: 'new_donation' }, () => setTimeout(loadAndRender, 1000))
       .subscribe();
   };
-  document.head.appendChild(script);
+  document.head.appendChild(s);
 }
 
 loadAndRender();
 connectRealtime();
-setInterval(loadAndRender,30000);
+setInterval(loadAndRender, 30000);
 </script>
 </body>
 </html>
