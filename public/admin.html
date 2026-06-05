@@ -26,22 +26,19 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 .main{padding:30px 24px;max-width:920px}.sec{display:none}.sec.active{display:block}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.card{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:16px;margin-bottom:16px}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}.hint{font-size:11px;color:var(--muted);margin-top:6px}.row{display:flex;gap:10px;align-items:center}.row>*{flex:1}
 .preview{display:none;width:100%;height:110px;object-fit:cover;border-radius:9px;border:1px solid var(--border);margin-bottom:10px}.avatar{width:74px;height:74px;border-radius:50%}.dash{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.num{font:24px 'DM Mono',monospace;color:var(--accent)}.small{font-size:11px;color:var(--muted)}
 .list{background:var(--panel);border:1px solid var(--border);border-radius:12px;overflow:hidden}.item{display:flex;gap:12px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border)}.item:last-child{border-bottom:0}.grow{flex:1;min-width:0}.amt{font:14px 'DM Mono',monospace;color:var(--accent);white-space:nowrap}.msg{font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-/* Pending items */
 .pending-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .pending-count{font-size:12px;color:var(--warn);font-family:'DM Mono',monospace}
 .item-pending{background:#0f0c04;border-left:3px solid var(--warn)}
 .item-actions{display:flex;gap:7px;align-items:center;flex-shrink:0}
 .pending-empty{padding:20px 14px;text-align:center;color:var(--muted);font-size:13px}
-.section-divider{height:1px;background:var(--border);margin:24px 0}
 .pulse{animation:pulseWarn 2s infinite}
 @keyframes pulseWarn{0%,100%{opacity:1}50%{opacity:.5}}
 .auto-refresh{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-bottom:16px}
 .auto-refresh input[type=checkbox]{width:auto}
 .refresh-dot{width:7px;height:7px;border-radius:50%;background:var(--good);display:inline-block;margin-right:4px}
 .refresh-dot.off{background:var(--muted)}
-
 .toolbar{display:flex;gap:10px;margin:18px 0}.toolbar input{flex:1}.pager{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:14px}.modal-bg{position:fixed;inset:0;background:rgba(6,5,10,.85);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-bg.show{display:flex}.modal{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}.toast{position:fixed;right:20px;bottom:20px;display:none;padding:12px 18px;border-radius:10px;background:#102418;color:var(--good);border:1px solid #2e6b40;z-index:99}.toast.bad{background:#2a1010;color:var(--danger);border-color:#6b2b2b}.toast.warn{background:#1a1200;color:var(--warn);border-color:#6b4f00}
+#goalDateRow{display:none}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap}.grid,.dash{grid-template-columns:1fr 1fr}.main{padding:20px 16px}}
 </style>
 </head>
@@ -71,7 +68,6 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
     <div class="card"><div class="num" id="dToday">-</div><div class="small">วันนี้</div></div>
     <div class="card"><div class="num" id="dDonors">-</div><div class="small">ผู้โดเนทไม่ซ้ำ</div></div>
   </div>
-  <!-- Pending summary in dashboard -->
   <div id="dashPendingBlock" style="display:none;margin-top:20px">
     <div class="pending-header">
       <div class="label" style="margin-bottom:0">⏳ รออนุมัติ</div>
@@ -141,14 +137,36 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
     <div class="card"><div class="label">เสียงยอดขั้นต่ำ URL</div><input id="cfgMinSoundUrl"><input type="file" id="fileMinSound" accept="audio/*"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileMinSound','alert-min.mp3','audio','overlayMinSoundUrl',null,'cfgMinSoundUrl')">อัปโหลดเสียงพิเศษ</button></div>
   </div>
   <div class="card"><div class="row"><label><input type="checkbox" id="cfgTtsEnabled" style="width:auto"> เปิด TTS</label><input type="number" step="0.1" id="cfgTtsRate" placeholder="rate"><input type="number" step="0.1" id="cfgTtsPitch" placeholder="pitch"></div></div>
-  <div class="card" style="margin-top:8px"><div class="label">🎯 เป้าหมายโดเนท</div><div class="grid" style="margin-top:10px"><div class="card"><div class="label">ยอดเป้าหมาย (0 = ซ่อนหลอด)</div><input type="number" id="cfgGoalAmount" min="0" placeholder="เช่น 1000"></div><div class="card"><div class="label">นับยอดจาก</div><select id="cfgGoalMode"><option value="total">ยอดรวมทั้งหมด</option><option value="today">ยอดวันนี้</option></select></div></div><div class="card" style="margin-top:0"><div class="label">ชื่อเป้าหมาย</div><input id="cfgGoalLabel" placeholder="เช่น เป้าหมาย Stream นี้"></div><div class="hint">เปิด Goal Overlay ใน OBS: /goal-overlay.html</div></div><button class="btn" onclick="saveOverlay()">บันทึก Overlay</button>
+
+  <!-- GOAL SECTION -->
+  <div class="card" style="margin-top:4px;border-color:rgba(232,164,200,0.3)">
+    <div class="label" style="color:var(--accent);margin-bottom:14px">🎯 เป้าหมายโดเนท</div>
+    <div class="grid">
+      <div class="card"><div class="label">ยอดเป้าหมาย (0 = ซ่อนหลอด)</div><input type="number" id="cfgGoalAmount" min="0" placeholder="เช่น 1000"></div>
+      <div class="card"><div class="label">นับยอดจาก</div>
+        <select id="cfgGoalMode" onchange="toggleGoalDateRow()">
+          <option value="total">ยอดรวมทั้งหมด</option>
+          <option value="today">ยอดวันนี้</option>
+          <option value="range">ช่วงวันที่</option>
+        </select>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:12px"><div class="label">ชื่อเป้าหมาย</div><input id="cfgGoalLabel" placeholder="เช่น เป้าหมาย Stream นี้"></div>
+    <div id="goalDateRow" class="grid">
+      <div class="card"><div class="label">วันเริ่มต้น</div><input type="date" id="cfgGoalFrom"></div>
+      <div class="card"><div class="label">วันสิ้นสุด (countdown)</div><input type="date" id="cfgGoalTo"></div>
+    </div>
+    <div class="hint">หลอดแสดงบนหน้าโดเนทและ OBS: <b>/goal-overlay.html</b></div>
+  </div>
+
+  <button class="btn" onclick="saveOverlay()">บันทึก Overlay</button>
   <button class="btn2" onclick="window.open('/overlay.html','_blank')" style="margin-left:8px">เปิด Overlay</button>
   <button class="btn2" onclick="window.open('/goal-overlay.html','_blank')" style="margin-left:8px">เปิด Goal Overlay</button>
 </section>
 
 <!-- DONATIONS -->
 <section class="sec" id="sec-donations">
-  <h2>จัดการรายการ</h2><div class="sub">เพิ่ม แก้ไข หรือลบรายการโดเนท (อนุมัติแล้วเท่านั้น)</div>
+  <h2>จัดการรายการ</h2><div class="sub">เพิ่ม แก้ไข หรือลบรายการโดเนท</div>
   <div class="toolbar"><input id="dmSearch" placeholder="ค้นหาชื่อ/ข้อความ" oninput="dmFilter()"><select id="dmSort" onchange="dmFilter()"><option value="date-desc">ใหม่สุด</option><option value="date-asc">เก่าสุด</option><option value="amount-desc">ยอดมากสุด</option><option value="amount-asc">ยอดน้อยสุด</option></select><button class="btn" onclick="openAdd()">เพิ่มรายการ</button></div>
   <div class="list" id="dmList"></div>
   <div class="pager"><button class="btn2" id="prevBtn" onclick="changePage(-1)">ก่อนหน้า</button><span class="small" id="pageInfo">1/1</span><button class="btn2" id="nextBtn" onclick="changePage(1)">ถัดไป</button></div>
@@ -158,17 +176,18 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 
 <!-- Edit/Add Modal -->
 <div class="modal-bg" id="editModal"><div class="modal"><h2 id="modalTitle">แก้ไขรายการ</h2><div class="card"><div class="label">ชื่อ</div><input id="mName"></div><div class="card"><div class="label">จำนวนเงิน</div><input id="mAmount" type="number"></div><div class="card"><div class="label">ข้อความ</div><textarea id="mMsg"></textarea></div><div class="row"><button class="btn" onclick="saveDonation()">บันทึก</button><button class="btn2 danger" id="deleteBtn" onclick="deleteDonation()">ลบ</button><button class="btn2" onclick="closeModal()">ปิด</button></div></div></div>
-
-<!-- Reject confirm modal -->
 <div class="modal-bg" id="rejectModal"><div class="modal"><h2>ปฏิเสธรายการ?</h2><div class="sub" style="margin-top:6px;margin-bottom:18px">รายการนี้จะถูกลบถาวร ไม่สามารถกู้คืนได้</div><div class="card" id="rejectPreview" style="margin-bottom:16px"></div><div class="row"><button class="btn-reject" style="padding:10px 16px;font-size:14px" onclick="confirmReject()">ยืนยันปฏิเสธ</button><button class="btn2" onclick="closeRejectModal()">ยกเลิก</button></div></div></div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 let pwd='',settings={},stats={},rows=[],pending=[],filtered=[],page=1,editId=null,isAdd=false,renderItems=[];
-let rejectTargetId=null;
-let autoRefreshTimer=null;
+let rejectTargetId=null,autoRefreshTimer=null;
 const LIMIT=30;
+
+function toggleGoalDateRow(){
+  const mode=document.getElementById('cfgGoalMode').value;
+  document.getElementById('goalDateRow').style.display=mode==='range'?'grid':'none';
+}
 
 async function doLogin(){
   const p=pwdInput.value,err=loginErr;
@@ -177,16 +196,14 @@ async function doLogin(){
     const j=await res.json().catch(()=>({}));
     if(!res.ok||!j.ok){err.style.display='block';return}
     pwd=p;loginScreen.style.display='none';adminShell.classList.add('show');
-    await loadAll();
-    startAutoRefresh();
+    await loadAll();startAutoRefresh();
   }catch(e){err.textContent='Login API error: '+e.message;err.style.display='block'}
 }
 
 function showSec(id,b){
   document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  b.classList.add('active');
+  document.getElementById('sec-'+id).classList.add('active');b.classList.add('active');
   if(id==='dashboard'||id==='donations'||id==='pending')loadAll();
 }
 
@@ -197,17 +214,12 @@ async function loadAll(){
     fetch('/api/admin/donations?password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]})),
     fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}))
   ]);
-  settings=s||{};stats=st||{};
-
-  rows=h.data||[];
-  pending=p.data||[];
+  settings=s||{};stats=st||{};rows=h.data||[];pending=p.data||[];
   fillSettings();renderDash();renderPending();dmFilter(false);updatePendingBadge();
 }
 
 function updatePendingBadge(){
-  const n=pending.length;
-  const btn=document.getElementById('navPending');
-  // remove old badge
+  const n=pending.length,btn=document.getElementById('navPending');
   const old=btn.querySelector('.nav-badge');if(old)old.remove();
   if(n>0){const b=document.createElement('span');b.className='nav-badge';b.textContent=n;btn.appendChild(b)}
 }
@@ -221,10 +233,8 @@ function fillSettings(){
   v('cfgMinSoundUrl',settings.overlayMinSoundUrl);v('cfgTtsRate',settings.ttsRate||1);
   v('cfgTtsPitch',settings.ttsPitch||1);cfgTtsEnabled.checked=!!settings.ttsEnabled;
   v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
-  const gm2=document.getElementById('cfgGoalMode');if(gm2)gm2.value=settings.goalMode||'total';
   v('cfgGoalFrom',settings.goalFrom||'');v('cfgGoalTo',settings.goalTo||'');
-  v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
-  const gm=document.getElementById('cfgGoalMode');if(gm)gm.value=settings.goalMode||'total';
+  const gm=document.getElementById('cfgGoalMode');if(gm){gm.value=settings.goalMode||'total';toggleGoalDateRow();}
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
   img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl);
 }
@@ -236,80 +246,41 @@ function renderDash(){
   dCount.textContent=Number(stats.totalCount||0).toLocaleString();
   dToday.textContent='฿'+Number(stats.todayAmount||0).toLocaleString();
   dDonors.textContent=Number(stats.uniqueDonors||0).toLocaleString();
-
-  // Dashboard pending preview
   const block=document.getElementById('dashPendingBlock');
-  const pList=document.getElementById('dashPendingList');
-  const pCount=document.getElementById('dashPendingCount');
   if(pending.length>0){
     block.style.display='block';
-    pCount.textContent=pending.length+' รายการรอการอนุมัติ';
-    pList.innerHTML=pending.slice(0,5).map(d=>pendingItemHtml(d,true)).join('');
-    if(pending.length>5){
-      pList.innerHTML+='<div class="item"><div class="small" style="color:var(--warn)">และอีก '+(pending.length-5)+' รายการ → <a href="#" style="color:var(--warn)" onclick="document.querySelector(\'[onclick*=pending]\').click();return false">ดูทั้งหมด</a></div></div>';
-    }
+    document.getElementById('dashPendingCount').textContent=pending.length+' รายการรอการอนุมัติ';
+    document.getElementById('dashPendingList').innerHTML=pending.slice(0,5).map(d=>pendingItemHtml(d,true)).join('');
+    if(pending.length>5)document.getElementById('dashPendingList').innerHTML+='<div class="item"><div class="small" style="color:var(--warn)">และอีก '+(pending.length-5)+' รายการ</div></div>';
   }else{block.style.display='none'}
-
-  recentList.innerHTML=(rows.slice(0,8).map(itemHtml).join('')||'<div class="item"><div class="small">ยังไม่มีรายการ</div></div>');
+  recentList.innerHTML=(rows.filter(d=>d.shown!==false).slice(0,8).map(itemHtml).join('')||'<div class="item"><div class="small">ยังไม่มีรายการ</div></div>');
 }
 
 function renderPending(){
   const el=document.getElementById('pendingList');
-  if(pending.length===0){
-    el.innerHTML='<div class="pending-empty">✓ ไม่มีรายการที่รอการอนุมัติ</div>';
-    return;
-  }
-  el.innerHTML=pending.map(d=>pendingItemHtml(d,false)).join('');
+  el.innerHTML=pending.length===0?'<div class="pending-empty">✓ ไม่มีรายการที่รอการอนุมัติ</div>':pending.map(d=>pendingItemHtml(d,false)).join('');
 }
 
-function pendingItemHtml(d,compact){
+function pendingItemHtml(d){
   const date=new Date(d.date).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
-  return `<div class="item item-pending" id="pitem-${d.id}">
-    <div class="grow">
-      <div style="font-weight:600">${esc(d.name)}</div>
-      ${d.message?`<div class="msg">${esc(d.message)}</div>`:''}
-      <div class="small" style="margin-top:3px">${date}</div>
-    </div>
-    <div class="amt">฿${Number(d.amount).toLocaleString()}</div>
-    <div class="item-actions">
-      <button class="btn-approve" onclick="approveDonation('${d.id}')">✓ อนุมัติ</button>
-      <button class="btn-reject" onclick="openReject('${d.id}','${esc(d.name)}',${d.amount})">✗ ปฏิเสธ</button>
-    </div>
-  </div>`;
+  return `<div class="item item-pending" id="pitem-${d.id}"><div class="grow"><div style="font-weight:600">${esc(d.name)}</div>${d.message?`<div class="msg">${esc(d.message)}</div>`:''}<div class="small" style="margin-top:3px">${date}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="item-actions"><button class="btn-approve" onclick="approveDonation('${d.id}')">✓ อนุมัติ</button><button class="btn-reject" onclick="openReject('${d.id}','${esc(d.name)}',${d.amount})">✗ ปฏิเสธ</button></div></div>`;
 }
-
-function itemHtml(d){
-  return `<div class="item"><div class="grow"><div>${esc(d.name)}</div><div class="msg">${esc(d.message||'')}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="small">${new Date(d.date).toLocaleDateString('th-TH')}</div></div>`;
-}
+function itemHtml(d){return `<div class="item"><div class="grow"><div>${esc(d.name)}</div><div class="msg">${esc(d.message||'')}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="small">${new Date(d.date).toLocaleDateString('th-TH')}</div></div>`;}
 
 async function approveDonation(id){
-  // Optimistic UI: dim the item
   const el=document.getElementById('pitem-'+id);
   if(el){el.style.opacity='.4';el.style.pointerEvents='none'}
   try{
-    const res=await fetch('/api/admin/donations/'+id,{
-      method:'PATCH',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({password:pwd,action:'approve'})
-    });
+    const res=await fetch('/api/admin/donations/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,action:'approve'})});
     const j=await res.json().catch(()=>({}));
-    if(res.ok&&j.ok){
-      toast('อนุมัติแล้ว — overlay กำลังยิง 🎉');
-      await loadAll();
-    }else{
-      if(el){el.style.opacity='';el.style.pointerEvents=''}
-      toast(j.error||'อนุมัติไม่สำเร็จ','bad');
-    }
-  }catch(e){
-    if(el){el.style.opacity='';el.style.pointerEvents=''}
-    toast('Network error: '+e.message,'bad');
-  }
+    if(res.ok&&j.ok){toast('อนุมัติแล้ว — overlay กำลังยิง 🎉');await loadAll();}
+    else{if(el){el.style.opacity='';el.style.pointerEvents=''}toast(j.error||'อนุมัติไม่สำเร็จ','bad');}
+  }catch(e){if(el){el.style.opacity='';el.style.pointerEvents=''}toast('Network error: '+e.message,'bad');}
 }
 
 function openReject(id,name,amount){
   rejectTargetId=id;
-  document.getElementById('rejectPreview').innerHTML=
-    `<div style="font-weight:600">${esc(name)}</div><div style="font:16px 'DM Mono',monospace;color:var(--danger);margin-top:6px">฿${Number(amount).toLocaleString()}</div>`;
+  document.getElementById('rejectPreview').innerHTML=`<div style="font-weight:600">${esc(name)}</div><div style="font:16px 'DM Mono',monospace;color:var(--danger);margin-top:6px">฿${Number(amount).toLocaleString()}</div>`;
   document.getElementById('rejectModal').classList.add('show');
 }
 function closeRejectModal(){document.getElementById('rejectModal').classList.remove('show');rejectTargetId=null}
@@ -320,36 +291,24 @@ async function confirmReject(){
   const el=document.getElementById('pitem-'+id);
   if(el){el.style.opacity='.4';el.style.pointerEvents='none'}
   try{
-    const res=await fetch('/api/admin/donations/'+id,{
-      method:'PATCH',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({password:pwd,action:'reject'})
-    });
+    const res=await fetch('/api/admin/donations/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,action:'reject'})});
     const j=await res.json().catch(()=>({}));
-    if(res.ok&&j.ok){toast('ปฏิเสธและลบรายการแล้ว','warn');await loadAll()}
-    else{if(el){el.style.opacity='';el.style.pointerEvents=''}toast(j.error||'ลบไม่สำเร็จ','bad')}
-  }catch(e){if(el){el.style.opacity='';el.style.pointerEvents=''}toast('Network error: '+e.message,'bad')}
+    if(res.ok&&j.ok){toast('ปฏิเสธและลบรายการแล้ว','warn');await loadAll();}
+    else{if(el){el.style.opacity='';el.style.pointerEvents=''}toast(j.error||'ลบไม่สำเร็จ','bad');}
+  }catch(e){if(el){el.style.opacity='';el.style.pointerEvents=''}toast('Network error: '+e.message,'bad');}
 }
 
-// ── Auto-refresh ──────────────────────────────────────────────────────────────
 function startAutoRefresh(){
   stopAutoRefresh();
   if(!document.getElementById('autoRefreshChk')?.checked)return;
   setRefreshDot(true);
-  autoRefreshTimer=setInterval(async()=>{
-    await loadAll();
-    flashDot();
-  },10000);
+  autoRefreshTimer=setInterval(async()=>{await loadAll();flashDot();},10000);
 }
 function stopAutoRefresh(){clearInterval(autoRefreshTimer);autoRefreshTimer=null;setRefreshDot(false)}
-function toggleAutoRefresh(){
-  if(document.getElementById('autoRefreshChk').checked)startAutoRefresh();
-  else stopAutoRefresh();
-}
-function setRefreshDot(on){const d=document.getElementById('refreshDot');if(d){d.className='refresh-dot'+(on?'':' off')}}
+function toggleAutoRefresh(){if(document.getElementById('autoRefreshChk').checked)startAutoRefresh();else stopAutoRefresh();}
+function setRefreshDot(on){const d=document.getElementById('refreshDot');if(d)d.className='refresh-dot'+(on?'':' off')}
 function flashDot(){const d=document.getElementById('refreshDot');if(!d)return;d.style.background='var(--accent)';setTimeout(()=>d.style.background='var(--good)',300)}
 
-// ── Settings saves ────────────────────────────────────────────────────────────
 async function saveSettings(partial){
   const res=await fetch('/api/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,...partial})});
   const j=await res.json().catch(()=>({}));
@@ -358,9 +317,16 @@ async function saveSettings(partial){
 }
 function saveProfile(){saveSettings({name:cfgName.value.trim(),greeting:cfgGreeting.value.trim(),thankyou:cfgThankyou.value.trim()})}
 function saveColors(){saveSettings({bgColor:cfgBgColor.value,accentColor:cfgAccentColor.value})}
-function saveOverlay(){saveSettings({overlayMinAmount:Number(cfgMinAmount.value)||20,overlayDuration:Number(cfgDuration.value)||8,overlayPosition:cfgPosition.value,overlayEffect:cfgEffect.value,overlayImageUrl:cfgAlertImgUrl.value.trim(),overlayAlertSoundUrl:cfgAlertSoundUrl.value.trim(),overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1,goalAmount:Number(cfgGoalAmount.value)||0,goalMode:cfgGoalMode.value,goalLabel:(cfgGoalLabel.value||'').trim(),goalFrom:cfgGoalFrom.value,goalTo:cfgGoalTo.value})}
+function saveOverlay(){saveSettings({
+  overlayMinAmount:Number(cfgMinAmount.value)||20,overlayDuration:Number(cfgDuration.value)||8,
+  overlayPosition:cfgPosition.value,overlayEffect:cfgEffect.value,
+  overlayImageUrl:cfgAlertImgUrl.value.trim(),overlayAlertSoundUrl:cfgAlertSoundUrl.value.trim(),
+  overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,
+  ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1,
+  goalAmount:Number(cfgGoalAmount.value)||0,goalMode:cfgGoalMode.value,
+  goalLabel:(cfgGoalLabel.value||'').trim(),goalFrom:cfgGoalFrom.value,goalTo:cfgGoalTo.value
+})}
 
-// ── Image uploads ─────────────────────────────────────────────────────────────
 function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
 async function uploadFile(inputId,filename,type,settingKey,imgId,urlInputId){
   const input=document.getElementById(inputId),f=input.files?.[0];
@@ -377,7 +343,6 @@ async function uploadFile(inputId,filename,type,settingKey,imgId,urlInputId){
   };rd.readAsDataURL(f);
 }
 
-// ── Donations list ────────────────────────────────────────────────────────────
 function dmFilter(reset=true){
   const q=(dmSearch?.value||'').toLowerCase().trim(),sort=dmSort?.value||'date-desc';
   filtered=rows.filter(d=>!q||String(d.name).toLowerCase().includes(q)||String(d.message||'').toLowerCase().includes(q));
