@@ -298,11 +298,25 @@ async function confirmReject(){
   }catch(e){if(el){el.style.opacity='';el.style.pointerEvents=''}toast('Network error: '+e.message,'bad');}
 }
 
+async function loadPending(){
+  const p=await fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}));
+  pending=p.data||[];
+  renderPending();updatePendingBadge();
+  // อัปเดต dashboard pending block ถ้าเปิดอยู่
+  const db=document.getElementById('dashPendingBlock');
+  if(db){
+    if(pending.length>0){
+      db.style.display='block';
+      document.getElementById('dashPendingCount').textContent=pending.length+' รายการรอการอนุมัติ';
+      document.getElementById('dashPendingList').innerHTML=pending.slice(0,5).map(d=>pendingItemHtml(d,true)).join('');
+    }else{db.style.display='none'}
+  }
+}
 function startAutoRefresh(){
   stopAutoRefresh();
   if(!document.getElementById('autoRefreshChk')?.checked)return;
   setRefreshDot(true);
-  autoRefreshTimer=setInterval(async()=>{await loadAll();flashDot();},10000);
+  autoRefreshTimer=setInterval(async()=>{await loadPending();flashDot();},10000);
 }
 function stopAutoRefresh(){clearInterval(autoRefreshTimer);autoRefreshTimer=null;setRefreshDot(false)}
 function toggleAutoRefresh(){if(document.getElementById('autoRefreshChk').checked)startAutoRefresh();else stopAutoRefresh();}
