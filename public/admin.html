@@ -15,6 +15,7 @@ h1,h2{font-family:'Cormorant Garamond',serif;font-weight:400}h1{font-size:30px}h
 .sub{font-size:12px;color:var(--muted);margin-bottom:22px}.err{display:none;color:var(--danger);font-size:13px;margin-top:12px}
 input,textarea,select{width:100%;background:#06050a;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font:14px 'Noto Sans Thai',sans-serif;outline:none}
 input[type=color]{padding:4px 6px;height:40px;cursor:pointer}
+input[type=datetime-local]{color-scheme:dark}
 input:focus,textarea:focus,select:focus{border-color:var(--accent)}textarea{min-height:72px;resize:vertical}
 button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;border-radius:8px;padding:10px 16px;background:linear-gradient(135deg,var(--accent),#c87eb0);color:#08040a;font-weight:600}.btn2{background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--muted)}.btn2:hover{border-color:var(--accent);color:var(--accent)}.danger{border-color:#6b2b34;color:var(--danger)}.danger:hover{border-color:var(--danger)}
 .btn-approve{border:0;border-radius:8px;padding:8px 14px;background:linear-gradient(135deg,var(--good),#5abf80);color:#04140a;font-weight:600;font-family:'Noto Sans Thai',sans-serif;cursor:pointer;font-size:13px}
@@ -42,6 +43,7 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 #goalDateRow{display:none}
 .bar-preview{width:100%;height:36px;border-radius:99px;margin-top:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);position:relative}
 .bar-preview-fill{height:100%;width:60%;border-radius:99px;transition:background 0.3s}
+.datetime-hint{font-size:11px;color:var(--accent);margin-top:4px;opacity:0.8}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap}.grid,.dash{grid-template-columns:1fr 1fr}.main{padding:20px 16px}}
 </style>
 </head>
@@ -156,8 +158,16 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
     </div>
     <div class="card" style="margin-bottom:12px"><div class="label">ชื่อเป้าหมาย</div><input id="cfgGoalLabel" placeholder="เช่น เป้าหมาย Stream นี้"></div>
     <div id="goalDateRow" class="grid">
-      <div class="card"><div class="label">วันเริ่มต้น</div><input type="date" id="cfgGoalFrom"></div>
-      <div class="card"><div class="label">วันสิ้นสุด (countdown)</div><input type="date" id="cfgGoalTo"></div>
+      <div class="card">
+        <div class="label">วันและเวลาเริ่มต้น</div>
+        <input type="datetime-local" id="cfgGoalFrom">
+        <div class="datetime-hint">นับยอดตั้งแต่เวลานี้เป็นต้นไป</div>
+      </div>
+      <div class="card">
+        <div class="label">วันและเวลาสิ้นสุด (countdown)</div>
+        <input type="datetime-local" id="cfgGoalTo">
+        <div class="datetime-hint">หลอดจะแสดง countdown ถึงเวลานี้</div>
+      </div>
     </div>
     <!-- สีหลอด -->
     <div class="grid" style="margin-top:0">
@@ -252,6 +262,15 @@ function updatePendingBadge(){
   if(n>0){const b=document.createElement('span');b.className='nav-badge';b.textContent=n;btn.appendChild(b)}
 }
 
+// แปลง "2026-06-04" (date only) → "2026-06-04T00:00" สำหรับ datetime-local input
+function toDatetimeLocal(val){
+  if(!val)return '';
+  // ถ้ามี T แล้ว ตัด seconds/ms ออกให้ใช้กับ datetime-local ได้
+  if(val.includes('T')){return val.slice(0,16);}
+  // date only → เติมเวลาเริ่มต้น
+  return val+'T00:00';
+}
+
 function fillSettings(){
   const active=document.activeElement;
   const inOverlay=active&&active.closest&&active.closest('#sec-overlay');
@@ -264,7 +283,9 @@ function fillSettings(){
   v('cfgMinSoundUrl',settings.overlayMinSoundUrl);v('cfgTtsRate',settings.ttsRate||1);
   v('cfgTtsPitch',settings.ttsPitch||1);cfgTtsEnabled.checked=!!settings.ttsEnabled;
   v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
-  v('cfgGoalFrom',settings.goalFrom||'');v('cfgGoalTo',settings.goalTo||'');
+  // ใช้ datetime-local แทน date
+  v('cfgGoalFrom',toDatetimeLocal(settings.goalFrom||''));
+  v('cfgGoalTo',toDatetimeLocal(settings.goalTo||''));
   v('cfgGoalBarBg',settings.goalBarBg||'#000000');
   v('cfgGoalBarFill',settings.goalBarFill||'#e8a4c8');
   previewBar();
@@ -374,7 +395,10 @@ function saveOverlay(){saveSettings({
   overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,
   ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1,
   goalAmount:Number(cfgGoalAmount.value)||0,goalMode:cfgGoalMode.value,
-  goalLabel:(cfgGoalLabel.value||'').trim(),goalFrom:cfgGoalFrom.value,goalTo:cfgGoalTo.value,
+  goalLabel:(cfgGoalLabel.value||'').trim(),
+  // ส่งเป็น ISO string เต็ม เพื่อเก็บเวลาด้วย
+  goalFrom:cfgGoalFrom.value,  // "2026-06-04T20:00"
+  goalTo:cfgGoalTo.value,      // "2026-06-30T23:59"
   goalBarBg:cfgGoalBarBg.value,goalBarFill:cfgGoalBarFill.value
 })}
 
