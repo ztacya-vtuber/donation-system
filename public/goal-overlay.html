@@ -10,6 +10,8 @@
     --accent2: #c87eb0;
     --accent3: #f4d0e8;
     --glow: rgba(232,164,200,0.4);
+    --bar-bg: rgba(0,0,0,0.55);
+    --bar-fill-color: #e8a4c8;
     --bar-h: 52px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -20,7 +22,6 @@
     overflow: hidden;
     position: relative;
   }
-
   .goal-wrap {
     position: absolute;
     bottom: 40px;
@@ -30,12 +31,8 @@
     opacity: 0;
     transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2,0,0,1);
   }
-  .goal-wrap.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
+  .goal-wrap.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  /* label ชื่อด้านบน */
   .goal-label {
     text-align: center;
     margin-bottom: 8px;
@@ -46,14 +43,7 @@
     letter-spacing: 0.08em;
     text-shadow: 0 0 20px var(--glow);
   }
-
-  /* wrapper บาร์ + เลขข้าง */
-  .bar-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
+  .bar-row { display: flex; align-items: center; gap: 10px; }
   .side-num {
     font-family: 'DM Mono', monospace;
     font-size: 13px;
@@ -64,25 +54,21 @@
     min-width: 36px;
   }
   .side-num.right { text-align: right; }
-
-  /* track */
   .bar-track {
     flex: 1;
     height: var(--bar-h);
-    background: var(--bar-bg, rgba(0,0,0,0.55));
+    background: var(--bar-bg);
     border-radius: 99px;
     border: 1.5px solid rgba(255,255,255,0.12);
     overflow: hidden;
     position: relative;
   }
-
-  /* fill */
   .bar-fill {
     position: absolute;
     top: 0; left: 0; bottom: 0;
     width: 0%;
     border-radius: 99px;
-    background: linear-gradient(90deg, var(--accent2), var(--accent), var(--accent3));
+    background: var(--bar-fill-color);
     transition: width 1.6s cubic-bezier(0.3,0,0.1,1);
     overflow: hidden;
   }
@@ -94,16 +80,11 @@
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
     animation: shimmer 2.6s ease infinite;
   }
-  @keyframes shimmer {
-    0%   { left: -60%; }
-    100% { left: 160%; }
-  }
+  @keyframes shimmer { 0% { left: -60%; } 100% { left: 160%; } }
   .bar-fill.over {
-    background: linear-gradient(90deg, #c87eb0, #e8a4c8, #ffd6ee, #fff5fa);
+    background: linear-gradient(90deg, var(--accent2), var(--accent), #ffd6ee, #fff5fa);
     box-shadow: 0 0 30px rgba(232,164,200,0.8);
   }
-
-  /* ข้อความบนบาร์ */
   .bar-text {
     position: absolute;
     inset: 0;
@@ -120,7 +101,6 @@
     font-weight: 700;
     color: #fff;
     text-shadow: 0 1px 8px rgba(0,0,0,0.6);
-    letter-spacing: 0.01em;
   }
   .bar-pct {
     font-family: 'DM Mono', monospace;
@@ -129,8 +109,6 @@
     color: rgba(255,255,255,0.75);
     text-shadow: 0 1px 6px rgba(0,0,0,0.5);
   }
-
-  /* countdown ใต้บาร์ */
   .goal-countdown {
     text-align: center;
     margin-top: 7px;
@@ -139,15 +117,9 @@
     color: rgba(255,255,255,0.32);
     letter-spacing: 0.06em;
   }
-
-  /* particles */
   .particle {
-    position: fixed;
-    pointer-events: none;
-    font-size: 16px;
-    animation: floatUp 2.8s ease forwards;
-    opacity: 0;
-    z-index: 100;
+    position: fixed; pointer-events: none; font-size: 16px;
+    animation: floatUp 2.8s ease forwards; opacity: 0; z-index: 100;
   }
   @keyframes floatUp {
     0%   { opacity: 0; transform: translateY(0) scale(0.4) rotate(-10deg); }
@@ -196,19 +168,19 @@ async function loadAndRender() {
     const s = await fetchJSON('/api/settings?t=' + Date.now());
 
     // accent color
-    const accent      = s.accentColor || '#e8a4c8';
-    const accentDark  = shiftColor(accent, -30);
-    const accentLight = shiftColor(accent,  30);
+    const accent     = s.accentColor || '#e8a4c8';
+    const accentDark = shiftColor(accent, -30);
+    const accentLight= shiftColor(accent,  30);
     document.documentElement.style.setProperty('--accent',  accent);
     document.documentElement.style.setProperty('--accent2', accentDark);
     document.documentElement.style.setProperty('--accent3', accentLight);
     document.documentElement.style.setProperty('--glow',    hexToRgba(accent, 0.4));
 
-    // goal bar custom colors
-    const barBg   = s.goalBarBg   || '';
-    const barFill = s.goalBarFill || '';
-    if (barBg)   document.documentElement.style.setProperty('--bar-bg',   barBg);
-    if (barFill) document.documentElement.style.setProperty('--bar-fill', barFill);
+    // bar custom colors จาก admin
+    const barBg       = s.goalBarBg   || 'rgba(0,0,0,0.55)';
+    const barFillColor= s.goalBarFill || accent;
+    document.documentElement.style.setProperty('--bar-bg',         barBg);
+    document.documentElement.style.setProperty('--bar-fill-color', barFillColor);
 
     const goalAmount = Number(s.goalAmount) || 0;
     const goalMode   = s.goalMode  || 'total';
@@ -239,10 +211,8 @@ async function loadAndRender() {
                          : h > 0 ? '⏳ ' + h + ' ชม. ' + m + ' นาที'
                          :         '⏳ ' + m + ' นาที';
       }
-    } else if (goalMode === 'today') {
-      cdEl.textContent = 'ยอดวันนี้';
     } else {
-      cdEl.textContent = '';
+      cdEl.textContent = goalMode === 'today' ? 'ยอดวันนี้' : '';
     }
 
     // fetch stats
