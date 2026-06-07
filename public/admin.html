@@ -14,6 +14,7 @@ body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Noto S
 h1,h2{font-family:'Cormorant Garamond',serif;font-weight:400}h1{font-size:30px}h2{font-size:28px;margin-bottom:4px}
 .sub{font-size:12px;color:var(--muted);margin-bottom:22px}.err{display:none;color:var(--danger);font-size:13px;margin-top:12px}
 input,textarea,select{width:100%;background:#06050a;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font:14px 'Noto Sans Thai',sans-serif;outline:none}
+input[type=color]{padding:4px 6px;height:40px;cursor:pointer}
 input:focus,textarea:focus,select:focus{border-color:var(--accent)}textarea{min-height:72px;resize:vertical}
 button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;border-radius:8px;padding:10px 16px;background:linear-gradient(135deg,var(--accent),#c87eb0);color:#08040a;font-weight:600}.btn2{background:transparent;border:1px solid var(--border);border-radius:8px;padding:9px 13px;color:var(--muted)}.btn2:hover{border-color:var(--accent);color:var(--accent)}.danger{border-color:#6b2b34;color:var(--danger)}.danger:hover{border-color:var(--danger)}
 .btn-approve{border:0;border-radius:8px;padding:8px 14px;background:linear-gradient(135deg,var(--good),#5abf80);color:#04140a;font-weight:600;font-family:'Noto Sans Thai',sans-serif;cursor:pointer;font-size:13px}
@@ -39,6 +40,8 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 .refresh-dot.off{background:var(--muted)}
 .toolbar{display:flex;gap:10px;margin:18px 0}.toolbar input{flex:1}.pager{display:flex;gap:10px;justify-content:center;align-items:center;margin-top:14px}.modal-bg{position:fixed;inset:0;background:rgba(6,5,10,.85);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}.modal-bg.show{display:flex}.modal{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px}.toast{position:fixed;right:20px;bottom:20px;display:none;padding:12px 18px;border-radius:10px;background:#102418;color:var(--good);border:1px solid #2e6b40;z-index:99}.toast.bad{background:#2a1010;color:var(--danger);border-color:#6b2b2b}.toast.warn{background:#1a1200;color:var(--warn);border-color:#6b4f00}
 #goalDateRow{display:none}
+.bar-preview{width:100%;height:36px;border-radius:99px;margin-top:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);position:relative}
+.bar-preview-fill{height:100%;width:60%;border-radius:99px;transition:background 0.3s}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap}.grid,.dash{grid-template-columns:1fr 1fr}.main{padding:20px 16px}}
 </style>
 </head>
@@ -156,7 +159,24 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
       <div class="card"><div class="label">วันเริ่มต้น</div><input type="date" id="cfgGoalFrom"></div>
       <div class="card"><div class="label">วันสิ้นสุด (countdown)</div><input type="date" id="cfgGoalTo"></div>
     </div>
-    <div class="hint">หลอดแสดงบนหน้าโดเนทและ OBS: <b>/goal-overlay.html</b></div>
+    <!-- สีหลอด -->
+    <div class="grid" style="margin-top:0">
+      <div class="card">
+        <div class="label">สีพื้นหลังหลอด</div>
+        <input type="color" id="cfgGoalBarBg" value="#000000" oninput="previewBar()">
+        <div class="hint">สีพื้นหลังของแถบ progress</div>
+      </div>
+      <div class="card">
+        <div class="label">สี fill หลอด</div>
+        <input type="color" id="cfgGoalBarFill" value="#e8a4c8" oninput="previewBar()">
+        <div class="hint">สีของส่วนที่เติมตามยอดโดเนท</div>
+      </div>
+    </div>
+    <!-- preview bar -->
+    <div class="bar-preview" id="barPreviewBg">
+      <div class="bar-preview-fill" id="barPreviewFill"></div>
+    </div>
+    <div class="hint" style="margin-top:6px">หลอดแสดงบนหน้าโดเนทและ OBS: <b>/goal-overlay.html</b></div>
   </div>
 
   <button class="btn" onclick="saveOverlay()">บันทึก Overlay</button>
@@ -187,6 +207,13 @@ const LIMIT=30;
 function toggleGoalDateRow(){
   const mode=document.getElementById('cfgGoalMode').value;
   document.getElementById('goalDateRow').style.display=mode==='range'?'grid':'none';
+}
+
+function previewBar(){
+  const bg=document.getElementById('cfgGoalBarBg').value;
+  const fill=document.getElementById('cfgGoalBarFill').value;
+  document.getElementById('barPreviewBg').style.background=bg;
+  document.getElementById('barPreviewFill').style.background=fill;
 }
 
 async function doLogin(){
@@ -226,7 +253,6 @@ function updatePendingBadge(){
 }
 
 function fillSettings(){
-  // ถ้า user กำลังพิมพ์ใน overlay section อยู่ ไม่ reset
   const active=document.activeElement;
   const inOverlay=active&&active.closest&&active.closest('#sec-overlay');
   if(inOverlay)return;
@@ -239,6 +265,9 @@ function fillSettings(){
   v('cfgTtsPitch',settings.ttsPitch||1);cfgTtsEnabled.checked=!!settings.ttsEnabled;
   v('cfgGoalAmount',settings.goalAmount||0);v('cfgGoalLabel',settings.goalLabel||'');
   v('cfgGoalFrom',settings.goalFrom||'');v('cfgGoalTo',settings.goalTo||'');
+  v('cfgGoalBarBg',settings.goalBarBg||'#000000');
+  v('cfgGoalBarFill',settings.goalBarFill||'#e8a4c8');
+  previewBar();
   const gm=document.getElementById('cfgGoalMode');if(gm){gm.value=settings.goalMode||'total';toggleGoalDateRow();}
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
   img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl);
@@ -267,10 +296,13 @@ function renderPending(){
 }
 
 function pendingItemHtml(d){
-  const date=new Date(d.date).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
+  const date=new Date(d.created_at||d.date).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
   return `<div class="item item-pending" id="pitem-${d.id}"><div class="grow"><div style="font-weight:600">${esc(d.name)}</div>${d.message?`<div class="msg">${esc(d.message)}</div>`:''}<div class="small" style="margin-top:3px">${date}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="item-actions"><button class="btn-approve" onclick="approveDonation('${d.id}')">✓ อนุมัติ</button><button class="btn-reject" onclick="openReject('${d.id}','${esc(d.name)}',${d.amount})">✗ ปฏิเสธ</button></div></div>`;
 }
-function itemHtml(d){return `<div class="item"><div class="grow"><div>${esc(d.name)}</div><div class="msg">${esc(d.message||'')}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="small">${new Date(d.date).toLocaleDateString('th-TH')}</div></div>`;}
+function itemHtml(d){
+  const date=new Date(d.created_at||d.date);
+  return `<div class="item"><div class="grow"><div>${esc(d.name)}</div><div class="msg">${esc(d.message||'')}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="small">${isNaN(date)?''  :date.toLocaleDateString('th-TH')}</div></div>`;
+}
 
 async function approveDonation(id){
   const el=document.getElementById('pitem-'+id);
@@ -307,7 +339,6 @@ async function loadPending(){
   const p=await fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}));
   pending=p.data||[];
   renderPending();updatePendingBadge();
-  // อัปเดต dashboard pending block ถ้าเปิดอยู่
   const db=document.getElementById('dashPendingBlock');
   if(db){
     if(pending.length>0){
@@ -343,7 +374,8 @@ function saveOverlay(){saveSettings({
   overlayMinSoundUrl:cfgMinSoundUrl.value.trim(),ttsEnabled:cfgTtsEnabled.checked,
   ttsRate:Number(cfgTtsRate.value)||1,ttsPitch:Number(cfgTtsPitch.value)||1,
   goalAmount:Number(cfgGoalAmount.value)||0,goalMode:cfgGoalMode.value,
-  goalLabel:(cfgGoalLabel.value||'').trim(),goalFrom:cfgGoalFrom.value,goalTo:cfgGoalTo.value
+  goalLabel:(cfgGoalLabel.value||'').trim(),goalFrom:cfgGoalFrom.value,goalTo:cfgGoalTo.value,
+  goalBarBg:cfgGoalBarBg.value,goalBarFill:cfgGoalBarFill.value
 })}
 
 function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
@@ -365,8 +397,8 @@ async function uploadFile(inputId,filename,type,settingKey,imgId,urlInputId){
 function dmFilter(reset=true){
   const q=(dmSearch?.value||'').toLowerCase().trim(),sort=dmSort?.value||'date-desc';
   filtered=rows.filter(d=>!q||String(d.name).toLowerCase().includes(q)||String(d.message||'').toLowerCase().includes(q));
-  if(sort==='date-desc')filtered.sort((a,b)=>new Date(b.date)-new Date(a.date));
-  if(sort==='date-asc')filtered.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(sort==='date-desc')filtered.sort((a,b)=>new Date(b.created_at||b.date)-new Date(a.created_at||a.date));
+  if(sort==='date-asc')filtered.sort((a,b)=>new Date(a.created_at||a.date)-new Date(b.created_at||b.date));
   if(sort==='amount-desc')filtered.sort((a,b)=>Number(b.amount)-Number(a.amount));
   if(sort==='amount-asc')filtered.sort((a,b)=>Number(a.amount)-Number(b.amount));
   if(reset)page=1;renderDonations();
