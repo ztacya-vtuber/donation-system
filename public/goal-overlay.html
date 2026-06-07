@@ -69,7 +69,7 @@
   .bar-track {
     flex: 1;
     height: var(--bar-h);
-    background: rgba(0,0,0,0.55);
+    background: var(--bar-bg, rgba(0,0,0,0.55));
     border-radius: 99px;
     border: 1.5px solid rgba(255,255,255,0.12);
     overflow: hidden;
@@ -203,6 +203,12 @@ async function loadAndRender() {
     document.documentElement.style.setProperty('--accent2', accentDark);
     document.documentElement.style.setProperty('--accent3', accentLight);
     document.documentElement.style.setProperty('--glow',    hexToRgba(accent, 0.4));
+
+    // goal bar custom colors
+    const barBg   = s.goalBarBg   || '';
+    const barFill = s.goalBarFill || '';
+    if (barBg)   document.documentElement.style.setProperty('--bar-bg',   barBg);
+    if (barFill) document.documentElement.style.setProperty('--bar-fill', barFill);
 
     const goalAmount = Number(s.goalAmount) || 0;
     const goalMode   = s.goalMode  || 'total';
