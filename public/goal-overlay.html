@@ -164,6 +164,19 @@ async function fetchJSON(path) {
   return r.json();
 }
 
+// แปลงค่าจาก settings → Date object
+// รองรับทั้ง "2026-06-04" (เก่า) และ "2026-06-04T20:00" (ใหม่)
+function parseSettingDate(val) {
+  if (!val) return null;
+  // datetime-local format: "2026-06-04T20:00" → parse ตรงๆ เป็น local time
+  if (val.includes('T')) {
+    return new Date(val);
+  }
+  // date only (เก่า) → ใช้เวลา 00:00:00 local time
+  const [y, m, d] = val.split('-').map(Number);
+  return new Date(y, m - 1, d, 0, 0, 0, 0);
+}
+
 async function loadAndRender() {
   try {
     const s = await fetchJSON('/api/settings?t=' + Date.now());
@@ -197,30 +210,38 @@ async function loadAndRender() {
     document.getElementById('goalLabel').textContent = goalLabel;
     document.getElementById('sideMax').textContent   = '฿' + goalAmount.toLocaleString();
 
-    // countdown
+    // countdown — ใช้เวลาจริงจาก goalTo (ไม่ hardcode 23:59)
     const cdEl = document.getElementById('goalCountdown');
     if (goalTo) {
-      const end  = new Date(goalTo); end.setHours(23,59,59,999);
-      const diff = end - new Date();
+      const end  = parseSettingDate(goalTo);
+      const now  = new Date();
+      const diff = end - now;
       if (diff <= 0) {
         cdEl.textContent = 'หมดเวลาแล้ว';
       } else {
         const d = Math.floor(diff / 86400000);
         const h = Math.floor((diff % 86400000) / 3600000);
         const m = Math.floor((diff % 3600000) / 60000);
-        cdEl.textContent = d > 0 ? '⏳ ' + d + ' วัน ' + h + ' ชม.'
-                         : h > 0 ? '⏳ ' + h + ' ชม. ' + m + ' นาที'
-                         :         '⏳ ' + m + ' นาที';
+        const sec = Math.floor((diff % 60000) / 1000);
+        if (d > 0) {
+          cdEl.textContent = '⏳ ' + d + ' วัน ' + h + ' ชม.';
+        } else if (h > 0) {
+          cdEl.textContent = '⏳ ' + h + ' ชม. ' + m + ' นาที';
+        } else if (m > 0) {
+          cdEl.textContent = '⏳ ' + m + ' นาที ' + sec + ' วินาที';
+        } else {
+          cdEl.textContent = '⏳ ' + sec + ' วินาที';
+        }
       }
     } else {
       cdEl.textContent = goalMode === 'today' ? 'ยอดวันนี้' : '';
     }
 
-    // fetch stats
+    // fetch stats — ส่ง goalFrom/goalTo เป็น ISO datetime
     let statsPath = '/api/stats?t=' + Date.now();
     if (goalMode === 'range') {
-      if (goalFrom) statsPath += '&from=' + goalFrom;
-      if (goalTo)   statsPath += '&to='   + goalTo;
+      if (goalFrom) statsPath += '&from=' + encodeURIComponent(goalFrom);
+      if (goalTo)   statsPath += '&to='   + encodeURIComponent(goalTo);
     }
     const st = await fetchJSON(statsPath);
 
