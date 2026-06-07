@@ -8,7 +8,6 @@ export default async function handler(req, res) {
   }
   const sb = getSupabase();
   if (req.method === 'GET') {
-    // ?pending=true → ดึงเฉพาะรายการที่ยังไม่อนุมัติ
     if (req.query.pending === 'true') {
       const { data, error } = await sb
         .from('donations')
@@ -38,6 +37,7 @@ export default async function handler(req, res) {
         amount: parsed,
         message: (message || '').trim(),
         shown: true,
+        date: new Date().toISOString(), // ← เพิ่มตรงนี้
       })
       .select()
       .single();
