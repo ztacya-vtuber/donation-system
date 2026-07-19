@@ -44,6 +44,10 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 .bar-preview{width:100%;height:36px;border-radius:99px;margin-top:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.1);position:relative}
 .bar-preview-fill{height:100%;width:60%;border-radius:99px;transition:background 0.3s}
 .datetime-hint{font-size:11px;color:var(--accent);margin-top:4px;opacity:0.8}
+.notify-dot{width:9px;height:9px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:6px;transition:background .3s,box-shadow .3s}
+.notify-dot.on{background:var(--good);box-shadow:0 0 8px var(--good)}
+.notify-dot.off{background:var(--danger)}
+.notify-banner{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-bottom:16px}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap}.grid,.dash{grid-template-columns:1fr 1fr}.main{padding:20px 16px}}
 </style>
 </head>
@@ -51,7 +55,7 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 <div class="login" id="loginScreen"><div class="login-card"><h1>Admin Panel</h1><div class="sub">ใส่รหัสผ่านเพื่อจัดการระบบโดเนท</div><input id="pwdInput" type="password" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()"><button class="btn" style="width:100%;margin-top:12px" onclick="doLogin()">เข้าสู่ระบบ</button><div class="err" id="loginErr">รหัสผ่านไม่ถูกต้อง</div></div></div>
 
 <div class="shell" id="adminShell">
-<div class="top"><a href="/">← หน้าโดเนท</a><div class="top-title">Admin Panel</div><button class="btn2" onclick="location.reload()">ออก</button></div>
+<div class="top"><a href="/">← หน้าโดเนท</a><div class="top-title">Admin Panel</div><span class="notify-dot off" id="notifyDot" title="สถานะระบบแจ้งเตือนเสียง (ตรวจทุก 5 วินาที)"></span><button class="btn2" onclick="location.reload()">ออก</button></div>
 <div class="layout">
 <div class="nav">
 <button class="active" onclick="showSec('dashboard',this)">Dashboard</button>
@@ -189,9 +193,32 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
     <div class="hint" style="margin-top:6px">หลอดแสดงบนหน้าโดเนทและ OBS: <b>/goal-overlay.html</b></div>
   </div>
 
+  <!-- ADMIN NOTIFICATION SOUND -->
+  <div class="card" style="margin-top:4px;border-color:rgba(232,164,200,0.3)">
+    <div class="label" style="color:var(--accent);margin-bottom:14px">🔔 แจ้งเตือนเสียงในหน้าแอดมิน</div>
+    <div class="hint" style="margin-bottom:12px">ระบบจะตรวจสอบรายการรออนุมัติทุก 5 วินาทีในพื้นหลัง (ทำงานทุกแท็บของ Admin Panel ไม่ต้องเปิดหน้า "รออนุมัติ" ค้างไว้) แล้วเล่นเสียงทันทีที่เจอรายการใหม่ — ถ้าไม่อัปโหลดเสียงเอง จะใช้เสียงติ๊งพื้นฐานแทน</div>
+    <div class="row">
+      <label style="flex:0 0 auto"><input type="checkbox" id="cfgAdminNotifyEnabled" style="width:auto"> เปิดใช้งาน</label>
+      <div style="flex:1">
+        <div class="label" style="margin-bottom:4px">ระดับเสียง</div>
+        <input type="range" id="cfgAdminNotifyVolume" min="0" max="1" step="0.05" value="0.8">
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px;margin-bottom:0">
+      <div class="label">เสียงแจ้งเตือน URL</div>
+      <input id="cfgAdminNotifySoundUrl" placeholder="ปล่อยว่างไว้ = ใช้เสียงเตือนเริ่มต้น">
+      <input type="file" id="fileAdminNotifySound" accept="audio/*">
+      <div class="row" style="margin-top:10px">
+        <button class="btn" onclick="uploadFile('fileAdminNotifySound','admin-notify.mp3','audio','adminNotifySoundUrl',null,'cfgAdminNotifySoundUrl')">อัปโหลดเสียงของฉัน</button>
+        <button class="btn2" onclick="testAdminNotifySound()">▶ ทดสอบเสียง</button>
+      </div>
+    </div>
+  </div>
+
   <button class="btn" onclick="saveOverlay()">บันทึก Overlay</button>
   <button class="btn2" onclick="window.open('/overlay.html','_blank')" style="margin-left:8px">เปิด Overlay</button>
   <button class="btn2" onclick="window.open('/goal-overlay.html','_blank')" style="margin-left:8px">เปิด Goal Overlay</button>
+  <button class="btn2" onclick="window.open('/top-latest-overlay.html','_blank')" style="margin-left:8px">เปิด Top/Latest Overlay</button>
 </section>
 
 <!-- DONATIONS -->
@@ -208,11 +235,99 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 <div class="modal-bg" id="editModal"><div class="modal"><h2 id="modalTitle">แก้ไขรายการ</h2><div class="card"><div class="label">ชื่อ</div><input id="mName"></div><div class="card"><div class="label">จำนวนเงิน</div><input id="mAmount" type="number"></div><div class="card"><div class="label">ข้อความ</div><textarea id="mMsg"></textarea></div><div class="row"><button class="btn" onclick="saveDonation()">บันทึก</button><button class="btn2 danger" id="deleteBtn" onclick="deleteDonation()">ลบ</button><button class="btn2" onclick="closeModal()">ปิด</button></div></div></div>
 <div class="modal-bg" id="rejectModal"><div class="modal"><h2>ปฏิเสธรายการ?</h2><div class="sub" style="margin-top:6px;margin-bottom:18px">รายการนี้จะถูกลบถาวร ไม่สามารถกู้คืนได้</div><div class="card" id="rejectPreview" style="margin-bottom:16px"></div><div class="row"><button class="btn-reject" style="padding:10px 16px;font-size:14px" onclick="confirmReject()">ยืนยันปฏิเสธ</button><button class="btn2" onclick="closeRejectModal()">ยกเลิก</button></div></div></div>
 <div class="toast" id="toast"></div>
+<audio id="sfxAdminNotify" preload="auto"></audio>
 
 <script>
 let pwd='',settings={},stats={},rows=[],pending=[],filtered=[],page=1,editId=null,isAdd=false,renderItems=[];
 let rejectTargetId=null,autoRefreshTimer=null;
 const LIMIT=30;
+
+// ===== Admin notification (background polling, works with zero backend changes) =====
+// Polls the pending list every few seconds *regardless of which tab is open*, diffs
+// against previously-seen IDs, and plays a sound + toast for anything genuinely new.
+// This does not depend on any realtime broadcast existing for new submissions.
+let seenPendingIds=new Set();
+let pendingPollTimer=null;
+let pendingPollFirstRun=true;
+
+function startPendingWatcher(){
+  stopPendingWatcher();
+  setNotifyDot(true);
+  pendingPollTimer=setInterval(pollPendingForNotify,5000);
+  pollPendingForNotify(); // prime immediately
+}
+function stopPendingWatcher(){clearInterval(pendingPollTimer);pendingPollTimer=null;setNotifyDot(false)}
+function setNotifyDot(on){const d=document.getElementById('notifyDot');if(d)d.className='notify-dot '+(on?'on':'off')}
+
+async function pollPendingForNotify(){
+  try{
+    const p=await fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}));
+    const list=p.data||[];
+    const freshIds=new Set(list.map(d=>d.id));
+    if(!pendingPollFirstRun){
+      const newOnes=list.filter(d=>!seenPendingIds.has(d.id));
+      if(newOnes.length){
+        playAdminNotifySound();
+        if(newOnes.length===1){
+          toast('💸 โดเนทใหม่รออนุมัติ: '+esc(newOnes[0].name)+' ฿'+Number(newOnes[0].amount).toLocaleString());
+        }else{
+          toast('💸 มีโดเนทใหม่รออนุมัติ '+newOnes.length+' รายการ');
+        }
+        pending=list;renderPending();updatePendingBadge();
+        const db=document.getElementById('dashPendingBlock');
+        if(db&&document.getElementById('sec-dashboard').classList.contains('active'))loadAll();
+      }
+    }
+    seenPendingIds=freshIds;
+    pendingPollFirstRun=false;
+  }catch(e){/* silent — network hiccup, try again next tick */}
+}
+
+function playAdminNotifySound(){
+  if(settings.adminNotifyEnabled===false)return; // default on unless explicitly turned off
+  const url=(settings.adminNotifySoundUrl||'').trim();
+  if(url){
+    try{
+      const s=document.getElementById('sfxAdminNotify');
+      if(s.src!==url)s.src=url;
+      s.volume=settings.adminNotifyVolume!==undefined?Number(settings.adminNotifyVolume):0.8;
+      s.currentTime=0;
+      s.play().catch(()=>beep());
+    }catch(e){beep()}
+  }else{
+    beep();
+  }
+}
+function testAdminNotifySound(){
+  const url=(document.getElementById('cfgAdminNotifySoundUrl').value||'').trim();
+  const vol=Number(document.getElementById('cfgAdminNotifyVolume').value)||0.8;
+  if(url){
+    const s=document.getElementById('sfxAdminNotify');
+    s.src=url;s.volume=vol;s.currentTime=0;
+    s.play().catch(()=>beep(vol));
+  }else{
+    beep(vol);
+  }
+}
+// simple synthesized two-tone chime — used whenever no custom sound has been uploaded
+let _actx=null;
+function beep(vol){
+  vol=vol!==undefined?vol:(settings.adminNotifyVolume!==undefined?Number(settings.adminNotifyVolume):0.8);
+  try{
+    _actx=_actx||new (window.AudioContext||window.webkitAudioContext)();
+    const now=_actx.currentTime;
+    [[880,0],[1320,0.12]].forEach(([freq,delay])=>{
+      const osc=_actx.createOscillator(),gain=_actx.createGain();
+      osc.type='sine';osc.frequency.value=freq;
+      gain.gain.setValueAtTime(0,now+delay);
+      gain.gain.linearRampToValueAtTime(0.25*vol,now+delay+0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001,now+delay+0.28);
+      osc.connect(gain);gain.connect(_actx.destination);
+      osc.start(now+delay);osc.stop(now+delay+0.3);
+    });
+  }catch(e){}
+}
+// =========================================
 
 function toggleGoalDateRow(){
   const mode=document.getElementById('cfgGoalMode').value;
@@ -234,6 +349,9 @@ async function doLogin(){
     if(!res.ok||!j.ok){err.style.display='block';return}
     pwd=p;loginScreen.style.display='none';adminShell.classList.add('show');
     await loadAll();
+    seenPendingIds=new Set(pending.map(d=>d.id));
+    pendingPollFirstRun=false;
+    startPendingWatcher();
   }catch(e){err.textContent='Login API error: '+e.message;err.style.display='block'}
 }
 
@@ -290,6 +408,10 @@ function fillSettings(){
   v('cfgGoalBarFill',settings.goalBarFill||'#e8a4c8');
   previewBar();
   const gm=document.getElementById('cfgGoalMode');if(gm){gm.value=settings.goalMode||'total';toggleGoalDateRow();}
+  // admin notify settings
+  document.getElementById('cfgAdminNotifyEnabled').checked=settings.adminNotifyEnabled!==false;
+  document.getElementById('cfgAdminNotifyVolume').value=settings.adminNotifyVolume!==undefined?settings.adminNotifyVolume:0.8;
+  v('cfgAdminNotifySoundUrl',settings.adminNotifySoundUrl);
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
   img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl);
 }
@@ -399,7 +521,10 @@ function saveOverlay(){saveSettings({
   // ส่งเป็น ISO string เต็ม เพื่อเก็บเวลาด้วย
   goalFrom:cfgGoalFrom.value,  // "2026-06-04T20:00"
   goalTo:cfgGoalTo.value,      // "2026-06-30T23:59"
-  goalBarBg:cfgGoalBarBg.value,goalBarFill:cfgGoalBarFill.value
+  goalBarBg:cfgGoalBarBg.value,goalBarFill:cfgGoalBarFill.value,
+  adminNotifyEnabled:document.getElementById('cfgAdminNotifyEnabled').checked,
+  adminNotifyVolume:Number(document.getElementById('cfgAdminNotifyVolume').value)||0.8,
+  adminNotifySoundUrl:document.getElementById('cfgAdminNotifySoundUrl').value.trim()
 })}
 
 function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
