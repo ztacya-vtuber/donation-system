@@ -46,6 +46,19 @@
     .pending-sub{font-size:13px;color:#b98a9b;line-height:1.7;}
     .status{font-size:13px;min-height:18px;text-align:center;}
     .status.error{color:#f08080;}
+
+    /* ── Sound picker ── */
+    #soundPicker{display:none;flex-direction:column;gap:8px;}
+    #soundPicker .field label{margin-bottom:8px;}
+    .sound-hint{font-size:11px;color:var(--accent);margin-bottom:2px;}
+    .sound-opt{display:flex;align-items:center;gap:10px;background:rgba(13,5,8,0.6);border:1px solid rgba(228,185,208,0.14);border-radius:10px;padding:9px 12px;cursor:pointer;transition:border-color .2s,background .2s;}
+    .sound-opt:hover{border-color:rgba(228,185,208,0.3);}
+    .sound-opt.selected{border-color:var(--accent);background:rgba(192,96,128,0.16);}
+    .sound-opt input[type=radio]{width:auto;flex:0 0 auto;accent-color:var(--accent);}
+    .sound-opt-name{flex:1;font-size:14px;color:#e0c0c8;}
+    .sound-opt-play{flex:0 0 auto;background:rgba(228,185,208,0.14);border:none;border-radius:50%;width:30px;height:30px;color:#e0c0c8;font-size:12px;cursor:pointer;}
+    .sound-opt-play:hover{background:var(--accent);color:#1a0510;}
+    .sound-none{font-size:12px;color:#7a5464;padding:6px 2px;}
     .footer{margin-top:20px;text-align:center;}
     .footer a{color:#7a4354;font-size:12px;text-decoration:none;letter-spacing:1px;}
     .ornament{color:#5f2d3e;font-size:11px;text-align:center;margin-top:12px;}
@@ -103,9 +116,13 @@
       <div class="field">
         <label>จำนวนเงินที่โอน *</label>
         <div class="amount-wrap">
-          <input id="amount" type="number" placeholder="0" min="1" max="99999"/>
+          <input id="amount" type="number" placeholder="0" min="1" max="99999" oninput="updateSoundPicker()"/>
           <span class="amount-unit">฿</span>
         </div>
+      </div>
+      <div class="field" id="soundPicker">
+        <label><span id="soundPickerLabel">เลือกเสียงตอนแสดงผล (ไม่บังคับ)</span></label>
+        <div id="soundOptList"></div>
       </div>
       <div class="status error" id="formStatus"></div>
       <button class="btn" id="submitBtn" onclick="submitDonation()">ยืนยัน ✓</button>
@@ -146,12 +163,17 @@
     <a href="/top.html">🏆 TOP DONORS</a>
   </div>
 
+  <audio id="soundPreviewPlayer" preload="none"></audio>
+
   <script>
     let goalAmount = 0, goalMode = 'total', goalFrom = '', goalTo = '';
+    let soundOptions = [], soundMinAmount = 100, selectedSoundId = null;
 
     fetch('/api/settings?t='+Date.now(),{cache:'no-store'})
       .then(r=>r.json())
       .then(s=>{
+        soundOptions = Array.isArray(s.soundOptions) ? s.soundOptions : [];
+        soundMinAmount = Number(s.soundMinAmount ?? 100);
         if(s.name) document.getElementById('streamerName').textContent=s.name;
         if(s.greeting) document.getElementById('streamerSub').textContent=s.greeting;
         if(s.accentColor) document.documentElement.style.setProperty('--accent',s.accentColor);
@@ -212,6 +234,43 @@
       }).catch(()=>{});
     }
 
+    function updateSoundPicker(){
+      const amount = parseFloat(document.getElementById('amount').value) || 0;
+      const picker = document.getElementById('soundPicker');
+      if(!soundOptions.length || amount < soundMinAmount){
+        picker.style.display = 'none';
+        return;
+      }
+      picker.style.display = 'flex';
+      renderSoundOptions();
+    }
+
+    function renderSoundOptions(){
+      const el = document.getElementById('soundOptList');
+      el.innerHTML = `<div class="sound-opt${selectedSoundId===null?' selected':''}" onclick="selectSound(null)">
+          <input type="radio" name="soundOpt" ${selectedSoundId===null?'checked':''} onclick="selectSound(null)">
+          <div class="sound-opt-name">ไม่เลือก (ใช้เสียงปกติของ streamer)</div>
+        </div>` +
+        soundOptions.map(s => `
+        <div class="sound-opt${selectedSoundId===s.id?' selected':''}" onclick="selectSound('${s.id}')">
+          <input type="radio" name="soundOpt" ${selectedSoundId===s.id?'checked':''} onclick="selectSound('${s.id}')">
+          <div class="sound-opt-name">${esc(s.name)}</div>
+          <button type="button" class="sound-opt-play" onclick="event.stopPropagation();previewSelectedSound('${s.url}')">▶</button>
+        </div>`).join('');
+    }
+
+    function selectSound(id){
+      selectedSoundId = id;
+      renderSoundOptions();
+    }
+
+    function previewSelectedSound(url){
+      const p = document.getElementById('soundPreviewPlayer');
+      p.src = url; p.currentTime = 0; p.play().catch(()=>{});
+    }
+
+    function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
     function goTo(n){
       [1,2,3].forEach(i=>document.getElementById('page'+i).classList.toggle('active',i===n));
       const states=n===1?['active','','']:n===2?['done','active','']:['done','done','active'];
@@ -228,7 +287,7 @@
       if(!amount||amount<=0){statusEl.textContent='กรุณากรอกจำนวนเงิน';return;}
       statusEl.textContent='';btn.disabled=true;btn.textContent='กำลังส่ง...';
       try{
-        const res=await fetch('/api/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({display_name:name,message,amount})});
+        const res=await fetch('/api/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({display_name:name,message,amount,sound_id:selectedSoundId})});
         const data=await res.json();
         if(!res.ok) throw new Error(data.error||'เกิดข้อผิดพลาด');
         goTo(3);
@@ -242,6 +301,8 @@
       document.getElementById('message').value='';
       document.getElementById('amount').value='';
       document.getElementById('formStatus').textContent='';
+      selectedSoundId=null;
+      updateSoundPicker();
       goTo(1);
     }
   </script>
