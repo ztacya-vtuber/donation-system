@@ -1,5 +1,9 @@
 import { getSupabase, cors, DEFAULT_SETTINGS } from '../lib/supabase.js';
 
+// Matches Thungngern's notification format, e.g. "เงินเข้า 1 บาท"
+// Captures the numeric amount (supports thousands separators and decimals).
+const AMOUNT_REGEX = /เงินเข้า\s*([\d,]+\.?\d*)\s*บาท/;
+
 export default async function handler(req, res) {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -20,10 +24,25 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  const { amount } = req.body || {};
-  const parsed = Number(amount);
-  if (!parsed || parsed <= 0) {
-    return res.status(400).json({ error: 'Invalid amount' });
+  // Accept either a raw notification `text` (preferred — MacroDroid just
+  // forwards [notification_text] with no processing needed on the phone)
+  // or a pre-parsed `amount`, for flexibility.
+  const { text, amount } = req.body || {};
+
+  let parsed = null;
+  if (typeof amount === 'number' || typeof amount === 'string') {
+    parsed = Number(amount);
+  }
+  if ((!parsed || parsed <= 0) && typeof text === 'string') {
+    const match = text.match(AMOUNT_REGEX);
+    if (match) {
+      parsed = Number(match[1].replace(/,/g, ''));
+    }
+  }
+
+  if (!parsed || parsed <= 0 || Number.isNaN(parsed)) {
+    console.warn('[macrodroid] Could not extract a valid amount from:', { text, amount });
+    return res.status(400).json({ error: 'Could not extract a valid amount' });
   }
 
   const sb = getSupabase();
@@ -50,7 +69,7 @@ export default async function handler(req, res) {
     // No matching pending donation — log it so it can be checked manually
     // later (e.g. money arrived but the amount typed in the form was wrong).
     console.warn('[macrodroid] No pending match for amount:', parsed);
-    return res.json({ ok: true, matched: false });
+    return res.json({ ok: true, matched: false, extractedAmount: parsed });
   }
 
   const match = matches[0];
