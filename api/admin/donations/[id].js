@@ -12,6 +12,7 @@ async function broadcastDonation(donation) {
     message: donation.message || '',
     amount: donation.amount,
     id: donation.id,
+    sound_url: donation.sound_url || null,
   };
   const res = await sb.channel('donations').send({
     type: 'broadcast',
