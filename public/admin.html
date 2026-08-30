@@ -64,6 +64,7 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 <button onclick="showSec('images',this)">รูปภาพ</button>
 <button onclick="showSec('colors',this)">สีและธีม</button>
 <button onclick="showSec('overlay',this)">Overlay OBS</button>
+<button onclick="showSec('sounds',this)">เสียงโดเนท</button>
 <button onclick="showSec('donations',this)">จัดการรายการ</button>
 </div>
 <div class="main">
@@ -221,6 +222,30 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
   <button class="btn2" onclick="window.open('/top-latest-overlay.html','_blank')" style="margin-left:8px">เปิด Top/Latest Overlay</button>
 </section>
 
+<!-- SOUNDS -->
+<section class="sec" id="sec-sounds">
+  <h2>เสียงโดเนท</h2><div class="sub">ชุดเสียงให้คนโดเนทเลือกได้เอง เมื่อโดเนทถึงยอดขั้นต่ำที่กำหนด</div>
+  <div class="card" style="border-color:rgba(232,164,200,0.3)">
+    <div class="label" style="color:var(--accent)">ยอดขั้นต่ำที่จะเลือกเสียงได้</div>
+    <div class="row">
+      <input type="number" id="cfgSoundMinAmount" min="0" placeholder="เช่น 100">
+      <button class="btn" style="flex:0 0 auto" onclick="saveSoundMinAmount()">บันทึกยอดขั้นต่ำ</button>
+    </div>
+    <div class="hint">คนโดเนทที่ใส่ยอด ≥ ค่านี้ จะเห็นตัวเลือกเสียงบนฟอร์มโดเนท (หน้า /) — ต่ำกว่านี้จะไม่เห็นตัวเลือกเลย</div>
+  </div>
+
+  <div class="card">
+    <div class="label">เพิ่มเสียงใหม่เข้าชุด</div>
+    <input id="newSoundName" placeholder="ชื่อเสียง เช่น 'เสียงกรี๊ด', 'แตรรถ'" style="margin-bottom:10px">
+    <input type="file" id="newSoundFile" accept="audio/*">
+    <button class="btn" style="width:100%;margin-top:10px" onclick="addSoundOption()">อัปโหลดและเพิ่มเข้าชุด</button>
+    <div class="hint">อัปโหลดแล้วจะไปโผล่ในลิสต์ด้านล่างทันที คนโดเนทจะเห็นเป็นชื่อที่ตั้งไว้ ไม่เห็นไฟล์จริง</div>
+  </div>
+
+  <div class="label" style="margin-top:18px">ชุดเสียงทั้งหมด (<span id="soundCount">0</span>)</div>
+  <div class="list" id="soundList"><div class="pending-empty">ยังไม่มีเสียงในชุด</div></div>
+</section>
+
 <!-- DONATIONS -->
 <section class="sec" id="sec-donations">
   <h2>จัดการรายการ</h2><div class="sub">เพิ่ม แก้ไข หรือลบรายการโดเนท</div>
@@ -361,6 +386,7 @@ function showSec(id,b){
   document.getElementById('sec-'+id).classList.add('active');b.classList.add('active');
   if(id==='pending'){loadPending();startAutoRefresh();}
   else{stopAutoRefresh();if(id==='dashboard'||id==='donations')loadAll();}
+  if(id==='sounds')renderSoundList();
 }
 
 async function loadAll(){
@@ -412,6 +438,7 @@ function fillSettings(){
   document.getElementById('cfgAdminNotifyEnabled').checked=settings.adminNotifyEnabled!==false;
   document.getElementById('cfgAdminNotifyVolume').value=settings.adminNotifyVolume!==undefined?settings.adminNotifyVolume:0.8;
   v('cfgAdminNotifySoundUrl',settings.adminNotifySoundUrl);
+  v('cfgSoundMinAmount',settings.soundMinAmount!==undefined?settings.soundMinAmount:100);
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
   img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl);
 }
@@ -440,7 +467,8 @@ function renderPending(){
 
 function pendingItemHtml(d){
   const date=new Date(d.created_at||d.date).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
-  return `<div class="item item-pending" id="pitem-${d.id}"><div class="grow"><div style="font-weight:600">${esc(d.name)}</div>${d.message?`<div class="msg">${esc(d.message)}</div>`:''}<div class="small" style="margin-top:3px">${date}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="item-actions"><button class="btn-approve" onclick="approveDonation('${d.id}')">✓ อนุมัติ</button><button class="btn-reject" onclick="openReject('${d.id}','${esc(d.name)}',${d.amount})">✗ ปฏิเสธ</button></div></div>`;
+  const soundBtn=d.sound_url?`<button class="btn2" style="padding:5px 10px;font-size:11px" onclick="previewSound('${esc(d.sound_url)}')">🔊 ฟังเสียงที่เลือก</button>`:'';
+  return `<div class="item item-pending" id="pitem-${d.id}"><div class="grow"><div style="font-weight:600">${esc(d.name)}</div>${d.message?`<div class="msg">${esc(d.message)}</div>`:''}<div class="small" style="margin-top:3px">${date}</div>${soundBtn?`<div style="margin-top:6px">${soundBtn}</div>`:''}</div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="item-actions"><button class="btn-approve" onclick="approveDonation('${d.id}')">✓ อนุมัติ</button><button class="btn-reject" onclick="openReject('${d.id}','${esc(d.name)}',${d.amount})">✗ ปฏิเสธ</button></div></div>`;
 }
 function itemHtml(d){
   const date=new Date(d.created_at||d.date);
@@ -526,6 +554,52 @@ function saveOverlay(){saveSettings({
   adminNotifyVolume:Number(document.getElementById('cfgAdminNotifyVolume').value)||0.8,
   adminNotifySoundUrl:document.getElementById('cfgAdminNotifySoundUrl').value.trim()
 })}
+
+// ===== Donation sound library =====
+function renderSoundList(){
+  const list=Array.isArray(settings.soundOptions)?settings.soundOptions:[];
+  document.getElementById('soundCount').textContent=list.length;
+  document.getElementById('soundList').innerHTML=list.length===0
+    ? '<div class="pending-empty">ยังไม่มีเสียงในชุด — เพิ่มด้านบนได้เลย</div>'
+    : list.map(s=>`<div class="item"><div class="grow"><div style="font-weight:600">${esc(s.name)}</div></div><button class="btn2" onclick="previewSound('${esc(s.url)}')">▶ ฟัง</button><button class="btn2 danger" onclick="removeSoundOption('${esc(s.id)}')">ลบ</button></div>`).join('');
+}
+function previewSound(url){
+  const s=document.getElementById('sfxAdminNotify');
+  s.src=url;s.volume=0.8;s.currentTime=0;s.play().catch(()=>toast('เล่นเสียงไม่ได้','bad'));
+}
+async function addSoundOption(){
+  const nameInput=document.getElementById('newSoundName'),fileInput=document.getElementById('newSoundFile');
+  const name=nameInput.value.trim(),f=fileInput.files?.[0];
+  if(!name){toast('ตั้งชื่อเสียงก่อน','bad');return}
+  if(!f){toast('เลือกไฟล์เสียงก่อน','bad');return}
+  const btn=event.target;const old=btn.textContent;btn.disabled=true;btn.textContent='กำลังอัปโหลด...';
+  const rd=new FileReader();
+  rd.onload=async e=>{
+    try{
+      // no settingKey here on purpose — we don't want the raw URL to overwrite
+      // the soundOptions array, we merge it into the array ourselves below
+      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename:'sound-'+Date.now()+'.mp3',data:e.target.result,type:'audio'})});
+      const j=await res.json().catch(()=>({}));
+      if(!res.ok||!j.ok)throw new Error(j.error||'Upload failed');
+      const list=Array.isArray(settings.soundOptions)?[...settings.soundOptions]:[];
+      const id='s'+Date.now()+Math.random().toString(36).slice(2,6);
+      list.push({id,name,url:j.url});
+      const ok=await saveSettings({soundOptions:list});
+      if(ok){nameInput.value='';fileInput.value='';renderSoundList();}
+    }catch(err){toast(err.message,'bad')}finally{btn.disabled=false;btn.textContent=old}
+  };
+  rd.readAsDataURL(f);
+}
+async function removeSoundOption(id){
+  if(!confirm('ลบเสียงนี้ออกจากชุด?'))return;
+  const list=(Array.isArray(settings.soundOptions)?settings.soundOptions:[]).filter(s=>s.id!==id);
+  const ok=await saveSettings({soundOptions:list});
+  if(ok)renderSoundList();
+}
+async function saveSoundMinAmount(){
+  await saveSettings({soundMinAmount:Number(document.getElementById('cfgSoundMinAmount').value)||0});
+}
+// ===================================
 
 function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
 async function uploadFile(inputId,filename,type,settingKey,imgId,urlInputId){
