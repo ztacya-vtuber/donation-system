@@ -48,14 +48,24 @@ export default async function handler(req, res) {
   const sb = getSupabase();
   const nowIso = new Date().toISOString();
 
-  // Find the oldest still-valid pending donation with this exact amount.
+  // Find the oldest still-valid pending donation with this amount.
   // Oldest-first (FIFO) is the safest default when two people donate the
   // same amount close together — it matches whichever donor has been
   // waiting longest, rather than guessing.
+  //
+  // Uses a tight range (±0.5 satang) instead of exact equality (`eq`).
+  // Exact equality can silently fail to match two values that *look*
+  // identical in the dashboard (e.g. "1" vs "1.00") if they were stored
+  // with different numeric types/precision — a mismatch that's invisible
+  // to the eye but breaks a strict `eq` comparison. A tight range still
+  // only matches genuinely-equal amounts, since real donation amounts are
+  // never within 0.005 of each other by coincidence.
+  const tolerance = 0.005;
   const { data: matches, error: findError } = await sb
     .from('pending')
     .select('*')
-    .eq('amount', parsed)
+    .gte('amount', parsed - tolerance)
+    .lte('amount', parsed + tolerance)
     .gt('expires_at', nowIso)
     .order('created_at', { ascending: true })
     .limit(1);
