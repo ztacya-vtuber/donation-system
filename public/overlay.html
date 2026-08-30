@@ -40,6 +40,7 @@
 <button id="testBtn" onclick="testDonation()">⟳ Test</button>
 <audio id="sfxAlert" preload="auto"></audio>
 <audio id="sfxMin" preload="auto"></audio>
+<audio id="sfxChosen" preload="none"></audio>
 
 <script>
 // ===== แก้ 2 บรรทัดนี้ =====
@@ -88,7 +89,7 @@ function connectRealtime(){
 
 function processQueue(){if(!queue.length){showing=false;return;}showing=true;showDonation(queue.shift());}
 
-function showDonation({name,message,amount}){
+function showDonation({name,message,amount,sound_url}){
   const alertEl=document.getElementById('alert');
   const isMin=Number(amount)>=Number(settings.overlayMinAmount);
   document.getElementById('donorName').textContent=name;
@@ -96,14 +97,16 @@ function showDonation({name,message,amount}){
   document.getElementById('donorMsg').textContent=message||settings.thankyou||'';
   document.getElementById('donorName').classList.toggle('name-glow',isMin&&(settings.overlayEffect==='glow'||settings.overlayEffect==='both'));
   alertEl.classList.remove('hide');void alertEl.offsetWidth;alertEl.classList.add('show');
-  playSound(isMin);
+  playSound(isMin,sound_url);
   if(isMin&&settings.ttsEnabled)setTimeout(()=>speakTTS(name,message,amount),800);
   if(isMin&&(settings.overlayEffect==='roses'||settings.overlayEffect==='both'))launchPetals(60);
   setTimeout(()=>{alertEl.classList.remove('show');alertEl.classList.add('hide');setTimeout(processQueue,500);},(Number(settings.overlayDuration)||8)*1000);
 }
 
-function playSound(isMin){
+function playSound(isMin,soundUrl){
   try{
+    // the donor's chosen preset sound takes priority over the streamer's defaults
+    if(soundUrl){const s=document.getElementById('sfxChosen');s.src=soundUrl;s.currentTime=0;s.play().catch(()=>{});return;}
     if(isMin&&settings.overlayMinSoundUrl){const s=document.getElementById('sfxMin');s.currentTime=0;s.play().catch(()=>{});}
     else if(settings.overlayAlertSoundUrl){const s=document.getElementById('sfxAlert');s.currentTime=0;s.play().catch(()=>{});}
   }catch(e){}
