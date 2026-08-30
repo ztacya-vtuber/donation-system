@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   try {
     const sb = getSupabase();
-    const { data } = await sb.from('donations').select('name, amount');
+    const { data } = await sb.from('donations').select('name, amount').eq('shown', true);
     const rows = data || [];
     const totals = {};
     rows.forEach(d => {
