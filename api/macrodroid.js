@@ -100,7 +100,13 @@ export default async function handler(req, res) {
     amount: parsed,
     sound_url,
     ip_address,
-    shown: false, // still goes through the normal overlay display flow
+    // A bank-notification match IS the approval now — MacroDroid only
+    // reaches this point after confirming real money arrived, which is
+    // stronger proof than a human clicking "approve". Marking shown:true
+    // here means this donation skips the admin "pending approval" queue
+    // entirely and counts immediately in stats/dashboard totals, matching
+    // how manual admin-added donations already behave.
+    shown: true,
     date: new Date().toISOString(),
   }).select().single();
 
