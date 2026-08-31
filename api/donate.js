@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { display_name, message, amount, sound_id } = req.body || {};
+  const { display_name, message, amount, sound_id, meme_id } = req.body || {};
   if (!display_name?.trim()) {
     return res.status(400).json({ error: 'กรุณากรอกชื่อ' });
   }
@@ -16,20 +16,24 @@ export default async function handler(req, res) {
 
   const sb = getSupabase();
 
+  const { data: settingsRow } = await sb
+    .from('settings')
+    .select('value')
+    .eq('key', 'site')
+    .maybeSingle();
+  const settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.value || {}) };
+
+  // ยอด 10 บาทขึ้นไป เลือกเสียงและ/หรือมีมได้ทั้งคู่
   let resolved_sound_id = null;
-  if (sound_id) {
-    const { data: settingsRow } = await sb
-      .from('settings')
-      .select('value')
-      .eq('key', 'site')
-      .maybeSingle();
-    const settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.value || {}) };
-    const minAmount = Number(settings.soundMinAmount ?? DEFAULT_SETTINGS.soundMinAmount);
-    if (parsed >= minAmount) {
-      const options = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
-      const match = options.find(o => o.id === sound_id);
-      if (match) resolved_sound_id = sound_id;
-    }
+  if (sound_id && parsed >= 10) {
+    const soundOptions = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
+    if (soundOptions.find(o => o.id === sound_id)) resolved_sound_id = sound_id;
+  }
+
+  let resolved_meme_id = null;
+  if (meme_id && parsed >= 10) {
+    const memeOptions = Array.isArray(settings.memeOptions) ? settings.memeOptions : [];
+    if (memeOptions.find(o => o.id === meme_id)) resolved_meme_id = meme_id;
   }
 
   const nowIso = new Date().toISOString();
@@ -57,15 +61,16 @@ export default async function handler(req, res) {
 
     let sound_url = null;
     if (resolved_sound_id) {
-      const { data: settingsRow } = await sb
-        .from('settings')
-        .select('value')
-        .eq('key', 'site')
-        .maybeSingle();
-      const settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.value || {}) };
-      const options = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
-      const soundMatch = options.find(o => o.id === resolved_sound_id);
+      const soundOptions = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
+      const soundMatch = soundOptions.find(o => o.id === resolved_sound_id);
       if (soundMatch) sound_url = soundMatch.url;
+    }
+
+    let meme_url = null;
+    if (resolved_meme_id) {
+      const memeOptions = Array.isArray(settings.memeOptions) ? settings.memeOptions : [];
+      const memeMatch = memeOptions.find(o => o.id === resolved_meme_id);
+      if (memeMatch) meme_url = memeMatch.url;
     }
 
     const ip_address =
@@ -78,6 +83,7 @@ export default async function handler(req, res) {
       message: message?.trim() || '',
       amount: parsed,
       sound_url,
+      meme_url,
       ip_address,
       shown: true,
       date: new Date().toISOString(),
@@ -93,7 +99,14 @@ export default async function handler(req, res) {
     await sb.channel('donations').send({
       type: 'broadcast',
       event: 'new_donation',
-      payload: { name: display_name.trim(), message: message?.trim() || '', amount: parsed, id: donation?.id },
+      payload: {
+        name: display_name.trim(),
+        message: message?.trim() || '',
+        amount: parsed,
+        sound_url,
+        meme_url,
+        id: donation?.id,
+      },
     });
 
     console.log('[donate] Bank event arrived first — matched immediately:', display_name.trim(), parsed);
@@ -107,6 +120,7 @@ export default async function handler(req, res) {
     message: message?.trim() || '',
     amount: parsed,
     sound_id: resolved_sound_id,
+    meme_id: resolved_meme_id,
     source: 'form',
     expires_at,
   }).select().single();
