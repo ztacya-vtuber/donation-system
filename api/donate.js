@@ -6,7 +6,6 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { display_name, message, amount, sound_id } = req.body || {};
-
   if (!display_name?.trim()) {
     return res.status(400).json({ error: 'กรุณากรอกชื่อ' });
   }
@@ -17,9 +16,6 @@ export default async function handler(req, res) {
 
   const sb = getSupabase();
 
-  // Resolve the donor's chosen sound server-side — never trust a raw URL from
-  // the client, only accept the id of something the admin actually configured,
-  // and only if the donor's amount actually clears the threshold.
   let resolved_sound_id = null;
   if (sound_id) {
     const { data: settingsRow } = await sb
@@ -36,17 +32,82 @@ export default async function handler(req, res) {
     }
   }
 
-  // Instead of writing straight to `donations`, we park this as a pending
-  // record waiting for MacroDroid to confirm the matching bank notification.
-  // expires_at gives the matcher a window to find this record; after that
-  // it's stale and won't be auto-matched anymore.
-  const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+  const nowIso = new Date().toISOString();
+  const tolerance = 0.005;
 
+  // เช็คก่อนว่ามี "bank event" ที่ยอดตรงกันรออยู่แล้วไหม (กรณีโอนเงินก่อน
+  // แล้วเพิ่งมากรอกฟอร์มทีหลัง) — ถ้ามี ให้ยืนยันเป็นโดเนทได้เลยทันที
+  const { data: bankMatches, error: findError } = await sb
+    .from('pending')
+    .select('*')
+    .eq('source', 'bank')
+    .gte('amount', parsed - tolerance)
+    .lte('amount', parsed + tolerance)
+    .gt('expires_at', nowIso)
+    .order('created_at', { ascending: true })
+    .limit(1);
+
+  if (findError) {
+    console.error('[donate] Lookup error:', findError);
+    return res.status(500).json({ error: findError.message });
+  }
+
+  if (bankMatches && bankMatches.length > 0) {
+    const bankEvent = bankMatches[0];
+
+    let sound_url = null;
+    if (resolved_sound_id) {
+      const { data: settingsRow } = await sb
+        .from('settings')
+        .select('value')
+        .eq('key', 'site')
+        .maybeSingle();
+      const settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.value || {}) };
+      const options = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
+      const soundMatch = options.find(o => o.id === resolved_sound_id);
+      if (soundMatch) sound_url = soundMatch.url;
+    }
+
+    const ip_address =
+      req.headers['x-forwarded-for']?.split(',')[0]?.trim() ||
+      req.socket?.remoteAddress ||
+      null;
+
+    const { data: donation, error: insertError } = await sb.from('donations').insert({
+      name: display_name.trim(),
+      message: message?.trim() || '',
+      amount: parsed,
+      sound_url,
+      ip_address,
+      shown: true,
+      date: new Date().toISOString(),
+    }).select().single();
+
+    if (insertError) {
+      console.error('[donate] Insert error:', insertError);
+      return res.status(500).json({ error: insertError.message });
+    }
+
+    await sb.from('pending').delete().eq('id', bankEvent.id);
+
+    await sb.channel('donations').send({
+      type: 'broadcast',
+      event: 'new_donation',
+      payload: { name: display_name.trim(), message: message?.trim() || '', amount: parsed, id: donation?.id },
+    });
+
+    console.log('[donate] Bank event arrived first — matched immediately:', display_name.trim(), parsed);
+    return res.status(200).json({ ok: true, status: 'confirmed', donation });
+  }
+
+  // ยังไม่มี bank event รอไว้ — parking เป็น pending ฝั่ง 'form' ตามเดิม
+  const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
   const { data: pending, error } = await sb.from('pending').insert({
     name: display_name.trim(),
     message: message?.trim() || '',
     amount: parsed,
     sound_id: resolved_sound_id,
+    source: 'form',
     expires_at,
   }).select().single();
 
