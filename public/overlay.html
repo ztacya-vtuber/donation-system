@@ -14,6 +14,10 @@
   .alert-image-wrap{width:720px;height:480px;margin:0 auto 24px;border-radius:24px;overflow:hidden;border:3px solid rgba(232,164,200,0.4);box-shadow:0 0 60px rgba(232,164,200,0.3),0 20px 60px rgba(0,0,0,0.8);display:none;}
   .alert-image-wrap.show{display:block}
   .alert-image-wrap img{width:100%;height:100%;object-fit:cover}
+  /* รูป/มีมของโดเนทนี้โดยเฉพาะ — คนละอันกับ overlayImageUrl ของ streamer */
+  .alert-meme-wrap{width:480px;height:320px;margin:0 auto 20px;border-radius:20px;overflow:hidden;border:3px solid rgba(232,164,200,0.5);box-shadow:0 0 50px rgba(232,164,200,0.35),0 16px 50px rgba(0,0,0,0.75);display:none;}
+  .alert-meme-wrap.show{display:block}
+  .alert-meme-wrap img{width:100%;height:100%;object-fit:cover}
   .alert-name{font-family:'Cormorant Garamond',serif;font-size:70px;font-weight:600;color:#fff;letter-spacing:0.02em;line-height:1;text-shadow:0 4px 30px rgba(0,0,0,0.8),0 0 60px rgba(232,164,200,0.4);margin-bottom:8px;}
   .alert-name.name-glow{color:var(--accent);text-shadow:0 0 30px color-mix(in srgb,var(--accent) 80%,transparent),0 0 60px color-mix(in srgb,var(--accent) 40%,transparent),0 4px 30px rgba(0,0,0,0.8);}
   .alert-verb{font-family:'Noto Sans Thai',sans-serif;font-size:32px;font-weight:300;color:rgba(255,255,255,0.7);margin-bottom:8px;text-shadow:0 2px 20px rgba(0,0,0,0.8);}
@@ -31,6 +35,7 @@
 <div id="particles"></div>
 <div class="alert" id="alert">
   <div class="alert-image-wrap" id="alertImgWrap"><img id="alertImg" alt=""></div>
+  <div class="alert-meme-wrap" id="alertMemeWrap"><img id="alertMemeImg" alt=""></div>
   <div class="alert-name" id="donorName">-</div>
   <div class="alert-verb">โดเนท</div>
   <div class="alert-amount" id="donorAmount">฿0</div>
@@ -43,10 +48,8 @@
 <audio id="sfxChosen" preload="none"></audio>
 
 <script>
-// ===== แก้ 2 บรรทัดนี้ =====
-const SUPABASE_URL  = 'https://idmnppkltddrfxwhvnwa.supabase.co';   // <- ใส่ URL จริง
-const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkbW5wcGtsdGRkcmZ4d2h2bndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTI2ODQsImV4cCI6MjA5NTc4ODY4NH0.p5JYw0boVmoKLACbLcRwK3FeO9yLZi1HSd7N_1c5Lu0'; // <- ใส่ anon key จริง
-// ===========================
+const SUPABASE_URL  = 'https://idmnppkltddrfxwhvnwa.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlkbW5wcGtsdGRkcmZ4d2h2bndhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyMTI2ODQsImV4cCI6MjA5NTc4ODY4NH0.p5JYw0boVmoKLACbLcRwK3FeO9yLZi1HSd7N_1c5Lu0';
 
 let settings={accentColor:'#e8a4c8',thankyou:'ขอบคุณมากนะคะ ♡',overlayMinAmount:20,overlayAlertSoundUrl:'',overlayMinSoundUrl:'',overlayImageUrl:'',ttsEnabled:true,ttsRate:1,ttsPitch:1,overlayDuration:8,overlayEffect:'roses'};
 let queue=[],showing=false;
@@ -89,13 +92,18 @@ function connectRealtime(){
 
 function processQueue(){if(!queue.length){showing=false;return;}showing=true;showDonation(queue.shift());}
 
-function showDonation({name,message,amount,sound_url}){
+function showDonation({name,message,amount,sound_url,meme_url}){
   const alertEl=document.getElementById('alert');
   const isMin=Number(amount)>=Number(settings.overlayMinAmount);
   document.getElementById('donorName').textContent=name;
   document.getElementById('donorAmount').textContent='฿'+Number(amount).toLocaleString();
   document.getElementById('donorMsg').textContent=message||settings.thankyou||'';
   document.getElementById('donorName').classList.toggle('name-glow',isMin&&(settings.overlayEffect==='glow'||settings.overlayEffect==='both'));
+
+  const memeWrap=document.getElementById('alertMemeWrap'),memeImg=document.getElementById('alertMemeImg');
+  if(meme_url){memeImg.src=meme_url;memeWrap.classList.add('show');}
+  else memeWrap.classList.remove('show');
+
   alertEl.classList.remove('hide');void alertEl.offsetWidth;alertEl.classList.add('show');
   playSound(isMin,sound_url);
   if(isMin&&settings.ttsEnabled)setTimeout(()=>speakTTS(name,message,amount),800);
@@ -105,7 +113,6 @@ function showDonation({name,message,amount,sound_url}){
 
 function playSound(isMin,soundUrl){
   try{
-    // the donor's chosen preset sound takes priority over the streamer's defaults
     if(soundUrl){const s=document.getElementById('sfxChosen');s.src=soundUrl;s.currentTime=0;s.play().catch(()=>{});return;}
     if(isMin&&settings.overlayMinSoundUrl){const s=document.getElementById('sfxMin');s.currentTime=0;s.play().catch(()=>{});}
     else if(settings.overlayAlertSoundUrl){const s=document.getElementById('sfxAlert');s.currentTime=0;s.play().catch(()=>{});}
