@@ -7,6 +7,12 @@ const ALLOWED = [
   'overlayDuration', 'overlayPosition', 'overlayEffect',
   'goalAmount', 'goalMode', 'goalLabel', 'goalFrom', 'goalTo',
   'goalBarBg', 'goalBarFill',
+  // เดิมไฟล์นี้ขาด 6 key ด้านล่างนี้ไป — ทำให้แม้ POST จะสำเร็จ (ขึ้น "บันทึกแล้ว")
+  // แต่ค่าพวกนี้ถูกกรองทิ้งก่อนเขียนลง DB จริง เพราะไม่อยู่ใน whitelist ของ endpoint นี้
+  // (เห็นได้ว่า pages/api/settings.js มีครบ แต่ admin panel ไม่ได้ยิงไปที่ endpoint นั้น)
+  'adminNotifyEnabled', 'adminNotifyVolume', 'adminNotifySoundUrl',
+  'soundOptions', 'soundMinAmount',
+  'memeOptions',
 ];
 export default async function handler(req, res) {
   cors(res);
