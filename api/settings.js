@@ -1,4 +1,4 @@
-import { getSupabase, cors, ADMIN_PASSWORD, DEFAULT_SETTINGS } from '../../lib/supabase.js';
+import { getSupabase, cors, ADMIN_PASSWORD, DEFAULT_SETTINGS } from '../lib/supabase.js';
 const ALLOWED = [
   'name', 'greeting', 'thankyou',
   'avatarUrl', 'bannerUrl', 'bgUrl', 'bgColor', 'accentColor', 'qrUrl',
