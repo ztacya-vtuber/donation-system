@@ -48,6 +48,11 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 .notify-dot.on{background:var(--good);box-shadow:0 0 8px var(--good)}
 .notify-dot.off{background:var(--danger)}
 .notify-banner{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-bottom:16px}
+.meme-grid-admin{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px}
+.meme-tile{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--panel)}
+.meme-tile img{width:100%;height:90px;object-fit:cover;display:block}
+.meme-tile .meme-name{font-size:11px;color:var(--muted);padding:6px 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meme-tile .meme-del{position:absolute;top:5px;right:5px;background:rgba(6,5,10,.75);border:1px solid var(--danger);color:var(--danger);border-radius:50%;width:22px;height:22px;font-size:12px;line-height:1;cursor:pointer}
 @media(max-width:760px){.layout{grid-template-columns:1fr}.nav{display:flex;overflow:auto;border-right:0;border-bottom:1px solid var(--border)}.nav button{white-space:nowrap}.grid,.dash{grid-template-columns:1fr 1fr}.main{padding:20px 16px}}
 </style>
 </head>
@@ -55,16 +60,15 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 <div class="login" id="loginScreen"><div class="login-card"><h1>Admin Panel</h1><div class="sub">ใส่รหัสผ่านเพื่อจัดการระบบโดเนท</div><input id="pwdInput" type="password" placeholder="รหัสผ่าน" onkeydown="if(event.key==='Enter')doLogin()"><button class="btn" style="width:100%;margin-top:12px" onclick="doLogin()">เข้าสู่ระบบ</button><div class="err" id="loginErr">รหัสผ่านไม่ถูกต้อง</div></div></div>
 
 <div class="shell" id="adminShell">
-<div class="top"><a href="/">← หน้าโดเนท</a><div class="top-title">Admin Panel</div><span class="notify-dot off" id="notifyDot" title="สถานะระบบแจ้งเตือนเสียง (ตรวจทุก 5 วินาที)"></span><button class="btn2" onclick="location.reload()">ออก</button></div>
+<div class="top"><a href="/">← หน้าโดเนท</a><div class="top-title">Admin Panel</div><span class="notify-dot off" id="notifyDot" title="สถานะระบบแจ้งเตือนโดเนทใหม่ (ตรวจทุก 5 วินาที)"></span><button class="btn2" onclick="location.reload()">ออก</button></div>
 <div class="layout">
 <div class="nav">
 <button class="active" onclick="showSec('dashboard',this)">Dashboard</button>
-<button onclick="showSec('pending',this)" id="navPending">รออนุมัติ</button>
 <button onclick="showSec('profile',this)">โปรไฟล์</button>
 <button onclick="showSec('images',this)">รูปภาพ</button>
 <button onclick="showSec('colors',this)">สีและธีม</button>
 <button onclick="showSec('overlay',this)">Overlay OBS</button>
-<button onclick="showSec('sounds',this)">เสียงโดเนท</button>
+<button onclick="showSec('sounds',this)">เสียง & มีม</button>
 <button onclick="showSec('donations',this)">จัดการรายการ</button>
 </div>
 <div class="main">
@@ -78,28 +82,8 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
     <div class="card"><div class="num" id="dToday">-</div><div class="small">วันนี้</div></div>
     <div class="card"><div class="num" id="dDonors">-</div><div class="small">ผู้โดเนทไม่ซ้ำ</div></div>
   </div>
-  <div id="dashPendingBlock" style="display:none;margin-top:20px">
-    <div class="pending-header">
-      <div class="label" style="margin-bottom:0">⏳ รออนุมัติ</div>
-      <div class="pending-count pulse" id="dashPendingCount"></div>
-    </div>
-    <div class="list" id="dashPendingList"></div>
-  </div>
-  <div class="label" style="margin-top:18px">รายการล่าสุด (อนุมัติแล้ว)</div>
+  <div class="label" style="margin-top:18px">รายการล่าสุด</div>
   <div class="list" id="recentList"></div>
-</section>
-
-<!-- PENDING -->
-<section class="sec" id="sec-pending">
-  <h2>รออนุมัติ</h2>
-  <div class="sub">รายการที่ยังไม่ได้แสดงบน overlay — อนุมัติเพื่อยิง alert หรือปฏิเสธเพื่อลบ</div>
-  <div class="auto-refresh">
-    <span class="refresh-dot" id="refreshDot"></span>
-    <input type="checkbox" id="autoRefreshChk" checked onchange="toggleAutoRefresh()">
-    <label for="autoRefreshChk">รีเฟรชอัตโนมัติทุก 10 วินาที</label>
-    <button class="btn2" style="padding:5px 11px;font-size:12px" onclick="loadAll()">รีเฟรชเดี๋ยวนี้</button>
-  </div>
-  <div class="list" id="pendingList"><div class="pending-empty">กำลังโหลด...</div></div>
 </section>
 
 <!-- PROFILE -->
@@ -197,7 +181,7 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
   <!-- ADMIN NOTIFICATION SOUND -->
   <div class="card" style="margin-top:4px;border-color:rgba(232,164,200,0.3)">
     <div class="label" style="color:var(--accent);margin-bottom:14px">🔔 แจ้งเตือนเสียงในหน้าแอดมิน</div>
-    <div class="hint" style="margin-bottom:12px">ระบบจะตรวจสอบรายการรออนุมัติทุก 5 วินาทีในพื้นหลัง (ทำงานทุกแท็บของ Admin Panel ไม่ต้องเปิดหน้า "รออนุมัติ" ค้างไว้) แล้วเล่นเสียงทันทีที่เจอรายการใหม่ — ถ้าไม่อัปโหลดเสียงเอง จะใช้เสียงติ๊งพื้นฐานแทน</div>
+    <div class="hint" style="margin-bottom:12px">ระบบจะตรวจสอบรายการโดเนทล่าสุดทุก 5 วินาทีในพื้นหลัง (ทำงานทุกแท็บของ Admin Panel) แล้วเล่นเสียงทันทีที่มีโดเนทใหม่เข้ามาจริง — ถ้าไม่อัปโหลดเสียงเอง จะใช้เสียงติ๊งพื้นฐานแทน</div>
     <div class="row">
       <label style="flex:0 0 auto"><input type="checkbox" id="cfgAdminNotifyEnabled" style="width:auto"> เปิดใช้งาน</label>
       <div style="flex:1">
@@ -222,16 +206,16 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
   <button class="btn2" onclick="window.open('/top-latest-overlay.html','_blank')" style="margin-left:8px">เปิด Top/Latest Overlay</button>
 </section>
 
-<!-- SOUNDS -->
+<!-- SOUNDS & MEMES -->
 <section class="sec" id="sec-sounds">
-  <h2>เสียงโดเนท</h2><div class="sub">ชุดเสียงให้คนโดเนทเลือกได้เอง เมื่อโดเนทถึงยอดขั้นต่ำที่กำหนด</div>
+  <h2>เสียง & มีม</h2><div class="sub">ชุดเสียงและรูป/มีมให้คนโดเนทเลือกได้เอง เมื่อโดเนทถึงยอดขั้นต่ำที่กำหนด</div>
   <div class="card" style="border-color:rgba(232,164,200,0.3)">
-    <div class="label" style="color:var(--accent)">ยอดขั้นต่ำที่จะเลือกเสียงได้</div>
+    <div class="label" style="color:var(--accent)">ยอดขั้นต่ำที่จะเลือกเสียง/มีมได้</div>
     <div class="row">
-      <input type="number" id="cfgSoundMinAmount" min="0" placeholder="เช่น 100">
+      <input type="number" id="cfgSoundMinAmount" min="0" placeholder="เช่น 10">
       <button class="btn" style="flex:0 0 auto" onclick="saveSoundMinAmount()">บันทึกยอดขั้นต่ำ</button>
     </div>
-    <div class="hint">คนโดเนทที่ใส่ยอด ≥ ค่านี้ จะเห็นตัวเลือกเสียงบนฟอร์มโดเนท (หน้า /) — ต่ำกว่านี้จะไม่เห็นตัวเลือกเลย</div>
+    <div class="hint">คนโดเนทที่ใส่ยอด ≥ ค่านี้ จะเห็นทั้งตัวเลือกเสียงและตัวเลือกมีม/รูปบนฟอร์มโดเนท (หน้า /) — ต่ำกว่านี้จะไม่เห็นตัวเลือกเลย ค่าเดียวกันนี้คุมทั้งสองอย่างพร้อมกัน</div>
   </div>
 
   <div class="card">
@@ -244,6 +228,17 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 
   <div class="label" style="margin-top:18px">ชุดเสียงทั้งหมด (<span id="soundCount">0</span>)</div>
   <div class="list" id="soundList"><div class="pending-empty">ยังไม่มีเสียงในชุด</div></div>
+
+  <div class="card" style="margin-top:26px">
+    <div class="label">เพิ่มมีม/รูปใหม่เข้าชุด</div>
+    <input id="newMemeName" placeholder="ชื่อมีม เช่น 'หน้าตกใจ', 'การ์ตูนหัวเราะ'" style="margin-bottom:10px">
+    <input type="file" id="newMemeFile" accept="image/*">
+    <button class="btn" style="width:100%;margin-top:10px" onclick="addMemeOption()">อัปโหลดและเพิ่มเข้าชุด</button>
+    <div class="hint">อัปโหลดแล้วจะไปโผล่ในลิสต์ด้านล่างทันที คนโดเนทจะเห็นเป็นรูปตัวอย่างให้เลือกโดยตรง</div>
+  </div>
+
+  <div class="label" style="margin-top:18px">ชุดมีม/รูปทั้งหมด (<span id="memeCount">0</span>)</div>
+  <div class="meme-grid-admin" id="memeList"><div class="pending-empty">ยังไม่มีมีม/รูปในชุด</div></div>
 </section>
 
 <!-- DONATIONS -->
@@ -258,53 +253,48 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
 
 <!-- Edit/Add Modal -->
 <div class="modal-bg" id="editModal"><div class="modal"><h2 id="modalTitle">แก้ไขรายการ</h2><div class="card"><div class="label">ชื่อ</div><input id="mName"></div><div class="card"><div class="label">จำนวนเงิน</div><input id="mAmount" type="number"></div><div class="card"><div class="label">ข้อความ</div><textarea id="mMsg"></textarea></div><div class="row"><button class="btn" onclick="saveDonation()">บันทึก</button><button class="btn2 danger" id="deleteBtn" onclick="deleteDonation()">ลบ</button><button class="btn2" onclick="closeModal()">ปิด</button></div></div></div>
-<div class="modal-bg" id="rejectModal"><div class="modal"><h2>ปฏิเสธรายการ?</h2><div class="sub" style="margin-top:6px;margin-bottom:18px">รายการนี้จะถูกลบถาวร ไม่สามารถกู้คืนได้</div><div class="card" id="rejectPreview" style="margin-bottom:16px"></div><div class="row"><button class="btn-reject" style="padding:10px 16px;font-size:14px" onclick="confirmReject()">ยืนยันปฏิเสธ</button><button class="btn2" onclick="closeRejectModal()">ยกเลิก</button></div></div></div>
 <div class="toast" id="toast"></div>
 <audio id="sfxAdminNotify" preload="auto"></audio>
 
 <script>
-let pwd='',settings={},stats={},rows=[],pending=[],filtered=[],page=1,editId=null,isAdd=false,renderItems=[];
-let rejectTargetId=null,autoRefreshTimer=null;
+let pwd='',settings={},stats={},rows=[],page=1,editId=null,isAdd=false,renderItems=[];
 const LIMIT=30;
 
 // ===== Admin notification (background polling, works with zero backend changes) =====
-// Polls the pending list every few seconds *regardless of which tab is open*, diffs
-// against previously-seen IDs, and plays a sound + toast for anything genuinely new.
-// This does not depend on any realtime broadcast existing for new submissions.
-let seenPendingIds=new Set();
-let pendingPollTimer=null;
-let pendingPollFirstRun=true;
+// Polls the recent donations list every few seconds *regardless of which tab is open*,
+// diffs against previously-seen IDs, and plays a sound + toast for anything genuinely new.
+let seenDonationIds=new Set();
+let donationPollTimer=null;
+let donationPollFirstRun=true;
 
-function startPendingWatcher(){
-  stopPendingWatcher();
+function startDonationWatcher(){
+  stopDonationWatcher();
   setNotifyDot(true);
-  pendingPollTimer=setInterval(pollPendingForNotify,5000);
-  pollPendingForNotify(); // prime immediately
+  donationPollTimer=setInterval(pollDonationsForNotify,5000);
+  pollDonationsForNotify(); // prime immediately
 }
-function stopPendingWatcher(){clearInterval(pendingPollTimer);pendingPollTimer=null;setNotifyDot(false)}
+function stopDonationWatcher(){clearInterval(donationPollTimer);donationPollTimer=null;setNotifyDot(false)}
 function setNotifyDot(on){const d=document.getElementById('notifyDot');if(d)d.className='notify-dot '+(on?'on':'off')}
 
-async function pollPendingForNotify(){
+async function pollDonationsForNotify(){
   try{
-    const p=await fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}));
-    const list=p.data||[];
+    const h=await fetch('/api/admin/donations?password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}));
+    const list=h.data||[];
     const freshIds=new Set(list.map(d=>d.id));
-    if(!pendingPollFirstRun){
-      const newOnes=list.filter(d=>!seenPendingIds.has(d.id));
+    if(!donationPollFirstRun){
+      const newOnes=list.filter(d=>!seenDonationIds.has(d.id));
       if(newOnes.length){
         playAdminNotifySound();
         if(newOnes.length===1){
-          toast('💸 โดเนทใหม่รออนุมัติ: '+esc(newOnes[0].name)+' ฿'+Number(newOnes[0].amount).toLocaleString());
+          toast('💸 โดเนทใหม่: '+esc(newOnes[0].name)+' ฿'+Number(newOnes[0].amount).toLocaleString());
         }else{
-          toast('💸 มีโดเนทใหม่รออนุมัติ '+newOnes.length+' รายการ');
+          toast('💸 มีโดเนทใหม่ '+newOnes.length+' รายการ');
         }
-        pending=list;renderPending();updatePendingBadge();
-        const db=document.getElementById('dashPendingBlock');
-        if(db&&document.getElementById('sec-dashboard').classList.contains('active'))loadAll();
+        rows=list;renderDash();dmFilter(false);
       }
     }
-    seenPendingIds=freshIds;
-    pendingPollFirstRun=false;
+    seenDonationIds=freshIds;
+    donationPollFirstRun=false;
   }catch(e){/* silent — network hiccup, try again next tick */}
 }
 
@@ -374,9 +364,9 @@ async function doLogin(){
     if(!res.ok||!j.ok){err.style.display='block';return}
     pwd=p;loginScreen.style.display='none';adminShell.classList.add('show');
     await loadAll();
-    seenPendingIds=new Set(pending.map(d=>d.id));
-    pendingPollFirstRun=false;
-    startPendingWatcher();
+    seenDonationIds=new Set(rows.map(d=>d.id));
+    donationPollFirstRun=false;
+    startDonationWatcher();
   }catch(e){err.textContent='Login API error: '+e.message;err.style.display='block'}
 }
 
@@ -384,26 +374,18 @@ function showSec(id,b){
   document.querySelectorAll('.sec').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');b.classList.add('active');
-  if(id==='pending'){loadPending();startAutoRefresh();}
-  else{stopAutoRefresh();if(id==='dashboard'||id==='donations')loadAll();}
-  if(id==='sounds')renderSoundList();
+  if(id==='dashboard'||id==='donations')loadAll();
+  if(id==='sounds'){renderSoundList();renderMemeList();}
 }
 
 async function loadAll(){
-  const [s,st,h,p]=await Promise.all([
+  const [s,st,h]=await Promise.all([
     fetch('/api/settings?t='+Date.now()).then(r=>r.json()),
     fetch('/api/stats?t='+Date.now()).then(r=>r.json()),
-    fetch('/api/admin/donations?password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]})),
-    fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}))
+    fetch('/api/admin/donations?password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}))
   ]);
-  settings=s||{};stats=st||{};rows=h.data||[];pending=p.data||[];
-  fillSettings();renderDash();renderPending();dmFilter(false);updatePendingBadge();
-}
-
-function updatePendingBadge(){
-  const n=pending.length,btn=document.getElementById('navPending');
-  const old=btn.querySelector('.nav-badge');if(old)old.remove();
-  if(n>0){const b=document.createElement('span');b.className='nav-badge';b.textContent=n;btn.appendChild(b)}
+  settings=s||{};stats=st||{};rows=h.data||[];
+  fillSettings();renderDash();dmFilter(false);
 }
 
 // แปลง "2026-06-04" (date only) → "2026-06-04T00:00" สำหรับ datetime-local input
@@ -438,7 +420,7 @@ function fillSettings(){
   document.getElementById('cfgAdminNotifyEnabled').checked=settings.adminNotifyEnabled!==false;
   document.getElementById('cfgAdminNotifyVolume').value=settings.adminNotifyVolume!==undefined?settings.adminNotifyVolume:0.8;
   v('cfgAdminNotifySoundUrl',settings.adminNotifySoundUrl);
-  v('cfgSoundMinAmount',settings.soundMinAmount!==undefined?settings.soundMinAmount:100);
+  v('cfgSoundMinAmount',settings.soundMinAmount!==undefined?settings.soundMinAmount:10);
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
   img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl);
 }
@@ -450,85 +432,18 @@ function renderDash(){
   dCount.textContent=Number(stats.totalCount||0).toLocaleString();
   dToday.textContent='฿'+Number(stats.todayAmount||0).toLocaleString();
   dDonors.textContent=Number(stats.uniqueDonors||0).toLocaleString();
-  const block=document.getElementById('dashPendingBlock');
-  if(pending.length>0){
-    block.style.display='block';
-    document.getElementById('dashPendingCount').textContent=pending.length+' รายการรอการอนุมัติ';
-    document.getElementById('dashPendingList').innerHTML=pending.slice(0,5).map(d=>pendingItemHtml(d,true)).join('');
-    if(pending.length>5)document.getElementById('dashPendingList').innerHTML+='<div class="item"><div class="small" style="color:var(--warn)">และอีก '+(pending.length-5)+' รายการ</div></div>';
-  }else{block.style.display='none'}
-  recentList.innerHTML=(rows.filter(d=>d.shown!==false).slice(0,8).map(itemHtml).join('')||'<div class="item"><div class="small">ยังไม่มีรายการ</div></div>');
+  recentList.innerHTML=(rows.slice(0,8).map(itemHtml).join('')||'<div class="item"><div class="small">ยังไม่มีรายการ</div></div>');
 }
 
-function renderPending(){
-  const el=document.getElementById('pendingList');
-  el.innerHTML=pending.length===0?'<div class="pending-empty">✓ ไม่มีรายการที่รอการอนุมัติ</div>':pending.map(d=>pendingItemHtml(d,false)).join('');
-}
-
-function pendingItemHtml(d){
-  const date=new Date(d.created_at||d.date).toLocaleString('th-TH',{dateStyle:'short',timeStyle:'short'});
-  const soundBtn=d.sound_url?`<button class="btn2" style="padding:5px 10px;font-size:11px" onclick="previewSound('${esc(d.sound_url)}')">🔊 ฟังเสียงที่เลือก</button>`:'';
-  return `<div class="item item-pending" id="pitem-${d.id}"><div class="grow"><div style="font-weight:600">${esc(d.name)}</div>${d.message?`<div class="msg">${esc(d.message)}</div>`:''}<div class="small" style="margin-top:3px">${date}</div>${soundBtn?`<div style="margin-top:6px">${soundBtn}</div>`:''}</div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="item-actions"><button class="btn-approve" onclick="approveDonation('${d.id}')">✓ อนุมัติ</button><button class="btn-reject" onclick="openReject('${d.id}','${esc(d.name)}',${d.amount})">✗ ปฏิเสธ</button></div></div>`;
-}
 function itemHtml(d){
   const date=new Date(d.created_at||d.date);
   return `<div class="item"><div class="grow"><div>${esc(d.name)}</div><div class="msg">${esc(d.message||'')}</div></div><div class="amt">฿${Number(d.amount).toLocaleString()}</div><div class="small">${isNaN(date)?''  :date.toLocaleDateString('th-TH')}</div></div>`;
 }
 
-async function approveDonation(id){
-  const el=document.getElementById('pitem-'+id);
-  if(el){el.style.opacity='.4';el.style.pointerEvents='none'}
-  try{
-    const res=await fetch('/api/admin/donations/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,action:'approve'})});
-    const j=await res.json().catch(()=>({}));
-    if(res.ok&&j.ok){toast('อนุมัติแล้ว — overlay กำลังยิง 🎉');await loadAll();}
-    else{if(el){el.style.opacity='';el.style.pointerEvents=''}toast(j.error||'อนุมัติไม่สำเร็จ','bad');}
-  }catch(e){if(el){el.style.opacity='';el.style.pointerEvents=''}toast('Network error: '+e.message,'bad');}
+function previewSound(url){
+  const s=document.getElementById('sfxAdminNotify');
+  s.src=url;s.volume=0.8;s.currentTime=0;s.play().catch(()=>toast('เล่นเสียงไม่ได้','bad'));
 }
-
-function openReject(id,name,amount){
-  rejectTargetId=id;
-  document.getElementById('rejectPreview').innerHTML=`<div style="font-weight:600">${esc(name)}</div><div style="font:16px 'DM Mono',monospace;color:var(--danger);margin-top:6px">฿${Number(amount).toLocaleString()}</div>`;
-  document.getElementById('rejectModal').classList.add('show');
-}
-function closeRejectModal(){document.getElementById('rejectModal').classList.remove('show');rejectTargetId=null}
-
-async function confirmReject(){
-  if(!rejectTargetId)return;
-  const id=rejectTargetId;closeRejectModal();
-  const el=document.getElementById('pitem-'+id);
-  if(el){el.style.opacity='.4';el.style.pointerEvents='none'}
-  try{
-    const res=await fetch('/api/admin/donations/'+id,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,action:'reject'})});
-    const j=await res.json().catch(()=>({}));
-    if(res.ok&&j.ok){toast('ปฏิเสธและลบรายการแล้ว','warn');await loadAll();}
-    else{if(el){el.style.opacity='';el.style.pointerEvents=''}toast(j.error||'ลบไม่สำเร็จ','bad');}
-  }catch(e){if(el){el.style.opacity='';el.style.pointerEvents=''}toast('Network error: '+e.message,'bad');}
-}
-
-async function loadPending(){
-  const p=await fetch('/api/admin/donations?pending=true&password='+encodeURIComponent(pwd)+'&t='+Date.now()).then(r=>r.ok?r.json():Promise.resolve({data:[]})).catch(()=>({data:[]}));
-  pending=p.data||[];
-  renderPending();updatePendingBadge();
-  const db=document.getElementById('dashPendingBlock');
-  if(db){
-    if(pending.length>0){
-      db.style.display='block';
-      document.getElementById('dashPendingCount').textContent=pending.length+' รายการรอการอนุมัติ';
-      document.getElementById('dashPendingList').innerHTML=pending.slice(0,5).map(d=>pendingItemHtml(d,true)).join('');
-    }else{db.style.display='none'}
-  }
-}
-function startAutoRefresh(){
-  stopAutoRefresh();
-  if(!document.getElementById('autoRefreshChk')?.checked)return;
-  setRefreshDot(true);
-  autoRefreshTimer=setInterval(async()=>{await loadPending();flashDot();},10000);
-}
-function stopAutoRefresh(){clearInterval(autoRefreshTimer);autoRefreshTimer=null;setRefreshDot(false)}
-function toggleAutoRefresh(){if(document.getElementById('autoRefreshChk').checked)startAutoRefresh();else stopAutoRefresh();}
-function setRefreshDot(on){const d=document.getElementById('refreshDot');if(d)d.className='refresh-dot'+(on?'':' off')}
-function flashDot(){const d=document.getElementById('refreshDot');if(!d)return;d.style.background='var(--accent)';setTimeout(()=>d.style.background='var(--good)',300)}
 
 async function saveSettings(partial){
   const res=await fetch('/api/admin/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,...partial})});
@@ -563,10 +478,6 @@ function renderSoundList(){
     ? '<div class="pending-empty">ยังไม่มีเสียงในชุด — เพิ่มด้านบนได้เลย</div>'
     : list.map(s=>`<div class="item"><div class="grow"><div style="font-weight:600">${esc(s.name)}</div></div><button class="btn2" onclick="previewSound('${esc(s.url)}')">▶ ฟัง</button><button class="btn2 danger" onclick="removeSoundOption('${esc(s.id)}')">ลบ</button></div>`).join('');
 }
-function previewSound(url){
-  const s=document.getElementById('sfxAdminNotify');
-  s.src=url;s.volume=0.8;s.currentTime=0;s.play().catch(()=>toast('เล่นเสียงไม่ได้','bad'));
-}
 async function addSoundOption(){
   const nameInput=document.getElementById('newSoundName'),fileInput=document.getElementById('newSoundFile');
   const name=nameInput.value.trim(),f=fileInput.files?.[0];
@@ -599,6 +510,44 @@ async function removeSoundOption(id){
 async function saveSoundMinAmount(){
   await saveSettings({soundMinAmount:Number(document.getElementById('cfgSoundMinAmount').value)||0});
 }
+
+// ===== Meme/image library =====
+function renderMemeList(){
+  const list=Array.isArray(settings.memeOptions)?settings.memeOptions:[];
+  document.getElementById('memeCount').textContent=list.length;
+  document.getElementById('memeList').innerHTML=list.length===0
+    ? '<div class="pending-empty">ยังไม่มีมีม/รูปในชุด — เพิ่มด้านบนได้เลย</div>'
+    : list.map(m=>`<div class="meme-tile"><button class="meme-del" onclick="removeMemeOption('${esc(m.id)}')" title="ลบ">✕</button><img src="${esc(m.url)}" alt="${esc(m.name||'')}" loading="lazy"><div class="meme-name">${esc(m.name)}</div></div>`).join('');
+}
+async function addMemeOption(){
+  const nameInput=document.getElementById('newMemeName'),fileInput=document.getElementById('newMemeFile');
+  const name=nameInput.value.trim(),f=fileInput.files?.[0];
+  if(!name){toast('ตั้งชื่อมีมก่อน','bad');return}
+  if(!f){toast('เลือกไฟล์รูปก่อน','bad');return}
+  const btn=event.target;const old=btn.textContent;btn.disabled=true;btn.textContent='กำลังอัปโหลด...';
+  const rd=new FileReader();
+  rd.onload=async e=>{
+    try{
+      // no settingKey here on purpose — same reasoning as sounds: merge into
+      // the memeOptions array ourselves instead of letting upload overwrite a single key
+      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename:'meme-'+Date.now()+'.webp',data:e.target.result,type:'image'})});
+      const j=await res.json().catch(()=>({}));
+      if(!res.ok||!j.ok)throw new Error(j.error||'Upload failed');
+      const list=Array.isArray(settings.memeOptions)?[...settings.memeOptions]:[];
+      const id='m'+Date.now()+Math.random().toString(36).slice(2,6);
+      list.push({id,name,url:j.url});
+      const ok=await saveSettings({memeOptions:list});
+      if(ok){nameInput.value='';fileInput.value='';renderMemeList();}
+    }catch(err){toast(err.message,'bad')}finally{btn.disabled=false;btn.textContent=old}
+  };
+  rd.readAsDataURL(f);
+}
+async function removeMemeOption(id){
+  if(!confirm('ลบมีม/รูปนี้ออกจากชุด?'))return;
+  const list=(Array.isArray(settings.memeOptions)?settings.memeOptions:[]).filter(m=>m.id!==id);
+  const ok=await saveSettings({memeOptions:list});
+  if(ok)renderMemeList();
+}
 // ===================================
 
 function previewFile(input,imgId){const f=input.files?.[0];if(!f||!imgId)return;const e=document.getElementById(imgId);e.src=URL.createObjectURL(f);e.style.display='block'}
@@ -626,6 +575,7 @@ function dmFilter(reset=true){
   if(sort==='amount-asc')filtered.sort((a,b)=>Number(a.amount)-Number(b.amount));
   if(reset)page=1;renderDonations();
 }
+let filtered=[];
 function renderDonations(){
   const max=Math.max(1,Math.ceil(filtered.length/LIMIT));page=Math.min(page,max);
   renderItems=filtered.slice((page-1)*LIMIT,page*LIMIT);
