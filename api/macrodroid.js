@@ -1,7 +1,5 @@
 import { getSupabase, cors, DEFAULT_SETTINGS } from '../lib/supabase.js';
 
-// Matches Thungngern's notification format, e.g. "เงินเข้า 1 บาท"
-// Captures the numeric amount (supports thousands separators and decimals).
 const AMOUNT_REGEX = /เงินเข้า\s*([\d,]+\.?\d*)\s*บาท/;
 
 export default async function handler(req, res) {
@@ -9,10 +7,6 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Shared-secret check first, before touching anything else. Anyone who
-  // doesn't have this token gets rejected immediately — this endpoint is
-  // the only thing standing between "someone claims money arrived" and
-  // "a donation actually appears on stream", so it must not be guessable.
   const token = req.headers['x-secret-token'];
   const expected = process.env.MACRODROID_SECRET;
   if (!expected) {
@@ -24,9 +18,6 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
 
-  // Accept either a raw notification `text` (preferred — MacroDroid just
-  // forwards [notification_text] with no processing needed on the phone)
-  // or a pre-parsed `amount`, for flexibility.
   const { text, amount } = req.body || {};
 
   let parsed = null;
@@ -47,23 +38,13 @@ export default async function handler(req, res) {
 
   const sb = getSupabase();
   const nowIso = new Date().toISOString();
-
-  // Find the oldest still-valid pending donation with this amount.
-  // Oldest-first (FIFO) is the safest default when two people donate the
-  // same amount close together — it matches whichever donor has been
-  // waiting longest, rather than guessing.
-  //
-  // Uses a tight range (±0.5 satang) instead of exact equality (`eq`).
-  // Exact equality can silently fail to match two values that *look*
-  // identical in the dashboard (e.g. "1" vs "1.00") if they were stored
-  // with different numeric types/precision — a mismatch that's invisible
-  // to the eye but breaks a strict `eq` comparison. A tight range still
-  // only matches genuinely-equal amounts, since real donation amounts are
-  // never within 0.005 of each other by coincidence.
   const tolerance = 0.005;
+
+  // หา pending ฝั่ง 'form' ก่อน (กรณี user กรอกฟอร์มไว้ก่อนโอน)
   const { data: matches, error: findError } = await sb
     .from('pending')
     .select('*')
+    .eq('source', 'form')
     .gte('amount', parsed - tolerance)
     .lte('amount', parsed + tolerance)
     .gt('expires_at', nowIso)
@@ -76,16 +57,23 @@ export default async function handler(req, res) {
   }
 
   if (!matches || matches.length === 0) {
-    // No matching pending donation — log it so it can be checked manually
-    // later (e.g. money arrived but the amount typed in the form was wrong).
-    console.warn('[macrodroid] No pending match for amount:', parsed);
-    return res.json({ ok: true, matched: false, extractedAmount: parsed });
+    // ยังไม่มีฟอร์มรอไว้ — เก็บ event นี้เป็น 'bank' ไว้ก่อน เผื่อ user
+    // จะมากรอกฟอร์มทีหลัง (แทนที่จะทิ้งเงินโอนจริงไปเฉย ๆ)
+    const expires_at = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+    const { error: insertPendingError } = await sb.from('pending').insert({
+      amount: parsed,
+      source: 'bank',
+      expires_at,
+    });
+    if (insertPendingError) {
+      console.error('[macrodroid] Failed to park unmatched bank event:', insertPendingError);
+    }
+    console.warn('[macrodroid] No form match yet — parked as bank event:', parsed);
+    return res.json({ ok: true, matched: false, parked: true, extractedAmount: parsed });
   }
 
   const match = matches[0];
 
-  // Resolve sound_id -> actual sound_url the same way donate.js does,
-  // re-checking against current settings rather than trusting stored state.
   let sound_url = null;
   if (match.sound_id) {
     const { data: settingsRow } = await sb
@@ -110,12 +98,6 @@ export default async function handler(req, res) {
     amount: parsed,
     sound_url,
     ip_address,
-    // A bank-notification match IS the approval now — MacroDroid only
-    // reaches this point after confirming real money arrived, which is
-    // stronger proof than a human clicking "approve". Marking shown:true
-    // here means this donation skips the admin "pending approval" queue
-    // entirely and counts immediately in stats/dashboard totals, matching
-    // how manual admin-added donations already behave.
     shown: true,
     date: new Date().toISOString(),
   }).select().single();
