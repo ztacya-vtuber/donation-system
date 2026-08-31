@@ -125,10 +125,43 @@ button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer}.btn{border:0;bord
     <div class="card"><div class="label">ตำแหน่ง</div><select id="cfgPosition"><option value="center">center</option><option value="bottom-left">bottom-left</option><option value="bottom-right">bottom-right</option></select></div>
     <div class="card"><div class="label">เอฟเฟกต์</div><select id="cfgEffect"><option value="roses">roses</option><option value="glow">glow</option><option value="both">both</option><option value="none">none</option></select></div>
   </div>
-  <div class="card"><div class="label">Alert Image URL</div><input id="cfgAlertImgUrl"><div class="hint">หรืออัปโหลดรูปด้านล่าง</div><input type="file" id="fileAlertImg" accept="image/*" onchange="previewFile(this,'curAlertImg')"><img id="curAlertImg" class="preview"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileAlertImg','alert-img.webp','image','overlayImageUrl','curAlertImg','cfgAlertImgUrl')">อัปโหลด Alert Image</button></div>
+  <div class="card">
+    <div class="label">Alert Image</div>
+    <select id="cfgAlertImgSelect" onchange="onLibrarySelect('cfgAlertImgSelect','cfgAlertImgUrl','curAlertImg')"></select>
+    <img id="curAlertImg" class="preview" style="margin-top:10px">
+    <input type="hidden" id="cfgAlertImgUrl">
+    <div class="hint">เลือกจากชุด "เสียง & มีม" ที่มีอยู่ — ถ้ายังไม่มีของที่ถูกใจ อัปโหลดใหม่ด้านล่างได้เลย จะเข้าชุดให้อัตโนมัติและถูกเลือกใช้ทันที</div>
+    <div class="row" style="margin-top:8px">
+      <input id="newAlertImgName" placeholder="ชื่อ (สำหรับเก็บเข้าชุด)">
+      <input type="file" id="fileAlertImg" accept="image/*">
+    </div>
+    <button class="btn" style="width:100%;margin-top:8px" onclick="uploadToLibrary('image','fileAlertImg','newAlertImgName','cfgAlertImgSelect','cfgAlertImgUrl','curAlertImg')">อัปโหลดใหม่เข้าชุด และใช้เป็น Alert Image</button>
+  </div>
   <div class="grid">
-    <div class="card"><div class="label">เสียงทั่วไป URL</div><input id="cfgAlertSoundUrl"><input type="file" id="fileAlertSound" accept="audio/*"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileAlertSound','alert.mp3','audio','overlayAlertSoundUrl',null,'cfgAlertSoundUrl')">อัปโหลดเสียงทั่วไป</button></div>
-    <div class="card"><div class="label">เสียงยอดขั้นต่ำ URL</div><input id="cfgMinSoundUrl"><input type="file" id="fileMinSound" accept="audio/*"><button class="btn" style="margin-top:10px" onclick="uploadFile('fileMinSound','alert-min.mp3','audio','overlayMinSoundUrl',null,'cfgMinSoundUrl')">อัปโหลดเสียงพิเศษ</button></div>
+    <div class="card">
+      <div class="label">เสียงทั่วไป</div>
+      <select id="cfgAlertSoundSelect" onchange="onLibrarySelect('cfgAlertSoundSelect','cfgAlertSoundUrl')"></select>
+      <input type="hidden" id="cfgAlertSoundUrl">
+      <button class="btn2" style="width:100%;margin-top:8px" onclick="previewSound(document.getElementById('cfgAlertSoundUrl').value)">▶ ฟังเสียงที่เลือก</button>
+      <div class="hint" style="margin-top:8px">เลือกจากชุด "เสียง & มีม" — ไม่มีที่ถูกใจก็อัปโหลดใหม่ได้เลย</div>
+      <div class="row" style="margin-top:8px">
+        <input id="newAlertSoundName" placeholder="ชื่อ (สำหรับเก็บเข้าชุด)">
+        <input type="file" id="fileAlertSound" accept="audio/*">
+      </div>
+      <button class="btn" style="width:100%;margin-top:8px" onclick="uploadToLibrary('audio','fileAlertSound','newAlertSoundName','cfgAlertSoundSelect','cfgAlertSoundUrl')">อัปโหลดใหม่เข้าชุด และใช้เป็นเสียงทั่วไป</button>
+    </div>
+    <div class="card">
+      <div class="label">เสียงยอดขั้นต่ำ</div>
+      <select id="cfgMinSoundSelect" onchange="onLibrarySelect('cfgMinSoundSelect','cfgMinSoundUrl')"></select>
+      <input type="hidden" id="cfgMinSoundUrl">
+      <button class="btn2" style="width:100%;margin-top:8px" onclick="previewSound(document.getElementById('cfgMinSoundUrl').value)">▶ ฟังเสียงที่เลือก</button>
+      <div class="hint" style="margin-top:8px">เลือกจากชุด "เสียง & มีม" — ไม่มีที่ถูกใจก็อัปโหลดใหม่ได้เลย</div>
+      <div class="row" style="margin-top:8px">
+        <input id="newMinSoundName" placeholder="ชื่อ (สำหรับเก็บเข้าชุด)">
+        <input type="file" id="fileMinSound" accept="audio/*">
+      </div>
+      <button class="btn" style="width:100%;margin-top:8px" onclick="uploadToLibrary('audio','fileMinSound','newMinSoundName','cfgMinSoundSelect','cfgMinSoundUrl')">อัปโหลดใหม่เข้าชุด และใช้เป็นเสียงพิเศษ</button>
+    </div>
   </div>
   <div class="card"><div class="row"><label><input type="checkbox" id="cfgTtsEnabled" style="width:auto"> เปิด TTS</label><input type="number" step="0.1" id="cfgTtsRate" placeholder="rate"><input type="number" step="0.1" id="cfgTtsPitch" placeholder="pitch"></div></div>
 
@@ -376,6 +409,7 @@ function showSec(id,b){
   document.getElementById('sec-'+id).classList.add('active');b.classList.add('active');
   if(id==='dashboard'||id==='donations')loadAll();
   if(id==='sounds'){renderSoundList();renderMemeList();}
+  if(id==='overlay')populateOverlayLibrarySelects();
 }
 
 async function loadAll(){
@@ -423,7 +457,69 @@ function fillSettings(){
   v('cfgSoundMinAmount',settings.soundMinAmount!==undefined?settings.soundMinAmount:10);
   img('curAvatar',settings.avatarUrl);img('curBanner',settings.bannerUrl);
   img('curBg',settings.bgUrl);img('curQr',settings.qrUrl);img('curAlertImg',settings.overlayImageUrl);
+  populateOverlayLibrarySelects();
 }
+
+// ===== Overlay tab: pick Alert Image / sounds from the shared "เสียง & มีม" library =====
+function populateOverlayLibrarySelects(){
+  populateLibrarySelect('cfgAlertImgSelect',settings.memeOptions,settings.overlayImageUrl);
+  populateLibrarySelect('cfgAlertSoundSelect',settings.soundOptions,settings.overlayAlertSoundUrl);
+  populateLibrarySelect('cfgMinSoundSelect',settings.soundOptions,settings.overlayMinSoundUrl);
+}
+function populateLibrarySelect(selectId,list,currentUrl){
+  const sel=document.getElementById(selectId);
+  if(!sel)return;
+  list=Array.isArray(list)?list:[];
+  const opts=['<option value="">— ไม่ใช้ —</option>'].concat(
+    list.map(it=>`<option value="${esc(it.url)}"${it.url===currentUrl?' selected':''}>${esc(it.name)}</option>`)
+  );
+  if(currentUrl&&!list.some(it=>it.url===currentUrl)){
+    opts.push(`<option value="${esc(currentUrl)}" selected>(ไฟล์เดิม ไม่อยู่ในชุด)</option>`);
+  }
+  sel.innerHTML=opts.join('');
+}
+function onLibrarySelect(selectId,urlInputId,imgId){
+  const sel=document.getElementById(selectId);
+  if(!sel)return;
+  const url=sel.value;
+  v(urlInputId,url);
+  if(imgId){
+    const im=document.getElementById(imgId);
+    if(url){im.src=url;im.style.display='block';}else{im.style.display='none';}
+  }
+}
+async function uploadToLibrary(kind,fileInputId,nameInputId,selectId,urlInputId,imgId){
+  const fileInput=document.getElementById(fileInputId),nameInput=document.getElementById(nameInputId);
+  const f=fileInput.files?.[0];
+  if(!f){toast('เลือกไฟล์ก่อน','bad');return}
+  const name=(nameInput.value||'').trim()||(kind==='image'?'รูป':'เสียง')+' '+new Date().toLocaleString('th-TH');
+  const btn=event.target;const old=btn.textContent;btn.disabled=true;btn.textContent='กำลังอัปโหลด...';
+  const rd=new FileReader();
+  rd.onload=async e=>{
+    try{
+      // no settingKey — merge into the shared library array ourselves, same pattern as addSoundOption/addMemeOption
+      const filename=(kind==='image'?'lib-img-':'lib-sound-')+Date.now()+(kind==='image'?'.webp':'.mp3');
+      const res=await fetch('/api/admin/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd,filename,data:e.target.result,type:kind})});
+      const j=await res.json().catch(()=>({}));
+      if(!res.ok||!j.ok)throw new Error(j.error||'Upload failed');
+      const key=kind==='image'?'memeOptions':'soundOptions';
+      const list=Array.isArray(settings[key])?[...settings[key]]:[];
+      const id=(kind==='image'?'m':'s')+Date.now()+Math.random().toString(36).slice(2,6);
+      list.push({id,name,url:j.url});
+      const ok=await saveSettings({[key]:list});
+      if(!ok)return;
+      // settings[key] is now refreshed from the server response inside saveSettings()
+      populateLibrarySelect(selectId,settings[key],j.url);
+      v(urlInputId,j.url);
+      if(imgId){const im=document.getElementById(imgId);im.src=j.url;im.style.display='block';}
+      fileInput.value='';if(nameInput)nameInput.value='';
+      if(kind==='image')renderMemeList();else renderSoundList();
+      toast('อัปโหลดเข้าชุดและตั้งเป็นค่านี้แล้ว — อย่าลืมกด "บันทึก Overlay"','warn');
+    }catch(err){toast(err.message,'bad')}finally{btn.disabled=false;btn.textContent=old}
+  };
+  rd.readAsDataURL(f);
+}
+// =========================================
 function v(id,val){const e=document.getElementById(id);if(e)e.value=val||''}
 function img(id,url){const e=document.getElementById(id);if(e&&url){e.src=url;e.style.display='block'}}
 
