@@ -23,15 +23,18 @@ export default async function handler(req, res) {
     .maybeSingle();
   const settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.value || {}) };
 
-  // ยอด 10 บาทขึ้นไป เลือกเสียงและ/หรือมีมได้ทั้งคู่
+  // ยอดขั้นต่ำที่จะเลือกเสียง/มีมได้ ดึงจาก settings.soundMinAmount ที่แอดมินตั้งได้เอง
+  // (เดิม hardcode เป็น 10 ตรงนี้ ทำให้ไม่ sync กับค่าที่แอดมินปรับในแผงจริง)
+  const soundMinAmount = Number(settings.soundMinAmount ?? 10);
+
   let resolved_sound_id = null;
-  if (sound_id && parsed >= 10) {
+  if (sound_id && parsed >= soundMinAmount) {
     const soundOptions = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
     if (soundOptions.find(o => o.id === sound_id)) resolved_sound_id = sound_id;
   }
 
   let resolved_meme_id = null;
-  if (meme_id && parsed >= 10) {
+  if (meme_id && parsed >= soundMinAmount) {
     const memeOptions = Array.isArray(settings.memeOptions) ? settings.memeOptions : [];
     if (memeOptions.find(o => o.id === meme_id)) resolved_meme_id = meme_id;
   }
