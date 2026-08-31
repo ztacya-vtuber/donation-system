@@ -40,6 +40,8 @@
     .btn{background:linear-gradient(90deg,var(--accent),#9a4060);border:none;border-radius:10px;color:#fff;font-family:'Sarabun',sans-serif;font-size:15px;padding:13px;cursor:pointer;transition:opacity 0.2s;letter-spacing:0.5px;box-shadow:0 12px 34px rgba(154,64,96,0.28);}
     .btn:disabled{opacity:0.5;cursor:not-allowed;}
     .btn-ghost{background:rgba(13,5,8,0.34);border:1px solid rgba(228,185,208,0.16);border-radius:10px;color:#b98a9b;font-family:'Sarabun',sans-serif;font-size:14px;padding:10px;cursor:pointer;}
+    .btn-random{background:rgba(228,185,208,0.12);border:1px solid rgba(228,185,208,0.3);border-radius:10px;color:#e0c0c8;font-family:'Sarabun',sans-serif;font-size:13px;padding:9px;cursor:pointer;width:100%;margin-top:2px;}
+    .btn-random:hover{border-color:var(--accent);color:var(--accent);}
     .pending-box{display:flex;flex-direction:column;align-items:center;gap:12px;padding:24px 0 16px;text-align:center;}
     .pending-symbol{font-size:36px;color:var(--accent);}
     .pending-title{font-family:'Cormorant Garamond',serif;font-size:22px;color:#f0d0d8;}
@@ -58,7 +60,16 @@
     .sound-opt-name{flex:1;font-size:14px;color:#e0c0c8;}
     .sound-opt-play{flex:0 0 auto;background:rgba(228,185,208,0.14);border:none;border-radius:50%;width:30px;height:30px;color:#e0c0c8;font-size:12px;cursor:pointer;}
     .sound-opt-play:hover{background:var(--accent);color:#1a0510;}
-    .sound-none{font-size:12px;color:#7a5464;padding:6px 2px;}
+
+    /* ── Meme/image picker ── */
+    #memePicker{display:none;flex-direction:column;gap:8px;}
+    #memePicker .field label{margin-bottom:8px;}
+    .meme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+    .meme-opt{position:relative;border-radius:10px;overflow:hidden;border:2px solid rgba(228,185,208,0.14);cursor:pointer;aspect-ratio:1;background:rgba(13,5,8,0.6);transition:border-color .2s;}
+    .meme-opt.selected{border-color:var(--accent);box-shadow:0 0 0 2px rgba(192,96,128,0.3);}
+    .meme-opt img{width:100%;height:100%;object-fit:cover;display:block;}
+    .meme-opt-none{display:flex;align-items:center;justify-content:center;font-size:11px;color:#b98a9b;text-align:center;padding:4px;}
+
     .footer{margin-top:20px;text-align:center;}
     .footer a{color:#7a4354;font-size:12px;text-decoration:none;letter-spacing:1px;}
     .ornament{color:#5f2d3e;font-size:11px;text-align:center;margin-top:12px;}
@@ -116,7 +127,7 @@
       <div class="field">
         <label>จำนวนเงินที่โอน *</label>
         <div class="amount-wrap">
-          <input id="amount" type="number" placeholder="0" min="1" max="99999" oninput="updateSoundPicker()"/>
+          <input id="amount" type="number" placeholder="0" min="1" max="99999" oninput="updatePickers()"/>
           <span class="amount-unit">฿</span>
         </div>
       </div>
@@ -124,6 +135,11 @@
         <label><span id="soundPickerLabel">เลือกเสียงตอนแสดงผล (ไม่บังคับ)</span></label>
         <div id="soundOptList"></div>
       </div>
+      <div class="field" id="memePicker">
+        <label><span id="memePickerLabel">เลือกรูป/มีมตอนแสดงผล (ไม่บังคับ)</span></label>
+        <div class="meme-grid" id="memeOptList"></div>
+      </div>
+      <button type="button" class="btn-random" id="randomBtn" style="display:none" onclick="randomizePicks()">🎲 สุ่มให้หน่อย</button>
       <div class="status error" id="formStatus"></div>
       <button class="btn" id="submitBtn" onclick="submitDonation()">ยืนยัน ✓</button>
       <button class="btn-ghost" onclick="goTo(1)">← กลับ</button>
@@ -167,13 +183,16 @@
 
   <script>
     let goalAmount = 0, goalMode = 'total', goalFrom = '', goalTo = '';
-    let soundOptions = [], soundMinAmount = 100, selectedSoundId = null;
+    let soundOptions = [], memeOptions = [], presetMinAmount = 10;
+    let selectedSoundId = null, selectedMemeId = null;
 
     fetch('/api/settings?t='+Date.now(),{cache:'no-store'})
       .then(r=>r.json())
       .then(s=>{
         soundOptions = Array.isArray(s.soundOptions) ? s.soundOptions : [];
-        soundMinAmount = Number(s.soundMinAmount ?? 100);
+        memeOptions = Array.isArray(s.memeOptions) ? s.memeOptions : [];
+        // เดิมชื่อ soundMinAmount ใช้เป็น threshold รวมสำหรับทั้งเสียงและมีม
+        presetMinAmount = Number(s.soundMinAmount ?? 10);
         if(s.name) document.getElementById('streamerName').textContent=s.name;
         if(s.greeting) document.getElementById('streamerSub').textContent=s.greeting;
         if(s.accentColor) document.documentElement.style.setProperty('--accent',s.accentColor);
@@ -211,11 +230,9 @@
         document.getElementById('goalCur').textContent='฿'+cur.toLocaleString();
         document.getElementById('goalPct').textContent=pctDisplay;
         const bar=document.getElementById('goalBar');
-        // overflow: bar เต็ม + glow แต่ไม่ล้น
         bar.style.width=Math.min(100,pct)+'%';
         if(pct>=100) bar.classList.add('complete');
         else bar.classList.remove('complete');
-        // countdown
         if(goalTo){
           const end=new Date(goalTo);end.setHours(23,59,59,999);
           const now=new Date();
@@ -234,15 +251,21 @@
       }).catch(()=>{});
     }
 
-    function updateSoundPicker(){
+    function updatePickers(){
       const amount = parseFloat(document.getElementById('amount').value) || 0;
-      const picker = document.getElementById('soundPicker');
-      if(!soundOptions.length || amount < soundMinAmount){
-        picker.style.display = 'none';
-        return;
+      const soundPicker = document.getElementById('soundPicker');
+      const memePicker = document.getElementById('memePicker');
+      const randomBtn = document.getElementById('randomBtn');
+      const eligible = amount >= presetMinAmount;
+
+      soundPicker.style.display = (eligible && soundOptions.length) ? 'flex' : 'none';
+      memePicker.style.display = (eligible && memeOptions.length) ? 'flex' : 'none';
+      randomBtn.style.display = (eligible && (soundOptions.length || memeOptions.length)) ? 'block' : 'none';
+
+      if(eligible){
+        renderSoundOptions();
+        renderMemeOptions();
       }
-      picker.style.display = 'flex';
-      renderSoundOptions();
     }
 
     function renderSoundOptions(){
@@ -259,9 +282,27 @@
         </div>`).join('');
     }
 
-    function selectSound(id){
-      selectedSoundId = id;
+    function renderMemeOptions(){
+      const el = document.getElementById('memeOptList');
+      el.innerHTML = `<div class="meme-opt meme-opt-none${selectedMemeId===null?' selected':''}" onclick="selectMeme(null)">ไม่เลือก</div>` +
+        memeOptions.map(m => `
+        <div class="meme-opt${selectedMemeId===m.id?' selected':''}" onclick="selectMeme('${m.id}')">
+          <img src="${m.url}" alt="${esc(m.name||'')}" loading="lazy"/>
+        </div>`).join('');
+    }
+
+    function selectSound(id){ selectedSoundId = id; renderSoundOptions(); }
+    function selectMeme(id){ selectedMemeId = id; renderMemeOptions(); }
+
+    function randomizePicks(){
+      if(soundOptions.length){
+        selectedSoundId = soundOptions[Math.floor(Math.random()*soundOptions.length)].id;
+      }
+      if(memeOptions.length){
+        selectedMemeId = memeOptions[Math.floor(Math.random()*memeOptions.length)].id;
+      }
       renderSoundOptions();
+      renderMemeOptions();
     }
 
     function previewSelectedSound(url){
@@ -287,7 +328,7 @@
       if(!amount||amount<=0){statusEl.textContent='กรุณากรอกจำนวนเงิน';return;}
       statusEl.textContent='';btn.disabled=true;btn.textContent='กำลังส่ง...';
       try{
-        const res=await fetch('/api/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({display_name:name,message,amount,sound_id:selectedSoundId})});
+        const res=await fetch('/api/donate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({display_name:name,message,amount,sound_id:selectedSoundId,meme_id:selectedMemeId})});
         const data=await res.json();
         if(!res.ok) throw new Error(data.error||'เกิดข้อผิดพลาด');
         goTo(3);
@@ -302,7 +343,8 @@
       document.getElementById('amount').value='';
       document.getElementById('formStatus').textContent='';
       selectedSoundId=null;
-      updateSoundPicker();
+      selectedMemeId=null;
+      updatePickers();
       goTo(1);
     }
   </script>
