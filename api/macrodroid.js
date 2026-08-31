@@ -74,17 +74,25 @@ export default async function handler(req, res) {
 
   const match = matches[0];
 
+  const { data: settingsRow } = await sb
+    .from('settings')
+    .select('value')
+    .eq('key', 'site')
+    .maybeSingle();
+  const settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.value || {}) };
+
   let sound_url = null;
   if (match.sound_id) {
-    const { data: settingsRow } = await sb
-      .from('settings')
-      .select('value')
-      .eq('key', 'site')
-      .maybeSingle();
-    const settings = { ...DEFAULT_SETTINGS, ...(settingsRow?.value || {}) };
-    const options = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
-    const soundMatch = options.find(o => o.id === match.sound_id);
+    const soundOptions = Array.isArray(settings.soundOptions) ? settings.soundOptions : [];
+    const soundMatch = soundOptions.find(o => o.id === match.sound_id);
     if (soundMatch) sound_url = soundMatch.url;
+  }
+
+  let meme_url = null;
+  if (match.meme_id) {
+    const memeOptions = Array.isArray(settings.memeOptions) ? settings.memeOptions : [];
+    const memeMatch = memeOptions.find(o => o.id === match.meme_id);
+    if (memeMatch) meme_url = memeMatch.url;
   }
 
   const ip_address =
@@ -97,6 +105,7 @@ export default async function handler(req, res) {
     message: match.message,
     amount: parsed,
     sound_url,
+    meme_url,
     ip_address,
     shown: true,
     date: new Date().toISOString(),
@@ -112,7 +121,14 @@ export default async function handler(req, res) {
   await sb.channel('donations').send({
     type: 'broadcast',
     event: 'new_donation',
-    payload: { name: match.name, message: match.message, amount: parsed, id: donation?.id },
+    payload: {
+      name: match.name,
+      message: match.message,
+      amount: parsed,
+      sound_url,
+      meme_url,
+      id: donation?.id,
+    },
   });
 
   console.log('[macrodroid] Matched and promoted donation:', match.name, parsed);
